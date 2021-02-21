@@ -1,7 +1,7 @@
 # shellcheck shell=sh
 # shellcheck disable=SC2039
 
-# author:       Li Junhao           edwin.jh.lee@gmail.com    edwinjhlee.github.io
+# author:       Li Junhao           l@x-cmd.com    edwinjhlee.github.io
 # maintainer:   Li Junhao
 
 # shellcheck disable=SC2142
@@ -26,7 +26,8 @@ _param_main(){
             eval printf "%s" \"\$PARAM_DEFAULT_${line}\"
             printf "\n\001\001\001\n"
         fi
-    done | awk -v ARG_SEP="$IFS" -f param.awk -
+    # done | awk -v ARG_SEP="$IFS" -f param.awk -
+    done | awk -v ARG_SEP="$IFS" -f "$(xrc_which param/v0.awk)" -
 }
 
 
