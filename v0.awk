@@ -337,7 +337,7 @@ BEGIN{
     null="\001"
     return_code = 0
 
-    part_one = 0
+    is_param_part = 0
 
     text = ""
 
@@ -347,23 +347,21 @@ BEGIN{
     keyline = ""
 }
 
-{
+NR==1{
+    ARGSTR = $0
+}
+
+NR>=2{
     if ($0 == "\001\001\001") {
-        part_one = part_one + 1
+        is_param_part = 1
     } else {
-        if (part_one == 0) {
-            if (ARGSTR == "") ARGSTR = $0
-            else ARGSTR = ARGSTR "\n" $0
-        } else if (part_one == 1) {
-            if (keyline == "") {
-                keyline = $0
-            } else {
-                default_scope[keyline] = $0
-                keyline = ""
-            }
+        if (is_param_part == 1) {
+            text = $0
+        } else if (keyline == "") {
+            keyline = $0
         } else {
-            if (text == "") text = $0
-            else text = text "\n" $0
+            default_scope[keyline] = $0
+            keyline = ""
         }
     }
 }

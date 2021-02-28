@@ -7,10 +7,12 @@
 # shellcheck disable=SC2142
 alias param='{ eval "$(_param_main "$@")"; }'
 
+xrc dict/v0
+
 # TODO: handle newline in ARGSTR
 _param_main(){
     local IFS
-    IFS="$(printf "\005")"
+    IFS="$(printf "\005")"  # ARG_SEP in awk script
 
     local sw=""
     while read -r line; do
@@ -19,115 +21,48 @@ _param_main(){
             continue
         fi
 
-        printf "%s" "$*"
-        printf "\n\001\001\001\n"
+        printf "%s${DICT_SEP}" "$*"
         sw=1
-        if line="$(echo "$line" | awk '{ if ($1 == "default") { printf("%s", $2); exit 0; } else { exit 1; } }' - )"; then    
-            eval printf "%s" \"\$PARAM_DEFAULT_${line}\"
-            printf "\n\001\001\001\n"
+        if line="$(echo "$line" | awk '{ 
+                if ($1 == "default") {
+                    if ($3 == "")   printf("%s_%s", $2, "default");
+                    else            printf("%s_%s", $2, $3);
+                    exit 0;
+                } 
+                else { exit 1; }
+            }' - )"; then
+            O="${PARAM_DEFAULT_VAR_PREFIX}${line}" dict_dump
+            printf "${DICT_SEP}\001\001\001${DICT_SEP}"
         fi
     # done | awk -v ARG_SEP="$IFS" -f param.awk -
-    done | awk -v ARG_SEP="$IFS" -f "$(xrc_which param/v0.awk)" -
+    done | awk -v ARG_SEP="$IFS" -v RS="${DICT_SEP}" -f "$(xrc_which param/v0.awk)" -
 }
 
+param_default_dump(){
+    # Using JO
+    O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide App Name}_${2:-default}" dict_dump | dict_pjson
+}
 
+param_default_load(){
+    O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide App Name}_${2:-default}" dict_load | dict_pjson_parse
+}
+
+PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT_
+
+# dict
 param_default(){
     case $# in
-        0|1) printf "%s" "TODO: help doc here"      ;;
-        2) param_default_get "$1" "$2"      ;;
-        3) param_default_set "$1" "$2" "$3" ;;
-        *) printf "%s" "TODO: help doc here"        ;;
+        0) printf "%s" "TODO: help doc here"                    ;;
+        1) O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide App Name}_${2:-default}" dict_print         ;;
+        2) O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide App Name}_${2:-default}" dict_get "$2"      ;;
+        3) O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide App Name}_${2:-default}" dict_set "$2" "$3" ;;
+        *) printf "%s" "TODO: help doc here"                    ;;
     esac
 }
 
-# Because awk split bug in unprintable seperators. We have to encode the string by transposing the newline character
-PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT
-
 param_default_clear(){
-    local O="${1:?Provide default scope}"
-    eval "${PARAM_DEFAULT_VAR_PREFIX}_$O=\"\""
+    O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide App Name}_${2:-default}" dict_clear
 }
-
-PARAM_NEWLINE_TR="$(printf "\001")"
-
-param_default_set(){
-    local O="${1:?Provide default scope}"
-
-    local s
-    s="$(awk \
-        -v key="$(printf "%s" "${2:?Provide key}" | tr "\n" "${PARAM_NEWLINE_TR}")" \
-        -v val="$(printf "%s" "${3:?Provide value}" | tr "\n" "${PARAM_NEWLINE_TR}")" '
-
-BEGIN {
-    RS="\n"
-    is_keyline = 0
-    sw = 1
-}
-
-{
-    if (is_keyline == 0) {
-        keyline=$0
-    } else {
-        if (keyline == key) {
-            print key
-            print val
-            sw = 0
-        } else {
-            print keyline
-            print $0
-        }
-        
-    }
-    is_keyline = 1 - is_keyline
-}
-
-END {
-    if (sw == 1) {
-        print key
-        print val
-    }
-}
-
-' <<A
-$(eval printf "%s" \"\$${PARAM_DEFAULT_VAR_PREFIX}_${O}\")
-A
-)"
-    eval "PARAM_DEFAULT_$O=\"\$s\""
-}
-
-
-param_default_get(){
-    awk -v key="$(printf "%s" "${2:?Provide key}" | tr "\n" "${PARAM_NEWLINE_TR}")" \
-        -v NEWLINE="${PARAM_NEWLINE_TR}" '
-
-NR%2==1{
-    if ($0 == key) {
-        getline
-        gsub(NEWLINE, "\n", $0)
-        print $0
-        exit 0
-    }
-}
-END { exit 1; }
-' <<A
-$(eval printf "%s" \"\$${PARAM_DEFAULT_VAR_PREFIX}_${1:?Provide default scope}\")
-A
-}
-
-param_default_list(){
-    eval printf "%s" \"\$${PARAM_DEFAULT_VAR_PREFIX}_${1:?Provide default scope}\" | \
-        awk -v NEWLINE="${PARAM_NEWLINE_TR}" '
-    NR%2==1{
-        keyline=$0
-    }
-    NR%2==0{
-        gsub("\001", "\n", $0)
-        gsub(NEWLINE, "\n", keyline)
-        gsub(NEWLINE, "\n", $0)
-        print keyline "=" $0
-    }'
-}
-
 
 alias param_example='local PARAM_EXAMPLE 2>/dev/null; _param_example PARAM_EXAMPLE'
 
@@ -167,10 +102,9 @@ param_default_set GITEE_OBJECT_NAME repo xk1
 # gitee.repo.create -a public a1 a2 a3
 
 
-
 w(){
     param <<A
-    default     GITEE_${O:?Provide object name}
+    default     gitee   ${O:?Provide object name}
     --repo      "Provide repo name"             =~      [A-Za-z0-9\n]+
     --user=el   -u  "Provide user name"         =~      [A-Za-z0-9]+
     --access    -a  "Access Priviledge"         =       public private
