@@ -31,7 +31,7 @@ param_default_dump(){
 }
 
 param_default_load(){
-    O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}"  dict_load | dict_pjson_parse
+    O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}" dict_load | dict_pjson_parse
 }
 
 PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT_
