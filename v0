@@ -1,50 +1,37 @@
-# shellcheck shell=sh
-# shellcheck disable=SC2039
+# shellcheck shell=sh disable=SC2039
 
 # author:       Li Junhao           l@x-cmd.com    edwinjhlee.github.io
 # maintainer:   Li Junhao
 
 # shellcheck disable=SC2142
-alias param='{ eval "$(_param_main "$@")"; }'
+
+alias param='{ eval "$(O= _param_main "$@")"; }'
 
 xrc dict/v0
+
+param_new(){
+    local O="${1:?Provide object name}"
+    alias "$O.param={ eval \"\$(O=$O _param_main \"\$@\")\"; }"
+}
 
 # TODO: handle newline in ARGSTR
 _param_main(){
     local IFS
     IFS="$(printf "\005")"  # ARG_SEP in awk script
-
-    local sw=""
-    while read -r line; do
-        if [ -n "$sw" ]; then
-            echo "$line"
-            continue
-        fi
-
+    {
         printf "%s${DICT_SEP}" "$*"
-        sw=1
-        if line="$(echo "$line" | awk '{ 
-                if ($1 == "default") {
-                    if ($3 == "")   printf("%s_%s", $2, "default");
-                    else            printf("%s_%s", $2, $3);
-                    exit 0;
-                } 
-                else { exit 1; }
-            }' - )"; then
-            O="${PARAM_DEFAULT_VAR_PREFIX}${line}" dict_dump
-            printf "${DICT_SEP}\001\001\001${DICT_SEP}"
-        fi
-    # done | awk -v ARG_SEP="$IFS" -f param.awk -
-    done | awk -v ARG_SEP="$IFS" -v RS="${DICT_SEP}" -f "$(xrc_which param/v0.awk)" -
+        cat
+        [ -n "$O" ] && O= dict_dump
+    } | awk -v ARG_SEP="$IFS" -v RS="${DICT_SEP}" -f "$(xrc_which param/v0.awk)" -
 }
 
 param_default_dump(){
     # Using JO
-    O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide App Name}_${2:-default}" dict_dump | dict_pjson
+    O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}" dict_dump | dict_pjson
 }
 
 param_default_load(){
-    O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide App Name}_${2:-default}" dict_load | dict_pjson_parse
+    O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}"  dict_load | dict_pjson_parse
 }
 
 PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT_
@@ -53,15 +40,15 @@ PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT_
 param_default(){
     case $# in
         0) printf "%s" "TODO: help doc here"                    ;;
-        1) O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide App Name}_${2:-default}" dict_print         ;;
-        2) O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide App Name}_${2:-default}" dict_get "$2"      ;;
-        3) O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide App Name}_${2:-default}" dict_set "$2" "$3" ;;
+        1) O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}"  dict_print         ;;
+        2) O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}"  dict_get "$1"      ;;
+        3) O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}"  dict_set "$1" "$2" ;;
         *) printf "%s" "TODO: help doc here"                    ;;
     esac
 }
 
 param_default_clear(){
-    O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide App Name}_${2:-default}" dict_clear
+    O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}" dict_clear
 }
 
 alias param_example='local PARAM_EXAMPLE 2>/dev/null; _param_example PARAM_EXAMPLE'
@@ -91,7 +78,6 @@ _param_example_cat(){
     done
 }
 
-
 ########
 
 param_default_set GITEE_OBJECT_NAME repo xk1
@@ -103,7 +89,9 @@ param_default_set GITEE_OBJECT_NAME repo xk1
 
 
 w(){
-    param <<A
+    param new abc
+
+    abc.param <<A
     default     gitee   ${O:?Provide object name}
     --repo      "Provide repo name"             =~      [A-Za-z0-9\n]+
     --user=el   -u  "Provide user name"         =~      [A-Za-z0-9]+
