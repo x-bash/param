@@ -1,9 +1,7 @@
-# shellcheck shell=sh disable=SC2039
+# shellcheck shell=sh disable=SC2039,SC2142
 
 # author:       Li Junhao           l@x-cmd.com    edwinjhlee.github.io
 # maintainer:   Li Junhao
-
-# shellcheck disable=SC2142
 
 alias param='{ eval "$(_param_main "$@")"; }'
 
@@ -38,7 +36,7 @@ _param_main(){
 
 param_default(){
     local op="$1"
-    local O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}"
+    local O="${PARAM_DEFAULT_VAR_PREFIX}${2:?Provide Object}"
     shift 2
 
     case "$op" in

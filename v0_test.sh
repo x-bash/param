@@ -10,7 +10,7 @@ xrc param/v0
 
 w(){
     echo "-------"
-    param_default get gitee_$O repo
+    param_default get "gitee_$O" repo
     echo "-------"
 
     param <<A
