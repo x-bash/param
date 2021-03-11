@@ -28,8 +28,8 @@ _param_main(){
                 first="."
             fi
         done
-        printf "%s" "${DICT_SEP}"
         if [ -n "$first" ] && [ ! "$first" = "." ]; then
+            printf "%s" "${DICT_SEP}"
             O="${PARAM_DEFAULT_VAR_PREFIX}$first" dict_dump
         fi
     } | awk -v ARG_SEP="$IFS" -v RS="${DICT_SEP}" -f "$_PARAM_AWK_PATH" -
@@ -45,22 +45,11 @@ param_default(){
     case "$op" in
         load)       dict_load | dict_pjson_parse ;;
         dump)       dict_dump | dict_pjson ;;
+        clear)      eval "$O="  ;;
         get)        dict_get "${1:?Provide [key] name in function 'param_default get'}" ;;
         put|set)    dict_put "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
-        *)      printf "%s" "TODO: help doc here" ;;
+        *)          printf "%s" "TODO: help doc here" ;;
     esac
-
-    # case $# in
-    #     0) dict_print         ;;
-    #     1) dict_get "$1"      ;;
-    #     2) dict_put "$1" "$2" ;;
-    #     *) printf "%s" "TODO: help doc here"                    ;;
-    # esac
-}
-
-param_default_clear(){
-    # O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}" dict_clear
-    eval "${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}="
 }
 
 alias param_example='local PARAM_EXAMPLE 2>/dev/null; _param_example PARAM_EXAMPLE'
@@ -99,7 +88,7 @@ _param_example_cat(){
 
 w(){
     echo "-------"
-    param_default gitee_$O repo
+    param_default get gitee_$O repo
     echo "-------"
 
     param <<A
