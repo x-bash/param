@@ -9,8 +9,8 @@ alias param='{ eval "$(_param_main "$@")"; }'
 
 xrc dict/v0
 
-# _PARAM_AWK_PATH="$(xrc which param/v0.awk)"
-_PARAM_AWK_PATH=./v0.awk
+_PARAM_AWK_PATH="$(xrc which param/v0.awk)"
+# _PARAM_AWK_PATH=./v0.awk
 
 # TODO: handle newline in ARGSTR
 _param_main(){
