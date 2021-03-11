@@ -351,18 +351,16 @@ NR==1{
     ARGSTR = $0
 }
 
-NR>=2{
-    if ($0 == "\001\001\001") {
-        is_param_part = 1
+NR==2{
+    text = $0
+}
+
+NR>=3{
+    if (keyline == "") {
+        keyline = $0
     } else {
-        if (is_param_part == 1) {
-            text = $0
-        } else if (keyline == "") {
-            keyline = $0
-        } else {
-            default_scope[keyline] = $0
-            keyline = ""
-        }
+        default_scope[keyline] = $0
+        keyline = ""
     }
 }
 

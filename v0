@@ -12,7 +12,12 @@ xrc dict/v0
 param_new(){
     local O="${1:?Provide object name}"
     alias "$O.param={ eval \"\$(O=$O _param_main \"\$@\")\"; }"
+    alias "$O.param_default=O=$O param_default"
+    alias "$O.del=alias $O.param=; alias $O.param_default="
 }
+
+# _PARAM_AWK_PATH="$(xrc which param/v0.awk)"
+_PARAM_AWK_PATH=./v0.awk
 
 # TODO: handle newline in ARGSTR
 _param_main(){
@@ -21,8 +26,9 @@ _param_main(){
     {
         printf "%s${DICT_SEP}" "$*"
         cat
-        [ -n "$O" ] && O= dict_dump
-    } | awk -v ARG_SEP="$IFS" -v RS="${DICT_SEP}" -f "$(xrc_which param/v0.awk)" -
+        printf "%s" "${DICT_SEP}"
+        [ -n "$O" ] && dict_dump
+    } | awk -v ARG_SEP="$IFS" -v RS="${DICT_SEP}" -f "$_PARAM_AWK_PATH" -
 }
 
 param_default_dump(){
@@ -38,11 +44,11 @@ PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT_
 
 # dict
 param_default(){
+    local O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}" 
     case $# in
-        0) printf "%s" "TODO: help doc here"                    ;;
-        1) O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}"  dict_print         ;;
-        2) O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}"  dict_get "$1"      ;;
-        3) O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}"  dict_set "$1" "$2" ;;
+        0) dict_print         ;;
+        1) dict_get "$1"      ;;
+        2) dict_put "$1" "$2" ;;
         *) printf "%s" "TODO: help doc here"                    ;;
     esac
 }
@@ -80,7 +86,7 @@ _param_example_cat(){
 
 ########
 
-param_default_set GITEE_OBJECT_NAME repo xk1
+
 
 # PARAM_ARGS=$li
 # $@
@@ -89,10 +95,20 @@ param_default_set GITEE_OBJECT_NAME repo xk1
 
 
 w(){
-    param new abc
+    local O=c
+    param_new gitee.$O
 
-    abc.param <<A
-    default     gitee   ${O:?Provide object name}
+    gitee.c.param_default repo xh1
+
+    echo gitee.$O.param_default repo xh1
+
+    alias gitee.$O.param_default
+
+    echo "-------"
+    eval gitee.$O.param_default repo
+    echo "-------"
+
+    gitee.$O.param <<A
     --repo      "Provide repo name"             =~      [A-Za-z0-9\n]+
     --user=el   -u  "Provide user name"         =~      [A-Za-z0-9]+
     --access    -a  "Access Priviledge"         =       public private
@@ -111,6 +127,9 @@ A
     echo "Other arguments:    $*"
     echo "$HELP_DOC"
 }
+
+# O=OBJECT_NAME param_default repo xk1
+O=OBJECT_NAME w -a private
 
 # w --repo hi
 
