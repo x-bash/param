@@ -35,15 +35,6 @@ _param_main(){
     } | awk -v ARG_SEP="$IFS" -v RS="${DICT_SEP}" -f "$_PARAM_AWK_PATH" -
 }
 
-param_default_dump(){
-    # Using JO
-    O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}" dict_dump | dict_pjson
-}
-
-param_default_load(){
-    O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}" dict_load | dict_pjson_parse
-}
-
 PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT___
 
 param_default(){
@@ -52,10 +43,10 @@ param_default(){
     shift 2
 
     case "$op" in
-        load)   dict_load | dict_pjson_parse ;;
-        dump)   dict_dump | dict_pjson ;;
-        get)    dict_get "${1:?Provide [key] name in function 'param_default get'}" ;;
-        put)    dict_put "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
+        load)       dict_load | dict_pjson_parse ;;
+        dump)       dict_dump | dict_pjson ;;
+        get)        dict_get "${1:?Provide [key] name in function 'param_default get'}" ;;
+        put|set)    dict_put "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
         *)      printf "%s" "TODO: help doc here" ;;
     esac
 
@@ -132,8 +123,8 @@ A
     echo "$HELP_DOC"
 }
 
-param_default_clear gitee___c
-param_default gitee___c repo xk1
+param_default clear gitee___c
+param_default put   gitee___c repo xk1
 O=c w -a private hi
 
 # w --repo hi
