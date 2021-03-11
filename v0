@@ -9,8 +9,9 @@ alias param='{ eval "$(_param_main "$@")"; }'
 
 xrc dict/v0
 
-_PARAM_AWK_PATH="$(xrc which param/v0.awk)"
-# _PARAM_AWK_PATH=./v0.awk
+PARAM_AWK_PATH="$(xrc which param/v0.awk)"
+# PARAM_AWK_PATH=./v0.awk
+PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT___
 
 # TODO: handle newline in ARGSTR
 _param_main(){
@@ -32,10 +33,8 @@ _param_main(){
             printf "%s" "${DICT_SEP}"
             O="${PARAM_DEFAULT_VAR_PREFIX}$first" dict_dump
         fi
-    } | awk -v ARG_SEP="$IFS" -v RS="${DICT_SEP}" -f "$_PARAM_AWK_PATH" -
+    } | awk -v ARG_SEP="$IFS" -v RS="${DICT_SEP}" -f "$PARAM_AWK_PATH" -
 }
-
-PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT___
 
 param_default(){
     local op="$1"
