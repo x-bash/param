@@ -5,16 +5,9 @@
 
 # shellcheck disable=SC2142
 
-alias param='{ eval "$(O= _param_main "$@")"; }'
+alias param='{ eval "$(_param_main "$@")"; }'
 
 xrc dict/v0
-
-param_new(){
-    local O="${1:?Provide object name}"
-    alias "$O.param={ eval \"\$(O=$O _param_main \"\$@\")\"; }"
-    alias "$O.param_default=O=$O param_default"
-    alias "$O.del=alias $O.param=; alias $O.param_default="
-}
 
 # _PARAM_AWK_PATH="$(xrc which param/v0.awk)"
 _PARAM_AWK_PATH=./v0.awk
@@ -25,36 +18,58 @@ _param_main(){
     IFS="$(printf "\005")"  # ARG_SEP in awk script
     {
         printf "%s${DICT_SEP}" "$*"
-        cat
+        local first=
+        while read -r line; do
+            if [ -n "$first" ]; then 
+                echo "$line"
+                continue
+            fi
+            if ! first="$(echo "$line" | awk '{ if ($1 == "default") { printf("%s", $2); exit 0; } else { exit 1; } }' - )"; then    
+                first="."
+            fi
+        done
         printf "%s" "${DICT_SEP}"
-        [ -n "$O" ] && dict_dump
+        if [ -n "$first" ] && [ ! "$first" = "." ]; then
+            O="${PARAM_DEFAULT_VAR_PREFIX}$first" dict_dump
+        fi
     } | awk -v ARG_SEP="$IFS" -v RS="${DICT_SEP}" -f "$_PARAM_AWK_PATH" -
 }
 
 param_default_dump(){
     # Using JO
-    O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}" dict_dump | dict_pjson
+    O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}" dict_dump | dict_pjson
 }
 
 param_default_load(){
-    O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}" dict_load | dict_pjson_parse
+    O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}" dict_load | dict_pjson_parse
 }
 
-PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT_
+PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT___
 
-# dict
 param_default(){
-    local O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}" 
-    case $# in
-        0) dict_print         ;;
-        1) dict_get "$1"      ;;
-        2) dict_put "$1" "$2" ;;
-        *) printf "%s" "TODO: help doc here"                    ;;
+    local op="$1"
+    local O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}"
+    shift 2
+
+    case "$op" in
+        load)   dict_load | dict_pjson_parse ;;
+        dump)   dict_dump | dict_pjson ;;
+        get)    dict_get "${1:?Provide [key] name in function 'param_default get'}" ;;
+        put)    dict_put "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
+        *)      printf "%s" "TODO: help doc here" ;;
     esac
+
+    # case $# in
+    #     0) dict_print         ;;
+    #     1) dict_get "$1"      ;;
+    #     2) dict_put "$1" "$2" ;;
+    #     *) printf "%s" "TODO: help doc here"                    ;;
+    # esac
 }
 
 param_default_clear(){
-    O="${PARAM_DEFAULT_VAR_PREFIX}${O:?Provide Object}" dict_clear
+    # O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}" dict_clear
+    eval "${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}="
 }
 
 alias param_example='local PARAM_EXAMPLE 2>/dev/null; _param_example PARAM_EXAMPLE'
@@ -86,29 +101,18 @@ _param_example_cat(){
 
 ########
 
-
-
 # PARAM_ARGS=$li
 # $@
 
 # gitee.repo.create -a public a1 a2 a3
 
-
 w(){
-    local O=c
-    param_new gitee.$O
-
-    gitee.c.param_default repo xh1
-
-    echo gitee.$O.param_default repo xh1
-
-    alias gitee.$O.param_default
-
     echo "-------"
-    eval gitee.$O.param_default repo
+    param_default gitee_$O repo
     echo "-------"
 
-    gitee.$O.param <<A
+    param <<A
+    default     gitee___$O
     --repo      "Provide repo name"             =~      [A-Za-z0-9\n]+
     --user=el   -u  "Provide user name"         =~      [A-Za-z0-9]+
     --access    -a  "Access Priviledge"         =       public private
@@ -128,8 +132,9 @@ A
     echo "$HELP_DOC"
 }
 
-# O=OBJECT_NAME param_default repo xk1
-O=OBJECT_NAME w -a private
+param_default_clear gitee___c
+param_default gitee___c repo xk1
+O=c w -a private hi
 
 # w --repo hi
 
