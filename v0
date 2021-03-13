@@ -19,12 +19,13 @@ _param_main(){
         printf "%s${DICT_SEP}" "$*"
         local first=
         while read -r line; do
-            if [ -n "$first" ]; then 
+            if [ -n "$first" ]; then
                 echo "$line"
                 continue
             fi
             if ! first="$(echo "$line" | awk '{ if ($1 == "default") { printf("%s", $2); exit 0; } else { exit 1; } }' - )"; then    
                 first="."
+                echo "$line"
             fi
         done
         if [ -n "$first" ] && [ ! "$first" = "." ]; then
@@ -45,6 +46,7 @@ param_default(){
         clear)      eval "$O="  ;;
         get)        dict_get "${1:?Provide [key] name in function 'param_default get'}" ;;
         put|set)    dict_put "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
+        export)     export "${O?}" ;;
         *)          printf "%s" "TODO: help doc here" ;;
     esac
 }
