@@ -11,7 +11,6 @@ PARAM_AWK_PATH="$(xrc which param/v0.awk)"
 # PARAM_AWK_PATH=./v0.awk
 PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT___
 
-# TODO: handle newline in ARGSTR
 _param_main(){
     local IFS
     IFS="$(printf "\005")"  # ARG_SEP in awk script
@@ -47,7 +46,18 @@ param_default(){
         get)        dict_get "${1:?Provide [key] name in function 'param_default get'}" ;;
         put|set)    dict_put "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
         export)     export "${O?}" ;;
-        *)          printf "%s" "TODO: help doc here" ;;
+        *)          cat >&2 <<A
+param_default     param default function
+
+Subcommand:
+        load        load the param default from /dev/stdin in json form
+        dump        dump the param default to /dev/stdout in json form
+        clear       unset the default param
+        get         Upgrade xrc from 'https://get.x-cmd.com/script'
+        put,set     param_default put <key> <value>
+        export      export the default param variable
+A
+        ;;
     esac
 }
 
