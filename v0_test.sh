@@ -31,7 +31,8 @@ A
     echo "access: $access"
     echo "verbose: $verbose"
 
-    echo "Other arguments:    $*"
+    echo "Other arguments:  $*"
+    echo "First argument:   $1"
     echo "$HELP_DOC"
 }
 

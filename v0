@@ -39,9 +39,9 @@ param_default(){
     local O="${PARAM_DEFAULT_VAR_PREFIX}${2:?Provide Object}"
     shift 2
 
-    case "$op" in
-        load)       dict_load | dict_pjson_parse ;;
-        dump)       dict_dump | dict_pjson ;;
+    case "$op" in   # yml seemed to be a better way to serialize
+        load)       dict_load_json ;;
+        dump)       dict_dump_json ;;
         clear)      eval "$O="  ;;
         get)        dict_get "${1:?Provide [key] name in function 'param_default get'}" ;;
         put|set)    dict_put "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
