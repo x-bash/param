@@ -35,17 +35,46 @@ _param_main(){
 }
 
 param_default(){
-    local op="$1"
-    local O="${PARAM_DEFAULT_VAR_PREFIX}${2:?Provide Object}"
-    shift 2
+    local op="$1";  shift
 
-    case "$op" in   # yml seemed to be a better
-        load)       dict_load_json ;;
-        dump)       dict_dump_json ;;
-        clear)      eval "$O="  ;;
-        get)        dict_get "${1:?Provide [key] name in function 'param_default get'}" ;;
-        put|set)    dict_put "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
-        export)     export "${O?}" ;;
+    local v1="${1:?Please provide <key> [...key] <val> name in function 'param_default put/set'}"; shift
+    while [ $# -ge 2 ]; do
+        tmp="${tmp}___$i"; shift;
+    done
+    local v2="$2"
+    
+
+    local i
+    local tmp
+    case "$op" in   # yml seemed to be a better way to serialize
+        load)       
+            local O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}" 
+            dict_load_json ;;
+        dump)       
+            local O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}"
+            dict_dump_json ;;
+        clear)
+            local O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}"
+            eval "$O="  ;;
+        get)
+            tmp="${1:?Please provide <key> [...key] name in function 'param_default get'}"; shift
+            for i in "$@"; do
+                tmp="${tmp}___$i";
+            done
+            dict_get "$tmp" ;;
+        put|set)
+            if [ "$#" -lt 2 ]; then
+                echo "Please provide <key> [...key] <val> name in function 'param_default put/set'"
+                return 1
+            fi
+            tmp="${1:?Please provide <key> [...key] <val> name in function 'param_default put/set'}"; shift
+            while [ $# -ge 2 ]; do
+                tmp="${tmp}___$i"; shift;
+            done
+            dict_put "$tmp" "$1" ;;
+        export)
+            local O="${PARAM_DEFAULT_VAR_PREFIX}${1:?Provide Object}"
+            export "${O?}" ;;
         *)          cat >&2 <<A
 param_default     param default function
 
