@@ -11,9 +11,9 @@ PARAM_AWK_PATH="$(xrc which param/v0.awk)"
 # PARAM_AWK_PATH=./v0.awk
 PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT___
 
-_param_main(){
+_param_main() {
     local IFS
-    IFS="$(printf "\005")"  # ARG_SEP in awk script
+    IFS="$(printf "\005")" # ARG_SEP in awk script
     {
         printf "%s${DICT_SEP}" "$*"
         local first=
@@ -22,7 +22,7 @@ _param_main(){
                 echo "$line"
                 continue
             fi
-            if ! first="$(echo "$line" | awk '{ if ($1 == "default") { printf("%s", $2); exit 0; } else { exit 1; } }' - )"; then    
+            if ! first="$(echo "$line" | awk '{ if ($1 == "default") { printf("%s", $2); exit 0; } else { exit 1; } }' -)"; then
                 first="."
                 echo "$line"
             fi
@@ -34,19 +34,20 @@ _param_main(){
     } | awk -v ARG_SEP="$IFS" -v RS="${DICT_SEP}" -f "$PARAM_AWK_PATH" -
 }
 
-param_default(){
+param_default() {
     local op="$1"
     local O="${PARAM_DEFAULT_VAR_PREFIX}${2:?Provide Object}"
     shift 2
 
-    case "$op" in   # yml seemed to be a better
-        load)       dict_load_json ;;
-        dump)       dict_dump_json ;;
-        clear)      eval "$O="  ;;
-        get)        dict_get "${1:?Provide [key] name in function 'param_default get'}" ;;
-        put|set)    dict_put "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
-        export)     export "${O?}" ;;
-        *)          cat >&2 <<A
+    case "$op" in # yml seemed to be a better
+    load) dict_load_json "$1" ;;
+    dump) dict_dump_json ;;
+    clear) eval "$O=" ;;
+    get) dict_get "${1:?Provide [key] name in function 'param_default get'}" ;;
+    put | set) dict_put "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
+    export) export "${O?}" ;;
+    *)
+        cat >&2 <<A
 param_default     param default function
 
 Subcommand:
@@ -63,13 +64,13 @@ A
 
 alias param_example='local PARAM_EXAMPLE 2>/dev/null; _param_example PARAM_EXAMPLE'
 
-param_example_show(){
+param_example_show() {
     # shellcheck disable=SC2154
     echo "$PARAM_EXAMPLE"
 }
 
-_param_example(){
-    local name=$1 
+_param_example() {
+    local name=$1
     local s
     shift
     # shellcheck disable=SC2034
@@ -77,14 +78,13 @@ _param_example(){
     eval "$name=\"\$s\""
 }
 
-_param_example_cat(){
+_param_example_cat() {
     local i
     echo "----------------"
     printf "Example:\n"
-    for (( i=1; i<${#@}; i++ )); do
+    for ((i = 1; i < ${#@}; i++)); do
         printf "  $(tput setaf 6)%s:$(tput init)\n" "* ${!i}"
-        (( i++ ))
+        ((i++))
         printf "    > $(tput setaf 2)%s$(tput init)\n" "${!i}"
     done
 }
-
