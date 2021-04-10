@@ -51,7 +51,9 @@ function parse_item_to_generate_help(line,      token_arr, token_arr_len, ret, n
         }
     } else {
         for (i=2; i<=name_idx; ++i){
-            arg_has_value[token_arr[i]] = true
+            idx = token_arr[i]   # idx is temp variable, here meaning _name
+            gsub("=.+$", "", idx)
+            arg_has_value[idx] = true
         }
     }
 
@@ -189,7 +191,7 @@ function parse_item(line,
     name = token_arr[2]
     if (name ~ /^\.\.\./) {
         for (idx=1; idx<=rest_len; idx++) {
-            if (assert(line, "...", rest[idx], token_arr[3], token_arr_len, token_arr, 4) == false) {
+            if (assert(line, "...", rest[idx], token_arr[4], token_arr_len, token_arr, 4) == false) {
                 return false
             }
         }
@@ -199,7 +201,7 @@ function parse_item(line,
     # handler the rest arguments with number
     if (name ~ "^#") {
         gsub("^#", "", name)
-        return assert(line, "#" name, rest[name], token_arr[3], token_arr_len, token_arr, 4)
+        return assert(line, "#" name, rest[name], token_arr[4], token_arr_len, token_arr, 4)
     }
 
     for (name_idx=2; name_idx <= token_arr_len; ++name_idx) {
@@ -216,10 +218,11 @@ function parse_item(line,
         gsub("^[^=]+=", "", default)
     }
     gsub("^--?", "", name)
-
+    
     value = null
     for (i=2; i<=name_idx; ++i){
         idx = token_arr[i]   # idx is temp variable, here meaning _name
+        gsub("=.+$", "", idx)
         if (idx in arg_map) {
             value = arg_map[idx]
             break
@@ -228,7 +231,7 @@ function parse_item(line,
 
     desc = token_arr[name_idx + 1]
     op = token_arr[name_idx + 2]
-
+    
     if (op == "=FLAG") {
         if (value == null) {
             append_code( "local " name "= " " 2>/dev/null" )
@@ -237,8 +240,7 @@ function parse_item(line,
         }
         return true
     }
-
-
+    
     if (value == null) {
         # TODO: get value from default scope
         if (name in default_scope) {
@@ -254,7 +256,7 @@ function parse_item(line,
         }
     }
 
-    if (assert(line, name, value, op, token_arr_len, token_arr, name_idx + 3)){
+    if (assert(line, name, value, op, token_arr_len, token_arr, name_idx + 3)) {
         append_code( "local " name "=" quote_string(value) " 2>/dev/null" )
     }
 }
@@ -300,6 +302,7 @@ function prepare_arg_map(argstr,        arg_arr_len, arg_arr, i, e, key, tmp, tm
         }
 
         if (match(e, "^--?")){
+
             if (arg_has_value[e] == true){
                 key = e
             } else {

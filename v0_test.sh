@@ -1,6 +1,6 @@
 
-xrc param/v0
-# . "./v0"
+# xrc param/v0
+. ./v0
 
 ########
 
@@ -16,12 +16,12 @@ w(){
 
     param <<A
     default     gitee___$O
-    --repo      "Provide repo name"             =~      [A-Za-z0-9\n]+
+    --repo      "Provide repo name"             =~      [一-龥a-zA-Z0-9]+
     --user=el   -u  "Provide user name"         =~      [A-Za-z0-9]+
     --access    -a  "Access Priviledge"         =       public private
     --verbose   -v  "Display in verbose mode"   =FLAG
-    #1          =~      [A-Za-z0-9\n]+
-    ...         =~      [A-Za-z0-9\n]+
+    #1          "test#"                         =~      [A-Za-z0-9\n]+
+    ...         "test..."                       =~      [A-Za-z0-9\n]+
 A
 
     echo "----"
@@ -38,13 +38,12 @@ A
 
 param_default clear gitee___c
 param_default put   gitee___c repo xk1
-O=c w -a private hi
+# O=c w -a private hi
 
 # w --repo hi
 
 ff(){
-    O=OBJECT_NAME w -a private --repo "asfasfd
-asdfaf" work a b
+    O=OBJECT_NAME w -a private --repo "中文" --user "7777" work a b 
 }
 
 ff
