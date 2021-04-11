@@ -370,7 +370,7 @@ NR>=3{
 END{
     parse(text)
     print CODE
-    # print "local PARAM_HELP_DOC=" quote_string(HELP_DOC) " 2>/dev/null"
+    print "local HELP_DOC=" quote_string(HELP_DOC) " 2>/dev/null"
     exit return_code
 }
 

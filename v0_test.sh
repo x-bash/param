@@ -25,6 +25,7 @@ w(){
 A
 
     echo "----"
+    local verbose=${verbose:-false}
 
     echo "repo: $repo"
     echo "user: $user"
@@ -33,7 +34,7 @@ A
 
     echo "Other arguments:  $*"
     echo "First argument:   $1"
-    echo "$HELP_DOC"
+    echo "help doc : $HELP_DOC"
 }
 
 param_default clear gitee___c
