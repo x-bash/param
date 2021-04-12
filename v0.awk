@@ -26,6 +26,8 @@ function f(text){
 function parse_item_to_generate_help(line,      token_arr, token_arr_len, ret, name, name_idx, i, default, desc, op) {
     token_arr_len = split(line, token_arr, TOKEN_SEP)
 
+    
+
     for (name_idx=2; name_idx <= token_arr_len; ++name_idx) {
         name = token_arr[name_idx]
         # gsub("(^ +)|( +$)", "", name)
@@ -33,17 +35,23 @@ function parse_item_to_generate_help(line,      token_arr, token_arr_len, ret, n
             break
         }
     }
-    name_idx --
+    
+    if (!(name ~ "^#") && !(name ~ /^\.\.\./)) {
+        name_idx --
+    }
+    
 
     name = token_arr[2]
     gsub("=.+$", "", name)
-    if (name == token_arr[2])    default = null
+    if (name == token_arr[2])    
+        default = null
     else {
         default = token_arr[2]
         gsub("^[^=]+=", "", default)
     }
 
-    desc = token_arr[name_idx+1];     op = token_arr[name_idx+2]
+    desc = token_arr[name_idx+1]
+    op = token_arr[name_idx+2]
 
     if (op == "=FLAG") {
         for (i=2; i<=name_idx; ++i){
@@ -58,14 +66,15 @@ function parse_item_to_generate_help(line,      token_arr, token_arr_len, ret, n
     }
 
     # TODO: make it better
-    ret = "    " name "\t"  default "\t"      desc    "\t"    op
+    ret = name "\t" op "\t" default "\t"  desc        
     
     if (name_idx > 2) {
-        ret = ret "\n        alias:"
         for (i=3; i<=name_idx; ++i){
-            ret = ret " " token_arr[i]
+            ret =  token_arr[i] "," ret
         }
     }
+
+    ret = "  " ret
 
     return ret
 }
