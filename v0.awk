@@ -26,8 +26,6 @@ function f(text){
 function parse_item_to_generate_help(line,      token_arr, token_arr_len, ret, name, name_idx, i, default, desc, op) {
     token_arr_len = split(line, token_arr, TOKEN_SEP)
 
-    
-
     for (name_idx=2; name_idx <= token_arr_len; ++name_idx) {
         name = token_arr[name_idx]
         # gsub("(^ +)|( +$)", "", name)
@@ -35,7 +33,7 @@ function parse_item_to_generate_help(line,      token_arr, token_arr_len, ret, n
             break
         }
     }
-    
+
     if (!(name ~ "^#") && !(name ~ /^\.\.\./)) {
         name_idx --
     }
@@ -66,7 +64,7 @@ function parse_item_to_generate_help(line,      token_arr, token_arr_len, ret, n
     }
 
     # TODO: make it better
-    ret = name "\t" op "\t" default "\t"  desc        
+    ret = name "\t" "\033[35m" op "\t" "\033[32m" default "\t" "\033[91m" desc "\033[0m"        
     
     if (name_idx > 2) {
         for (i=3; i<=name_idx; ++i){
@@ -74,7 +72,7 @@ function parse_item_to_generate_help(line,      token_arr, token_arr_len, ret, n
         }
     }
 
-    ret = "  " ret
+    ret = "  " "\033[36m" ret 
 
     return ret
 }
