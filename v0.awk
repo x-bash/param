@@ -7,7 +7,7 @@ function f(text){
     # print line
     gsub("^\n+|\n+$", "", text)
 
-    gsub("[\ \t\v\b]+\n[\ \t\v\b]+", "\n", text)
+    gsub("[\\ \t\v\b]+\n[\\ \t\v\b]+", "\n", text)
     # print line
     gsub(/\\\\/, "\001", text)
     gsub(/\\"/, "\002", text)
