@@ -83,10 +83,6 @@ _param_example_cat() {
     echo "----------------"
     printf "Example:\n"
 
-    # for ARG in "$@"; do
-    #     echo $ARG
-    # done
-
     i=1
     while [ "$i" -le $# ]; do
         printf "  \033[36m* %s:\033[0m\n" "$(eval echo "\"\$"$i"\"")"
