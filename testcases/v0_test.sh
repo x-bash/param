@@ -24,6 +24,12 @@ w(){
     ...         "test..."                       =~      [A-Za-z0-9\n]+
 A
 
+    param_example \
+        "list all members, using argument" \
+        "gt_repo_member_list x-bash/std" \
+        "list all members, using naming argument" \
+        "gt_repo_member_list --repo x-bash/std"
+
     echo "----"
     local verbose=${verbose:-false}
 
@@ -35,6 +41,7 @@ A
     echo "Other arguments:  $*"
     echo "First argument:   $1"
     echo "help doc : $HELP_DOC"
+    echo "param example : $PARAM_EXAMPLE "
 }
 
 param_default clear gitee___c
