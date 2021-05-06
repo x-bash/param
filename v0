@@ -1,4 +1,4 @@
-# shellcheck shell=sh disable=SC2039,SC2142
+# shellcheck shell=sh disable=SC2039,SC2142,SC3043
 
 # author:       Li Junhao           l@x-cmd.com    edwinjhlee.github.io
 # maintainer:   Li Junhao

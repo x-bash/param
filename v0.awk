@@ -1,6 +1,6 @@
 #shellcheck shell=awk
 
-# author:       Li Junhao           edwin.jh.lee@gmail.com    edwinjhlee.github.io
+# author:       Li Junhao           l@x-cmd.com    edwinjhlee.github.io
 # maintainer:   Li Junhao
 
 function f(text){
@@ -135,6 +135,7 @@ function exit_print(code){
     exit code
 }
 
+# op_arg_idx
 function assert(line, name, value, op, token_arr_len, token_arr, op_arg_idx,            sw, idx){
 
     if (op == "=int") {
