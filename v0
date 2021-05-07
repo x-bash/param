@@ -40,14 +40,14 @@ param_default() {
     shift 2
 
     case "$op" in # yml seemed to be a better
-    load) dict_load_json "${1:?Provide path in function param_defaul}" ;;
-    dump) dict_dump_json ;;
-    clear) eval "$O=" ;;
-    get) dict_get "${1:?Provide [key] name in function 'param_default get'}" ;;
-    put | set) dict_put "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
-    export) export "${O?}" ;;
-    *)
-        cat >&2 <<A
+        load)       dict_load_json "${1:?Provide path in function param_defaul}" ;;
+        dump)       dict_dump_json ;;
+        clear)      eval "$O=" ;;
+        get)        dict_get "${1:?Provide [key] name in function 'param_default get'}" ;;
+        put | set)  dict_put "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
+        export)     export "${O?}" ;;
+        *)
+                    cat >&2 <<A
 param_default     param default function
 
 Subcommand:
