@@ -22,13 +22,12 @@ gitee.param typedef repo-type =~ [A-Za-z0-9]+
 # gitee.param
 # gitee.param
 
-param new gitee.param
+# param new gitee.param
 
-gitee.param_default set "scope" "key" "value"
-gitee.param_default set "scope" "a" "b"
 
-gitee.param_type repo-type =~ [A-Za-z0-9]+
+param_type repo-type =~ [A-Za-z0-9]
 
+# gitee.param_type repo-type =~ [A-Za-z0-9]+
 
 create_repo(){
 
@@ -36,30 +35,17 @@ create_repo(){
     # gitee.param_default lazy_load ".../.config" "~/.config" "/etc/config"
 
     # gitee.param_default use "$O"
-    gitee.param <<A
+    param <<A
 advises:
+    --repo      > 
     --repo      >
-    --repo2     
-        > list_repo
-        > list_repo
-    #1          >
 
 types:
     repo_type =~ [A-Za-z0-9]
 
-defaults:
-    scope   gitee $O
-    file    ".../.config" "~/.config" "/etc/config"
-
 options:
-    --repo|-r   <repo name>=""                  "Provide repo name"
-    --repo|-r   <repo name>:repo_type=""        "Provide repo name"
-    --repo2|-r
-        <repo name 1>:repo_type=""        
-        <repo name 2>:repo_type=""        "Provide repo name 2"
-
-subcommand:
-    repo
+    --repo|-r     <repo>=""                  "Provide repo name"
+    --repo|-r     <repo>:repo_type=""        "Provide repo name"
 
 arguments:
     #1      <repo name>=""          "Repo Name"

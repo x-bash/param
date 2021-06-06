@@ -4,7 +4,8 @@
         "**/*.awk": "awk",
         "**/*": "shellscript",
         "**/*.json": "json",
-        "**/*.md": "markdown"
+        "**/*.md": "markdown",
+        "**/*.yml": "yaml"
     },
     "editor.detectIndentation": true,
     "editor.tabSize": 4,

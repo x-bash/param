@@ -1,0 +1,56 @@
+# shellcheck shell=sh disable=SC2039,SC2142,SC3043
+
+# author:       Li Junhao           l@x-cmd.com    edwinjhlee.github.io
+# maintainer:   Li Junhao
+
+# In what scope?
+
+# shellcheck disable=SC2139
+param(){
+    local name="${1:-Please provide name}"
+    alias "${name}_param=_param_def"
+    alias "${name}_param_type=\"O=${name} param_type\""
+}
+
+param_marg(){
+    local a=${1:?Provide argument name}
+    local n=${2:?Provide argument name}
+    if [ -z "$3" ]; then
+        eval "echo \"\$${a}_${n}\""
+    else
+        eval "echo \"\$${a}_${n}_${3}\""
+    fi
+}
+
+param_marg_len(){
+    local a=${1:?Provide argument name}
+    eval "echo \"\$${a}_n\""
+}
+
+# param should follow app.
+
+# step 1: param create new app
+
+param gitee
+
+# Using alias
+gitee_param_type    repo
+gitee_param_type    user    =~  [A-Za-z0-9_]+
+gitee_param_type    access  =   private         public          inner-public
+
+# Using alias
+# gitee_param_eg
+
+# param should follow.
+# $O using Object
+gitee_param <<A
+advise:
+    repo list_repo
+    1: list_repo
+option:
+    --repo|-r|m     "Provide repo name"     <repo>:repo_type  =~   "abc"   "cde"   "def"
+subcommand:
+    repo            ""
+    user            ""
+A
+

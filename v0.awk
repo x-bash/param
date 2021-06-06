@@ -41,7 +41,7 @@ function parse_item_to_generate_help(line,      token_arr, token_arr_len, ret, n
 
     name = token_arr[2]
     gsub("=.+$", "", name)
-    if (name == token_arr[2])    
+    if (name == token_arr[2])
         default = null
     else {
         default = token_arr[2]
@@ -72,7 +72,7 @@ function parse_item_to_generate_help(line,      token_arr, token_arr_len, ret, n
         }
     }
 
-    ret = "  " "\033[36m" ret 
+    ret = "  " "\033[36m" ret
 
     return ret
 }
