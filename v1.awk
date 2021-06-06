@@ -415,7 +415,7 @@ function handle_arguments(
                 panic_error(i)
             }
 
-            arg_typecheck_then_generate_code( 
+            arg_typecheck_then_generate_code(
                 arg_var_name, 
                 arg_val, 
                 OPTION_DETAIL[OPTION_TYPE] 
@@ -428,7 +428,7 @@ function handle_arguments(
                     panic_error(i)
                 }
 
-                arg_typecheck_then_generate_code( 
+                arg_typecheck_then_generate_code(
                     arg_var_name "_" j,
                     arg_val,
                     OPTION_DETAIL[OPTION_TYPE j] 
