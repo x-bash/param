@@ -70,11 +70,11 @@ function handle_type_lines(line,
 }
 
 NR==1{
-    
-
+    type_arr_len = split($0, type_arr, /[ \t\v]+/)
+    for (i=1; i<=type_arr_len; ++i) {
+        handle_type_lines(type_arr[i])
+    }
 }
-
-
 
 ###############################
 # Line 2: Config lines
@@ -211,6 +211,9 @@ NR==3{
 
 }
 
+###############################
+# Line 4: argument lines
+###############################
 function handle_arg(arg_arr, arg_arr_len, option_map,
     i, arg, option_name, option_num,
     j){
@@ -258,9 +261,7 @@ function handle_arg(arg_arr, arg_arr_len, option_map,
     }
 }
 
-###############################
-# Line 4: argument lines
-###############################
+
 NR==4{
 
     # Handle parameters not set.
