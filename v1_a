@@ -30,12 +30,15 @@ advise:
     repo list_repo
     1: list_repo
 option:
-    --repo
-    --repo|-r|m     "Provide repo name"    
+    --repo|-r|m         "Provide repo name"
         <repo>:repo_type  =~   "abc"   "cde"   "def"
-    --repo2|-r2|m     "Provide two repo name"
+    --repo2|-r2|m       "Provide two repo name"
         <repo1>:repo_type  =~   "abc"   "cde"   "def"
         <repo2>:repo_type  =~   "abc"   "cde"   "def"
+
+    --repo|-r|m     "Provide repo name"
+        <repo>:repo_type  =~   "abc"   "cde"   "def"
+
     #1  "Provide"
     #2  "Provide type"      =~
 subcommand:
