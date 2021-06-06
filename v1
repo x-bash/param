@@ -15,6 +15,15 @@ param(){
 # Handle param marg
 param_marg(){
     local a=${1:?Provide argument name}
+    if [ -n "$2" ]; then
+        param_marg_get "$@"
+    else
+        param_marg_seq "$@"
+    fi
+}
+
+param_marg_get(){
+    local a=${1:?Provide argument name}
     local n=${2:?Provide argument name}
     if [ -z "$3" ]; then
         eval "echo \"\$${a}_${n}\""
@@ -28,13 +37,19 @@ param_marg_len(){
     eval "echo \"\$${a}_n\""
 }
 
+param_marg_seq(){
+    local a=${1:?Provide argument name}
+    seq "$(param_marg_len "$a")"
+}
+
 PARAM_AWK_PATH="$(xrc which param/v0.awk)"
 PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT___
 PARAM_TYPE_VAR_PREFIX=___X_CMD_X_BASH_PARAM_TYPE___
 
 param_types(){
     local app_name="${1:?Provide app name}"
-    local ARG_SEP="$(printf "\005")"          # ARG_SEP in awk script
+    local ARG_SEP
+    ARG_SEP="$(printf "\005")"          # ARG_SEP in awk script
     local result="$*"
     local varname="${PARAM_TYPE_VAR_PREFIX}${app_name}"
     echo "$varname"
@@ -48,7 +63,8 @@ param_types_print(){
 }
 
 param_types_pprint(){
-    local ARG_SEP="$(printf "\005")"          # ARG_SEP in awk script
+    local ARG_SEP
+    ARG_SEP="$(printf "\005")"          # ARG_SEP in awk script
     param_types_print "$@" | tr "$ARG_SEP" "\n"
 }
 
@@ -128,7 +144,6 @@ _param_main() {
         printf "%s" "$RS"
 
         # line 3: default dict
-        
         param_default dump "$scope"
         printf "%s" "$RS"
 
@@ -140,5 +155,6 @@ _param_main() {
 }
 
 
-
-
+for idx in $(param_marg scope); do
+    param_marg scope "$idx" 1
+done

@@ -16,25 +16,11 @@
 
 # step 1: param create new app
 
-
-
 # Using alias
 param_type    gitee     repo
 param_type    gitee     user    =~  [A-Za-z0-9_]+
 param_type    gitee     access  =   private         public          inner-public
 
-
-# Using alias
-param_type    gitee     repo
-param_type    gitee     user    =~  [A-Za-z0-9_]+
-param_type    gitee     access  =   private         public          inner-public
-
-
-# Using alias
-# gitee_param_eg
-
-# param should follow.
-# $O using Object
 param <<A
 scope:
     gitee   $O
