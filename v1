@@ -28,17 +28,41 @@ param_marg_len(){
     eval "echo \"\$${a}_n\""
 }
 
+PARAM_AWK_PATH="$(xrc which param/v0.awk)"
+PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT___
+PARAM_TYPE_VAR_PREFIX=___X_CMD_X_BASH_PARAM_TYPE___
+
+param_types(){
+    local app_name="${1:?Provide app name}"
+    local ARG_SEP="$(printf "\005")"          # ARG_SEP in awk script
+    local result="$*"
+    local varname="${PARAM_TYPE_VAR_PREFIX}${app_name}"
+    echo "$varname"
+    eval "$varname=\"\${$varname}\${ARG_SEP}\${result}\""
+}
+
+param_types_print(){
+    local app_name="${1:?Provide app name}"
+    local varname="${PARAM_TYPE_VAR_PREFIX}${app_name}"
+    eval echo "\"\$$varname\""
+}
+
+param_types_pprint(){
+    local ARG_SEP="$(printf "\005")"          # ARG_SEP in awk script
+    param_types_print "$@" | tr "$ARG_SEP" "\n"
+}
+
 # param_default put gitee/$O repo x-bash
 # param_default put gitee/$O user edwinjhlee
 # param_default put gitee/$O access public
 param_default() {
     local op="$1"
-    local module_name=${2:?Provide Object}
+    local app_name=${2:?Provide Object}
 
-    local object_name=${module_name#*/}
-    module_name=${module_name%%/*}
+    local object_name=${app_name#*/}
+    app_name=${app_name%%/*}
 
-    local O="${PARAM_DEFAULT_VAR_PREFIX}${module_name}"
+    local O="${PARAM_DEFAULT_VAR_PREFIX}${app_name}"
 
     shift 2
 
@@ -69,30 +93,52 @@ A
     esac
 }
 
-# param should follow app.
+################################################
 
-# step 1: param create new app
+_param_get_scope(){
+    awk '{
+        if ($1 == "scope:") {
+            if ($2 == "") {
+                getline
+                print $1
+                exit 1
+            } else {
+                print $2
+            }
+        }
+    }'
+}
 
-param gitee
+_param_main() {
+    local IFS
+    local RS="${DICT_SEP}"
+    
+    local src
+    echo src="$(cat)"
+    local scope
+    {
+        scope="$(echo "$src" | _param_get_scope)"
 
-# Using alias
-gitee.param_type    repo
-gitee.param_type    user    =~  [A-Za-z0-9_]+
-gitee.param_type    access  =   private         public          inner-public
+        # line 1: global types
+        param_types_print "${scope%%/*}"
+        printf "%s" "$RS"
 
-# Using alias
-# gitee_param_eg
+        # line 2: config lines
+        printf "%s" "$src"
+        printf "%s" "$RS"
 
-# param should follow.
-# $O using Object
-gitee_param <<A
-advise:
-    repo list_repo
-    1: list_repo
-option:
-    --repo|-r|m     "Provide repo name"     <repo>:repo_type  =~   "abc"   "cde"   "def"
-subcommand:
-    repo            ""
-    user            ""
-A
+        # line 3: default dict
+        
+        param_default dump "$scope"
+        printf "%s" "$RS"
+
+        # line 4: argument lines
+        IFS="$(printf "\005")"          # ARG_SEP in awk script
+        printf "%s" "$*"
+        printf "%s" "$RS"
+    } | awk -v ARG_SEP="$IFS" -v RS="$RS" -f "$PARAM_AWK_PATH" -
+}
+
+
+
 

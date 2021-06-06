@@ -1,0 +1,28 @@
+################################################
+
+# param should follow app.
+
+# step 1: param create new app
+
+param gitee
+
+# Using alias
+gitee.param_type    repo
+gitee.param_type    user    =~  [A-Za-z0-9_]+
+gitee.param_type    access  =   private         public          inner-public
+
+# Using alias
+# gitee_param_eg
+
+# param should follow.
+# $O using Object
+gitee_param <<A
+advise:
+    repo list_repo
+    1: list_repo
+option:
+    --repo|-r|m     "Provide repo name"     <repo>:repo_type  =~   "abc"   "cde"   "def"
+subcommand:
+    repo            ""
+    user            ""
+A
