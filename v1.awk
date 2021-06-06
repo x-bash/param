@@ -269,7 +269,7 @@ function parse_param_dsl(line,
     state = 0
     STATE_ADVISE        = 1
     STATE_TYPE          = 2
-    STATE_DEFAULT       = 3
+    STATE_SCOPE         = 3
     STATE_OPTION        = 4
     STATE_SUBCOMMAND    = 5
     STATE_ARGUMENT      = 6
@@ -285,8 +285,8 @@ function parse_param_dsl(line,
             state = STATE_ADVISE
         } else if (line ~ /^type:/) {
             state = STATE_TYPE
-        } else if (line ~ /^default:/) {
-            state = STATE_DEFAULT
+        } else if (line ~ /^scope:/) {
+            state = STATE_SCOPE
         } else if (line ~ /^option\s:\s+/) {
             state = STATE_OPTION
         } else if (line ~ /^subcommand\s:\s+/) {
