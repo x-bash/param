@@ -395,7 +395,6 @@ function parse_into_OPTION_DETAIL(option,
 
 }
 
-
 ###############################
 # handle_arguments
 ###############################
