@@ -12,6 +12,7 @@ param(){
     alias "${name}_param_type=\"O=${name} param_type\""
 }
 
+# Handle param marg
 param_marg(){
     local a=${1:?Provide argument name}
     local n=${2:?Provide argument name}
@@ -27,6 +28,47 @@ param_marg_len(){
     eval "echo \"\$${a}_n\""
 }
 
+# param_default put gitee/$O repo x-bash
+# param_default put gitee/$O user edwinjhlee
+# param_default put gitee/$O access public
+param_default() {
+    local op="$1"
+    local module_name=${2:?Provide Object}
+
+    local object_name=${module_name#*/}
+    module_name=${module_name%%/*}
+
+    local O="${PARAM_DEFAULT_VAR_PREFIX}${module_name}"
+
+    shift 2
+
+    case "$op" in # yml seemed to be a better
+        load)       dict_load_json "${1:?Provide path in function param_default}" ;;
+        dump)       if [ -n "$object_name" ]; then
+                        dict_scope "${object_name}" | dict_pjson
+                    else
+                        dict_json
+                    fi ;;
+        clear)      eval "$O=" ;;
+        get)        dict_get ${object_name:+"${object_name}"} "${1:?Provide [key] name in function 'param_default get'}" ;;
+        put | set)  dict_put ${object_name:+"${object_name}"} "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
+        export)     export "${O?}" ;;
+        *)
+                    cat >&2 <<A
+param_default     param default function
+
+Subcommand:
+        load        load the param default from /dev/stdin in json form
+        dump        dump the param default to /dev/stdout in json form
+        clear       unset the default param
+        get         Upgrade xrc from 'https://get.x-cmd.com/script'
+        put,set     param_default put <key> <value>
+        export      export the default param variable
+A
+        ;;
+    esac
+}
+
 # param should follow app.
 
 # step 1: param create new app
@@ -34,9 +76,9 @@ param_marg_len(){
 param gitee
 
 # Using alias
-gitee_param_type    repo
-gitee_param_type    user    =~  [A-Za-z0-9_]+
-gitee_param_type    access  =   private         public          inner-public
+gitee.param_type    repo
+gitee.param_type    user    =~  [A-Za-z0-9_]+
+gitee.param_type    access  =   private         public          inner-public
 
 # Using alias
 # gitee_param_eg

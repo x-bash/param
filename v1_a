@@ -19,9 +19,9 @@
 
 
 # Using alias
-param_type    gitee repo
-param_type    gitee user    =~  [A-Za-z0-9_]+
-param_type    gitee access  =   private         public          inner-public
+param_type    gitee     repo
+param_type    gitee     user    =~  [A-Za-z0-9_]+
+param_type    gitee     access  =   private         public          inner-public
 
 
 # Using alias
