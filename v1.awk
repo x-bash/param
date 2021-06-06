@@ -186,11 +186,17 @@ function typecheck(arg_val, arg_rule,
     }
 }
 
-function arg_typecheck_then_generate_code(arg_var_name, arg_val, argtype){
-    if (argtype ~ /^=/) {
-        typecheck(arg_val, argtype)
+function arg_typecheck_then_generate_code(arg_var_name, arg_val, arg_typedef){
+    
+    # arg_typedef =>  meta  arg_type
+    match( arg_typedef, /^/ )
+
+
+
+    if (arg_type ~ /^=/) {
+        typecheck(arg_val, arg_type)
     } else {
-        typecheck(arg_val, type_arr[argtype])
+        typecheck(arg_val, type_arr[arg_type])
     }
 
     append_code( "local " arg_var_name  " 2>/dev/null" )
@@ -413,11 +419,11 @@ function handle_arguments(
 
             arg_typecheck_then_generate_code(
                 option_varname, 
-                arg_val, 
-                OPTION_DETAIL[OPTION_TYPE] 
+                arg_val,
+                option_arr[ option_name KSEP 1 ]
             )
         } else {
-            for (j=1; j<=option_num; ++j) {
+            for ( j=1; j<=option_num; ++j ) {
                 i += 1
                 arg_val = arg_arr[i]
                 if (i > arg_arr_len) {
@@ -427,7 +433,7 @@ function handle_arguments(
                 arg_typecheck_then_generate_code(
                     option_varname "_" j,
                     arg_val,
-                    OPTION_DETAIL[OPTION_TYPE j]
+                    option_arr[ option_name KSEP j ]
                 )
             }
         }

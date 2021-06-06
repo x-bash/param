@@ -31,13 +31,16 @@ advise:
     1: list_repo
 option:
     --repo|-r|m         "Provide repo name"
-        <repo>:repo_type  =~   "abc"   "cde"   "def"
+        <repo>:repo_type                =~   "abc"   "cde"   "def"
     --repo2|-r2|m       "Provide two repo name"
-        <repo1>:repo_type  =~   "abc"   "cde"   "def"
-        <repo2>:repo_type  =~   "abc"   "cde"   "def"
+        <repo1>:repo_type               =~   "abc"   "cde"   "def"
+        <repo2>:repo_type               =~   "abc"   "cde"   "def"
 
     --repo|-r|m     "Provide repo name"
-        <repo>:repo_type  =~   "abc"   "cde"   "def"
+        <repo>:repo_type                =~   "abc"   "cde"   "def"
+
+    --repo|-r|m     "Provide repo name"
+        <repo>:repo_type="el's repo"    =~   "abc"   "cde"   "def"
 
     #1  "Provide"
     #2  "Provide type"      =~
