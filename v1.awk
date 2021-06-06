@@ -27,8 +27,6 @@ function exit_print(code){
 }
 
 # output certain kinds of array
-
-
 function str_trim(astr){
     gsub(/^[ \t\b\v\n]+/, "", astr)
     gsub(/[ \t\b\v\n]+$/, "", astr)
@@ -201,7 +199,6 @@ function arg_typecheck_then_generate_code(arg_var_name, arg_val, argtype){
 ###############################
 # Step 1 Utils: Global types
 ###############################
-
 BEGIN {
     type_arr[LEN]=0
 }
@@ -222,9 +219,8 @@ function type_arr_add(line,
 }
 
 ###############################
-# Step 2 Utils: Parse param dsl
+# Step 2 Utils: Parse param DSL
 ###############################
-
 BEGIN {
     advise_arr[LEN]=0
     option_arr[LEN]=0
@@ -282,7 +278,6 @@ function parse_param_dsl(line,
                 # TODO: if multiple options: merge.
 
                 # Parsing happened here.
-
                 if (line !~ /^-/) {
                     panic_error("Expect option starting with - or -- :\n" line)
                 }
@@ -325,8 +320,7 @@ function parse_param_dsl(line,
 ###############################
 # Step 3 Utils: Handle code
 ###############################
-
-BEGIN{
+BEGIN {
     OPTION_NUM = "num"
     OPTION_SHORT = "shoft"
     OPTION_TYPE = "type"
@@ -335,7 +329,7 @@ BEGIN{
 
 # Good.
 function parse_into_OPTION_DETAIL(option,
-    tmp, arr){
+    tmp, arr) {
     option = "--repo|-r       \"Provide repo name\"     <repo>:repo_type=\"\"   "
 
     gsub("\\\\", option, "\001")
@@ -379,8 +373,8 @@ function parse_into_OPTION_DETAIL(option,
 ###############################
 # handle_arguments
 ###############################
-function handle_arguments(   
-    i, j, argname, arg_val, option_name, option_num, count){
+function handle_arguments( 
+    i, j, argname, arg_val, option_name, option_num, count) {
 
     arg_arr_len = arg_arr[LEN]
 
