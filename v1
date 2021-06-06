@@ -49,13 +49,13 @@ PARAM_TYPE_VAR_PREFIX=___X_CMD_X_BASH_PARAM_TYPE___
 # DICT_KEYS_SEP conflict. But it is OK.
 PARAM_ARG_SEP="$(printf "\005")"          # ARG_SEP in awk script
 # PARAM_RS_SEP
-PARAM_RS_SEP="$(printf "\006")"
+PARAM_RS_SEP="${DICT_SEP}"
 
 # param_type    gitee     repo
 # param_type    gitee     user    =~  [A-Za-z0-9_]+
 # param_type    gitee     access  =   private         public          inner-public
 param_types(){
-    local app_name="${1:?Provide app name}";    shift
+    local app_name="${1:?Provide app name}";        shift
     local result="$*"
     local varname="${PARAM_TYPE_VAR_PREFIX}${app_name}"
     echo "$varname"
@@ -80,7 +80,11 @@ param_default() {
     local app_name=${2:?Provide Object}
 
     local object_name=${app_name#*/}
+    if [ "$object_name" = "$app_name" ]; then
+        object_name=
+    fi
     app_name=${app_name%%/*}
+
 
     local O="${PARAM_DEFAULT_VAR_PREFIX}${app_name}"
 
@@ -143,16 +147,16 @@ _param_main() {
         # line 2: config lines
         printf "%s" "$src"
         printf "%s" "$PARAM_RS_SEP"
-
-        # line 3: default dict
-        param_default dump "$scope"
-        printf "%s" "$PARAM_RS_SEP"
-
-        # line 4: running argument lines
+        
+        # line 3: running argument lines
         local IFS
         IFS="$PARAM_ARG_SEP"          # ARG_SEP in awk script
         printf "%s" "$*"
         printf "%s" "$PARAM_RS_SEP"
+
+        # line 4: default dict
+        param_default dump "$scope"
+        # printf "%s" "$PARAM_RS_SEP"
     } | awk \
             -v ARG_SEP="$PARAM_ARG_SEP" \
             -v RS="$PARAM_RS_SEP" \
@@ -160,6 +164,6 @@ _param_main() {
 }
 
 
-for idx in $(param_marg scope); do
-    param_marg scope "$idx" 1
-done
+# for idx in $(param_marg scope); do
+#     param_marg scope "$idx" 1
+# done

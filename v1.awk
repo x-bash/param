@@ -29,13 +29,16 @@ BEGIN{
     option_arr[LEN]=0
 
     type_arr[LEN]=0
+    arg_arr[LEN]=0
+
+    # arg_default_map
 
     default_scope = ""
     default_filelist = ""
 
     subcommand_arr[LEN]=0
 
-    argument_arr[LEN]=0
+    rest_argv_arr[LEN]=0
     # argument_detail_arr
 
     RS="\001"
@@ -134,9 +137,9 @@ function handle_config_lines(line,
                 subcommand_arr[tmp] = line
 
             } else if (state == STATE_ARGUMENT) {
-                tmp = argument_arr[LEN] + 1
-                argument_arr[LEN] = tmp
-                argument_arr[tmp] = line
+                tmp = rest_argv_arr[LEN] + 1
+                rest_argv_arr[LEN] = tmp
+                rest_argv_arr[tmp] = line
             }
 
         }
@@ -194,7 +197,6 @@ function parse_to_OPTION_DETAIL(option,
 }
 
 
-
 NR==2{
     handle_config_lines($0)
     # analyze option line
@@ -203,26 +205,40 @@ NR==2{
 }
 
 
-###############################
-# Line 3: Defaults As Map
-###############################
 NR==3{
-
-
+    # handle arguments
+    split($0, arg_arr, ARG_SEP)
 }
 
+
 ###############################
-# Line 4: argument lines
+# Line 4: Defaults As Map
 ###############################
-function handle_arg(arg_arr, arg_arr_len, option_map,
+
+NR>=4{
+    if (keyline == "") {
+        keyline = $0
+    } else {
+        arg_default_map[keyline] = $0
+        keyline = ""
+    }
+}
+
+
+###############################
+# handle_arguments
+###############################
+function handle_arguments(
     i, arg, option_name, option_num,
     j){
+
+    arg_arr_len = arg_arr[LEN]
 
     i = 1
     while (i <= arg_arr_len) {
         arg = arg_arr[i]
 
-        option_name = option_map[arg]
+        option_name = option_arr[arg]
         parse_to_OPTION_DETAIL(option_arr[option_name])
         option_num = OPTION_DETAIL[OPTION_NUM]
 
@@ -234,6 +250,7 @@ function handle_arg(arg_arr, arg_arr_len, option_map,
             # print code XXX=true
         } else if (option_num == 1) {
             i = i + 1
+            argval = arg_arr[i]
             if (i > arg_arr_len) {
                 panic_error(i)
             }
@@ -261,10 +278,8 @@ function handle_arg(arg_arr, arg_arr_len, option_map,
     }
 }
 
-
-NR==4{
-
-    # Handle parameters not set.
+END{
+    handle_arguments()
 }
 
 
