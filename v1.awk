@@ -62,7 +62,7 @@ function tokenize_argument(astr,
             gsub("\001", tmp, "\\")     # Unwrap
             TOKEN_ARRAY[len] = tmp
             TOKEN_ARRAY[LEN] = len
-            astr = substr(option, RLENGTH+1)
+            astr = substr(astr, RLENGTH+1)
 
         } else if (match(/^[^ \t\v]+/), astr){
             len = TOKEN_ARRAY[LEN] + 1
@@ -73,7 +73,8 @@ function tokenize_argument(astr,
             gsub("\001", tmp, "\\\\")   # Notice different
             TOKEN_ARRAY[len] = tmp
             TOKEN_ARRAY[LEN] = len
-            astr = substr(option, RLENGTH+1)
+            astr = substr(astr, RLENGTH+1)
+            
         } else {
             panic_error("Fail to tokenzied following line:\n" original_astr)
         }
@@ -264,7 +265,7 @@ function parse_option_name(option_name,
 }
 
 function parse_param_dsl(line,
-    line_arr, i, j, state, tmp) {
+    line_arr, i, j, state, tmp, nextline) {
 
     state = 0
     STATE_ADVISE        = 1
@@ -312,8 +313,8 @@ function parse_param_dsl(line,
 
                 while (true) {
                     nextline = line[++j]
-                    if ( str_trim(line[++j]) !~ /^-/ ) {
-
+                    if ( str_trim(nextline) !~ /^-/ ) {
+                        
                     }
                 }
                 
