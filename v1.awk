@@ -431,7 +431,7 @@ function handle_arguments(
                 arg_typecheck_then_generate_code(
                     arg_var_name "_" j,
                     arg_val,
-                    OPTION_DETAIL[OPTION_TYPE j] 
+                    OPTION_DETAIL[OPTION_TYPE j]
                 )
             }
         }
