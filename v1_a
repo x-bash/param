@@ -43,7 +43,7 @@ option:
         <repo>:repo_type="el's repo"    =~   "abc"   "cde"   "def"
 
     #1  "Provide"
-    #2  "Provide type"      =~
+    #2  "Provide type"
 subcommand:
     repo            ""
     user            ""
