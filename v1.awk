@@ -235,6 +235,32 @@ BEGIN {
     OPTION_ARGC = "ARGC"
 
     RS="\001"
+
+    option_name_list[LEN] = 0
+    # arg_name_2_option_name
+}
+
+function parse_option_name(option_name,
+    arr, arr_len, arg_name, i, sw){
+
+    sw = false
+
+    arr_len = split(option_name, arr, /\|/)
+    for (i=1; i<arr_len; ++i) {
+        arg_name = arr[i]
+        if (arg_name == "m") {
+            sw = true
+            continue
+        }
+
+        if (arg_name !~ /^-/) {
+            panic_error("Unexpected option name: \n" option_name)
+        }
+
+        arg_name_2_option_name[arg_name] = option_name
+    }
+
+    return sw
 }
 
 function parse_param_dsl(line,
