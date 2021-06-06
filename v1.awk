@@ -198,7 +198,6 @@ function arg_typecheck_then_generate_code(arg_var_name, arg_val, argtype){
     append_code( arg_var_name "=" quote_string(arg_val) )
 }
 
-
 ###############################
 # Step 1 Utils: Global types
 ###############################
@@ -223,7 +222,7 @@ function type_arr_add(line,
 }
 
 ###############################
-# Step 2 Utils: Parse config
+# Step 2 Utils: Parse param dsl
 ###############################
 
 BEGIN {
@@ -323,6 +322,10 @@ function parse_param_dsl(line,
 }
 
 
+###############################
+# Step 3 Utils: Handle code
+###############################
+
 BEGIN{
     OPTION_NUM = "num"
     OPTION_SHORT = "shoft"
@@ -331,7 +334,7 @@ BEGIN{
 }
 
 # Good.
-function parse_to_OPTION_DETAIL(option,
+function parse_into_OPTION_DETAIL(option,
     tmp, arr){
     option = "--repo|-r       \"Provide repo name\"     <repo>:repo_type=\"\"   "
 
@@ -385,19 +388,19 @@ function handle_arguments(
     while (i <= arg_arr_len) {
         argname = arg_arr[i]
 
-        option_name = option_arr[argname]
-        parse_to_OPTION_DETAIL(option_arr[option_name])
-        option_num = OPTION_DETAIL[OPTION_NUM]
-        option_m = OPTION_DETAIL[OPTION_M]
+        option_name     = option_arr[argname]
 
-        arg_var_name = argname
+        parse_into_OPTION_DETAIL( option_arr[option_name] )
+        option_num      = OPTION_DETAIL[OPTION_NUM]
+        option_m        = OPTION_DETAIL[OPTION_M]
+
+        arg_var_name    = argname
 
         if (option_m == true) {
             counter = (arg_count[argname] || 0) + 1
             arg_count[argname] = counter
             arg_var_name = arg_var_name "_" counter
         }
-
 
         # Consider unhandled arguments are rest_argv
         if ( !( argname ~ /--?/ ) ) break
@@ -442,7 +445,6 @@ function handle_arguments(
         # TODO: print code set -- arguments
 
         # TODO: typecheck the argument value
-
     } else {
         append_code("set --")
     }
