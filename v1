@@ -97,6 +97,11 @@ param_default() {
                     else
                         dict_json
                     fi ;;
+        dump_raw)       if [ -n "$object_name" ]; then
+                        dict_scope "${object_name}" | dict_dump
+                    else
+                        dict_dump
+                    fi ;;
         clear)      eval "$O=" ;;
         get)        dict_get ${object_name:+"${object_name}"} "${1:?Provide [key] name in function 'param_default get'}" ;;
         put | set)  dict_put ${object_name:+"${object_name}"} "${1:?Provide key name in function param_default}" "${2:?Provide [value] in function 'param_default put'}" ;;
@@ -155,7 +160,7 @@ _param_main() {
         printf "%s" "$PARAM_RS_SEP"
 
         # line 4: default dict
-        param_default dump "$scope"
+        param_default dump_raw "$scope"
         # printf "%s" "$PARAM_RS_SEP"
     } | awk \
             -v ARG_SEP="$PARAM_ARG_SEP" \
