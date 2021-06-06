@@ -224,21 +224,27 @@ function type_arr_add(line,
 ###############################
 BEGIN {
     advise_arr[ LEN ]=0
-    option_arr[ LEN ]=0
-
     arg_arr[ LEN ]=0
-
     subcommand_arr[ LEN ]=0
 
     rest_argv_arr[ LEN ]=0
     # argument_detail_arr
 
-    OPTION_ARGC = "ARGC"
-
     RS="\001"
+}
 
+BEGIN {
+    option_arr[ LEN ]=0
     option_name_list[ LEN ] = 0
     # arg_name_2_option_name
+
+    OPTION_NUM = "num"
+    OPTION_SHORT = "shoft"
+    OPTION_TYPE = "type"
+    OPTION_DESC = "desc"
+
+    OPTION_M = "M"
+    OPTION_VARNAME = "varname"
 }
 
 function handle_option_name(option_name,
@@ -365,57 +371,7 @@ function parse_param_dsl(line,
 ###############################
 # Step 3 Utils: Handle code
 ###############################
-BEGIN {
-    OPTION_NUM = "num"
-    OPTION_SHORT = "shoft"
-    OPTION_TYPE = "type"
-    OPTION_DESC = "desc"
 
-    OPTION_M = "M"
-    OPTION_VARNAME = "varname"
-}
-
-# Good.
-function parse_into_OPTION_DETAIL(option,
-    tmp, arr) {
-    option = "--repo|-r       \"Provide repo name\"     <repo>:repo_type=\"\"   "
-
-    gsub("\\\\", option, "\001")
-    gsub("\\\"", option, "\002")
-    gsub("\"", option, "\003")
-    
-    if (! match( /--[^ ]+[ ]+/), option ){
-        panic_error( "error in match" )
-    }
-    
-    option_name = substr( option, 1, RLENGTH )
-    option = substr( option, RLENGTH+1 )
-
-    arr[LEN] = 0
-    
-    while (true) {
-        if (match(/[^\"]+[ ]+/), option) #"
-        {
-            tmp = substr( option, 1, RLENGTH )
-            option = substr( option, RLENGTH+1 )
-            len = arr[ LEN ]
-            arr[ LEN ] = len + 1
-            arr[ len ] = tmp
-        } else if (match(/[^\"]+=/, option)) #"
-        {
-            tmp = substr( option, 1, RLENGTH )
-            option = substr( option, RLENGTH+1) 
-            if (match(/\"[^"]\"/, option))  #"
-            {
-                tmp = tmp substr(option, 1, RLENGTH)
-                option = substr(option, RLENGTH+1)
-            }
-        } else {
-            panic_error("Fail to parse option")
-        }        
-    }
-
-}
 
 ###############################
 # handle_arguments

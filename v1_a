@@ -46,3 +46,45 @@ subcommand:
     user            ""
 A
 
+
+# Good.
+function parse_into_OPTION_DETAIL(option,
+    tmp, arr) {
+    option = "--repo|-r       \"Provide repo name\"     <repo>:repo_type=\"\"   "
+
+    gsub("\\\\", option, "\001")
+    gsub("\\\"", option, "\002")
+    gsub("\"", option, "\003")
+    
+    if (! match( /--[^ ]+[ ]+/), option ){
+        panic_error( "error in match" )
+    }
+    
+    option_name = substr( option, 1, RLENGTH )
+    option = substr( option, RLENGTH+1 )
+
+    arr[LEN] = 0
+    
+    while (true) {
+        if (match(/[^\"]+[ ]+/), option) #"
+        {
+            tmp = substr( option, 1, RLENGTH )
+            option = substr( option, RLENGTH+1 )
+            len = arr[ LEN ]
+            arr[ LEN ] = len + 1
+            arr[ len ] = tmp
+        } else if (match(/[^\"]+=/, option)) #"
+        {
+            tmp = substr( option, 1, RLENGTH )
+            option = substr( option, RLENGTH+1) 
+            if (match(/\"[^"]\"/, option))  #"
+            {
+                tmp = tmp substr(option, 1, RLENGTH)
+                option = substr(option, RLENGTH+1)
+            }
+        } else {
+            panic_error("Fail to parse option")
+        }        
+    }
+
+}
