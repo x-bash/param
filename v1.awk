@@ -199,13 +199,13 @@ function arg_typecheck_then_generate_code(arg_var_name, arg_val, argtype){
 }
 
 
-BEGIN {
-    type_arr[LEN]=0
-}
-
 ###############################
 # Step 1 Utils: Global types
 ###############################
+
+BEGIN {
+    type_arr[LEN]=0
+}
 
 function type_arr_add(line,
     name, rest){
@@ -226,7 +226,7 @@ function type_arr_add(line,
 # Step 2 Utils: Parse config
 ###############################
 
-BEGIN{
+BEGIN {
     advise_arr[LEN]=0
     option_arr[LEN]=0
 
@@ -449,7 +449,7 @@ function handle_arguments(
 }
 
 
-NR==1{
+NR==1 {
     type_arr_len = split($0, type_arr, /[ \t\v]+/)
     for (i=1; i<=type_arr_len; ++i) {
         type_arr_add(type_arr[i])
@@ -457,14 +457,14 @@ NR==1{
 }
 
 
-NR==2{
+NR==2 {
     parse_param_dsl($0)
     # analyze option line
 
     # analyze subcommand lines
 }
 
-NR==3{
+NR==3 {
     # handle arguments
     split($0, arg_arr, ARG_SEP)
 }
@@ -473,7 +473,7 @@ NR==3{
 # Line 4: Defaults As Map
 ###############################
 
-NR>=4{
+NR>=4 {
     if (keyline == "") {
         keyline = $0
     } else {
@@ -482,7 +482,7 @@ NR>=4{
     }
 }
 
-END{
+END {
     handle_arguments()
     print_code()
 }
