@@ -39,7 +39,7 @@ function str_trim_left(astr){
 }
 
 # TOKEN_ARRAY
-function tokenize_argument(astr,
+function tokenize_argument_into_TOKEN_ARRAY(astr,
     len, tmp ){
 
     original_astr = astr
@@ -74,7 +74,7 @@ function tokenize_argument(astr,
             TOKEN_ARRAY[len] = tmp
             TOKEN_ARRAY[LEN] = len
             astr = substr(astr, RLENGTH+1)
-            
+
         } else {
             panic_error("Fail to tokenzied following line:\n" original_astr)
         }
@@ -180,7 +180,7 @@ function assert(rule_line, arg_name, arg_val, op_arr,
 function typecheck(arg_val, arg_rule,
     len, i, token) {
 
-    tokenize_argument(arg_rule)
+    tokenize_argument_into_TOKEN_ARRAY(arg_rule)
     for (i=1; i<=len; ++i) {
         assert(arg_rule, arg_name, arg_val, TOKEN_ARRAY)
     }
@@ -223,34 +223,41 @@ function type_arr_add(line,
 # Step 2 Utils: Parse param DSL
 ###############################
 BEGIN {
-    advise_arr[LEN]=0
-    option_arr[LEN]=0
+    advise_arr[ LEN ]=0
+    option_arr[ LEN ]=0
 
-    arg_arr[LEN]=0
+    arg_arr[ LEN ]=0
 
-    subcommand_arr[LEN]=0
+    subcommand_arr[ LEN ]=0
 
-    rest_argv_arr[LEN]=0
+    rest_argv_arr[ LEN ]=0
     # argument_detail_arr
 
     OPTION_ARGC = "ARGC"
 
     RS="\001"
 
-    option_name_list[LEN] = 0
+    option_name_list[ LEN ] = 0
     # arg_name_2_option_name
 }
 
-function parse_option_name(option_name,
+function handle_option_name(option_name,
     arr, arr_len, arg_name, i, sw){
 
-    sw = false
+    # Add option_name to option_name_list
+    i = option_name_list[ LEN ] + 1
+    option_name_list[i] = option_name
+    option_name_list[ LEN ] = i
 
-    arr_len = split(option_name, arr, /\|/)
+
+    option_arr[ option_name KSEP OPTION_M ] = false
+
+    arr_len = split( option_name, arr, /\|/ )
     for (i=1; i<arr_len; ++i) {
         arg_name = arr[i]
+
         if (arg_name == "m") {
-            sw = true
+            option_arr[ option_name KSEP OPTION_M ] = true
             continue
         }
 
@@ -258,14 +265,16 @@ function parse_option_name(option_name,
             panic_error("Unexpected option name: \n" option_name)
         }
 
-        arg_name_2_option_name[arg_name] = option_name
-    }
+        if (i == 1) {
+            option_arr[ option_name KSEP OPTION_VARNAME ] = arg_name
+        }
 
-    return sw
+        arg_name_2_option_name[ arg_name ] = option_name
+    }
 }
 
 function parse_param_dsl(line,
-    line_arr, i, j, state, tmp, nextline) {
+    line_arr, i, j, state, tmp, len, nextline) {
 
     state = 0
     STATE_ADVISE        = 1
@@ -280,7 +289,7 @@ function parse_param_dsl(line,
     for (i=1; i<=line_arr_len; ++i) {
         line = line_arr[i]
 
-        line = str_trim(line)
+        line = str_trim( line )
 
         if (line ~ /^advise:/) {
             state = STATE_ADVISE
@@ -297,46 +306,55 @@ function parse_param_dsl(line,
         } else {
 
             if (state == STATE_ADVISE) {
-                tmp = advise_arr[LEN] + 1
-                advise_arr[LEN] = tmp
-                advise_arr[tmp] = line
+                tmp = advise_arr[ LEN ] + 1
+                advise_arr[ LEN ] = tmp
+                advise_arr[ tmp ] = line
 
             } else if (state == STATE_OPTION) {
-                # TODO: if multiple options: merge.
-
-                # Parsing happened here.
                 if (line !~ /^-/) {
                     panic_error("Expect option starting with - or -- :\n" line)
                 }
 
-                j = i
+                len = option_arr[ LEN ] + 1
+                option_arr[ LEN ] = len
+                option_arr[ len ] = line
 
-                while (true) {
-                    nextline = line[++j]
-                    if ( str_trim(nextline) !~ /^-/ ) {
-                        
-                    }
+                tokenize_argument_into_TOKEN_ARRAY( line )
+                option_name = TOKEN_ARRAY[1]
+                handle_option_name( option_name )
+
+                option_desc = TOKEN_ARRAY[2]
+                option_arr[ option_name KSEP OPTION_DESC ] = option_desc 
+
+                tmp = ""
+                for (i=3; i<=TOKEN_ARRAY[LEN]; ++i) {
+                    tmp = tmp " " TOKEN_ARRAY[i]
                 }
-                
-                tmp = option_arr[LEN] + 1
-                option_arr[LEN] = tmp
-                option_arr[tmp] = line
+                option_arr[ option_name KSEP 1 ] = tmp
 
-                option_arr[tmp KSEP 1]
-                option_arr[tmp KSEP 2]
+                j = 1
+                while (true) {
+                    nextline = str_trim( line[ i + j ] )
+                    if ( str_trim( nextline ) ~ /^-/ ) {
+                        break
+                    }
+                    j = j + 1
+                    option_arr[ option_name KSEP j ] = nextline
+                }
+                option_arr[ option_name KSEP LEN ] = j
 
-            } else if (state == STATE_TYPE) {
-                type_arr_add(line)
+            } else if ( state == STATE_TYPE ) {
+                type_arr_add( line )
 
-            } else if (state == STATE_SUBCOMMAND) {
-                tmp = subcommand_arr[LEN] + 1
-                subcommand_arr[LEN] = tmp
-                subcommand_arr[tmp] = line
+            } else if ( state == STATE_SUBCOMMAND ) {
+                tmp = subcommand_arr[ LEN ] + 1
+                subcommand_arr[ LEN ] = tmp
+                subcommand_arr[ tmp ] = line
 
             } else if (state == STATE_ARGUMENT) {
-                tmp = rest_argv_arr[LEN] + 1
-                rest_argv_arr[LEN] = tmp
-                rest_argv_arr[tmp] = line
+                tmp = rest_argv_arr[ LEN ] + 1
+                rest_argv_arr[ LEN ] = tmp
+                rest_argv_arr[ tmp ] = line
             }
 
         }
@@ -352,6 +370,9 @@ BEGIN {
     OPTION_SHORT = "shoft"
     OPTION_TYPE = "type"
     OPTION_DESC = "desc"
+
+    OPTION_M = "M"
+    OPTION_VARNAME = "varname"
 }
 
 # Good.
@@ -363,27 +384,27 @@ function parse_into_OPTION_DETAIL(option,
     gsub("\\\"", option, "\002")
     gsub("\"", option, "\003")
     
-    if (! match(/--[^ ]+[ ]+/), option){
-        panic_error("error in match")
+    if (! match( /--[^ ]+[ ]+/), option ){
+        panic_error( "error in match" )
     }
     
-    option_name = substr(option, 1, RLENGTH)
-    option = substr(option, RLENGTH+1)
+    option_name = substr( option, 1, RLENGTH )
+    option = substr( option, RLENGTH+1 )
 
     arr[LEN] = 0
     
-    while (1) {
+    while (true) {
         if (match(/[^\"]+[ ]+/), option) #"
         {
-            tmp = substr(option, 1, RLENGTH)
-            option = substr(option, RLENGTH+1)
-            len = arr[LEN]
-            arr[LEN] = len + 1
-            arr[len] = tmp
+            tmp = substr( option, 1, RLENGTH )
+            option = substr( option, RLENGTH+1 )
+            len = arr[ LEN ]
+            arr[ LEN ] = len + 1
+            arr[ len ] = tmp
         } else if (match(/[^\"]+=/, option)) #"
         {
-            tmp = substr(option, 1, RLENGTH)
-            option = substr(option, RLENGTH+1)
+            tmp = substr( option, 1, RLENGTH )
+            option = substr( option, RLENGTH+1) 
             if (match(/\"[^"]\"/, option))  #"
             {
                 tmp = tmp substr(option, 1, RLENGTH)
@@ -400,30 +421,29 @@ function parse_into_OPTION_DETAIL(option,
 # handle_arguments
 ###############################
 function handle_arguments( 
-    i, j, argname, arg_val, option_name, option_num, count) {
+    i, j, arg_name, arg_val, option_name, option_num, count) {
 
     arg_arr_len = arg_arr[LEN]
 
     i = 1
     while (i <= arg_arr_len) {
-        argname = arg_arr[i]
+        arg_name = arg_arr[i]
 
-        option_name     = option_arr[argname]
+        option_name     = arg_name_2_option_name[arg_name]
 
-        parse_into_OPTION_DETAIL( option_arr[option_name] )
-        option_num      = OPTION_DETAIL[OPTION_NUM]
-        option_m        = OPTION_DETAIL[OPTION_M]
-
-        arg_var_name    = argname
+        option_num      = option_arr[ option_name KSEP LEN ]
+        option_m        = option_arr[ option_name KSEP OPTION_M ]
+        option_varname  = option_arr[ option_name KSEP OPTION_VARNAME ]
+        gsub(/^--?/, "", option_varname)
 
         if (option_m == true) {
-            counter = (arg_count[argname] || 0) + 1
-            arg_count[argname] = counter
-            arg_var_name = arg_var_name "_" counter
+            counter = (arg_count[arg_name] || 0) + 1
+            arg_count[arg_name] = counter
+            option_varname = option_varname "_" counter
         }
 
         # Consider unhandled arguments are rest_argv
-        if ( !( argname ~ /--?/ ) ) break
+        if ( !( arg_name ~ /--?/ ) ) break
         
         if (option_num == 0) {
             # OK, enable
@@ -436,7 +456,7 @@ function handle_arguments(
             }
 
             arg_typecheck_then_generate_code(
-                arg_var_name, 
+                option_varname, 
                 arg_val, 
                 OPTION_DETAIL[OPTION_TYPE] 
             )
@@ -449,7 +469,7 @@ function handle_arguments(
                 }
 
                 arg_typecheck_then_generate_code(
-                    arg_var_name "_" j,
+                    option_varname "_" j,
                     arg_val,
                     OPTION_DETAIL[OPTION_TYPE j]
                 )
