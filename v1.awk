@@ -95,40 +95,59 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
 }
 
 ### Type check
-function assert_arr_eq(rule_line, arg_name, value, sep, op_arr,
+
+function join_to_rule_line(option_val_name, 
+    len, idx, result){
+
+    result = ""
+    len = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP LEN ]
+    for (idx=1; idx<=len; ++idx) {
+        result = result " " option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+    }
+
+    return result
+}
+
+function assert_arr_eq(option_val_name, arg_name, value, sep,
     i, idx, value_arr_len, value_arr, sw){
+
+    op_arr_len = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP LEN ]
 
     value_arr_len = split(value, value_arr, sep)
     for (i=1; i<=value_arr_len; ++i) {
         sw = false
-        for (idx=2; idx<=op_arr[LEN]; ++idx) {
-            if (value_arr[i] == op_arr[idx]) {
+        for (idx=2; idx<=op_arr_len; ++idx) {
+            val = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+            if ( value_arr[i] == val ) {
                 sw = true
                 break
             }
         }
         if (sw == false) {
-            error( "Arg: [" arg_name "] 's part of value is [" value_arr[i] "]\nFail to match any candidate:\n" rule_line )
+            error( "Arg: [" arg_name "] 's part of value is [" value_arr[i] "]\nFail to match any candidate:\n" join_to_rule_line( option_val_name ) )
             print_helpdoc()
             exit_print(1)
         }
     }
 }
 
-function assert_arr_regex(rule_line, arg_name, value, sep, op_arr,
+function assert_arr_regex(option_val_name, arg_name, value, sep,
     i, value_arr_len, value_arr, sw){
+
+    len = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP LEN ]
 
     value_arr_len = split(value, value_arr, sep)
     for (i=1; i<=value_arr_len; ++i) {
         sw = false
-        for (idx=2; idx<=op_arr[LEN]; ++idx) {
-            if (match(value_arr[i], op_arr[idx])) {
+        for (idx=2; idx<=len; ++idx) {
+            val = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+            if (match( value_arr[i], val )) {
                 sw = true
                 break
             }
         }
         if (sw == false) {
-            error( "Arg: [" arg_name "] 's part of value is [" value_arr[i] "]\nFail to match any regex pattern:\n" rule_line )
+            error( "Arg: [" arg_name "] 's part of value is [" value_arr[i] "]\nFail to match any regex pattern:\n" join_to_rule_line( option_val_name ) )
             print_helpdoc()
             exit_print(1)
         }
@@ -136,10 +155,11 @@ function assert_arr_regex(rule_line, arg_name, value, sep, op_arr,
 }
 
 # op_arg_idx # token_arr_len, token_arr, op_arg_idx,         
-function assert(rule_line, arg_name, arg_val, op_arr,
-    op, sw, idx){
+function assert(option_val_name, arg_name, arg_val,
+    op, sw, idx, len, val){
 
-    op = op_arr[1]
+    op = option_arr[option_val_name KSEP OPTION_VAL_OPARR KSEP 1 ]
+
     if (op == "=int") {
         if (! match(arg_val, /[+-]?[0-9]+/) ) {    # float is: /[+-]?[0-9]+(.[0-9]+)?/
             error( "Arg: [" arg_name "] value is [" arg_val "]\nIs NOT an integer." )
@@ -148,37 +168,41 @@ function assert(rule_line, arg_name, arg_val, op_arr,
         }
     } else if (op == "=") {
         sw = false
-        for (idx=2; idx<=op_arr[LEN]; ++idx) {
-            if (arg_val == op_arr[idx]) {
+        len = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP LEN ]
+        for (idx=2; idx<=len; ++idx) {
+            val = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+            if (arg_val == val) {
                 sw = true
                 break
             }
         }
         if (sw == false) {
-            error( "Arg: [" arg_name "] value is [" arg_val "]\nFail to match any candidates:\n" rule_line )
+            error( "Arg: [" arg_name "] value is [" arg_val "]\nFail to match any candidates:\n" join_to_rule_line(option_val_name) )
             print_helpdoc()
             exit_print(1)
         }
     } else if (op == "=~") {
         sw = false
-        for (idx=2; idx<=op_arr[LEN]; ++idx) {
-            if (match(arg_val, "^"op_arr[idx]"$")) {
+        len = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP LEN ]
+        for (idx=2; idx<=len; ++idx) {
+            val = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+            if (match(arg_val, "^"val"$")) {
                 sw = true
                 break
             }
         }
         if (sw == false) {
-            error( "Arg: [" arg_name "] value is [" arg_val "]\nFail to match any regex pattern:\n" rule_line )
+            error( "Arg: [" arg_name "] value is [" arg_val "]\nFail to match any regex pattern:\n" join_to_rule_line(option_val_name) )
             print_helpdoc()
             exit_print(1)
         }
 
     } else if (op ~ /^=.$/) {
         sep = substr(op, 2, 1)
-        assert_arr_eq(rule_line, arg_name, arg_val, sep, op, op_arr)
+        assert_arr_eq(option_val_name, arg_name, arg_val, sep)
     } else if (op ~ /^=~.$/) {
         sep = substr(op, 3, 1)
-        assert_arr_regex(rule_line, arg_name, arg_val, sep, op, op_arr)
+        assert_arr_regex(option_val_name, arg_name, arg_val, sep)
     } else {
         print "Op[" op "] Not Match any candidates: \n" line > "/dev/stderr"
         exit_print(1)
@@ -188,37 +212,25 @@ function assert(rule_line, arg_name, arg_val, op_arr,
     return true
 }
 
-function typecheck(arg_val, arg_rule,
-    len, i, token) {
+# function typecheck(option_val_name, arg_val,
+#     len, i, token) {
 
-    tokenize_argument_into_TOKEN_ARRAY(arg_rule)
-    for (i=1; i<=len; ++i) {
-        assert(arg_rule, arg_name, arg_val, TOKEN_ARRAY)
-    }
-}
+#     tokenize_argument_into_TOKEN_ARRAY(arg_rule)
+#     for (i=1; i<=len; ++i) {
+#         assert(option_val_name, arg_name, arg_val, TOKEN_ARRAY)
+#     }
+# }
 
 function parse_type(){
 
 }
 
-function arg_typecheck_then_generate_code(arg_var_name, arg_val, arg_typedef,
+function arg_typecheck_then_generate_code(option_val_name, arg_var_name, arg_val,
     def, tmp ){
-    
-    # arg_typedef =>  meta  arg_type
-    tokenize_argument_into_TOKEN_ARRAY( arg_typedef )
-    def = TOKEN_ARRAY[ 1 ]
-    tmp = ""
-    for ( i=2; i<TOKEN_ARRAY[ LEN ]; ++i ) {
-        tmp = TOKEN_ARRAY[ i ]
-    }
-    
 
 
-    if (arg_type ~ /^=/) {
-        typecheck(arg_val, arg_type)
-    } else {
-        typecheck(arg_val, type_arr[arg_type])
-    }
+    # typecheck(option_val_name, arg_val)
+    assert(option_val_name, arg_var_name, arg_val)
 
     append_code( "local " arg_var_name  " 2>/dev/null" )
     append_code( arg_var_name "=" quote_string(arg_val) )
@@ -272,6 +284,11 @@ BEGIN {
 
     OPTION_M = "M"
     OPTION_VARNAME = "varname"
+
+    OPTION_VAL_NAME = "val_name"
+    OPTION_VAL_TYPE = "val_type"
+    OPTION_VAL_DEFAULT = "val_default"
+    OPTION_VAL_OPARR = "val_oparr"
 }
 
 function handle_option_name(option_name,
@@ -281,7 +298,6 @@ function handle_option_name(option_name,
     i = option_name_list[ LEN ] + 1
     option_name_list[i] = option_name
     option_name_list[ LEN ] = i
-
 
     option_arr[ option_name KSEP OPTION_M ] = false
 
@@ -304,6 +320,54 @@ function handle_option_name(option_name,
 
         arg_name_2_option_name[ arg_name ] = option_name
     }
+}
+
+function handle_option_value(arg_typedef, name,
+    def, def_name, def_type, tmp, type_rule, i){
+
+    # arg_typedef =>  meta  arg_type
+    tokenize_argument_into_TOKEN_ARRAY( arg_typedef )
+    def = TOKEN_ARRAY[ 1 ]
+
+    if (! match(def, /^<[-_A-Za-z0-9]+>/)) {
+        panic_error("Unexecpted option value name: \n" arg_typedef)
+    }
+
+    def_name = sub(def, 2, RLENGTH-1)
+    option_arr[ name KSEP OPTION_VAL_NAME ] = def_name
+
+    def = sub(def, RLENGTH+1)
+
+    if (match(def, /^:[-_A-Za-z0-9]+/)) {
+        def_type = sub(def, 2, RLENGTH)
+        def = sub(def, RLENGTH+1)
+    }
+
+    if (match(def, /^=/)) {
+        def_default = sub(def, 2)
+        # TODO: Unquote the def_default
+        option_arr[ name KSEP OPTION_VAL_DEFAULT ] = def_default
+    }
+
+    if (TOKEN_ARRAY[ LEN ] >= 2) {
+        for ( i=2; i<=TOKEN_ARRAY[ LEN ]; ++i ) {
+            option_arr[ name KSEP OPTION_VAL_OPARR KSEP (i-1) ] = TOKEN_ARRAY[i]
+        }
+        option_arr[ name KSEP OPTION_VAL_OPARR KSEP LEN ] = i - 2
+    } else {
+        type_rule = type_arr[ def_type ]
+        if (type_rule == "") {
+            panic_error("Unknow rule name: \n" def_type)
+        }
+
+        tokenize_argument_into_TOKEN_ARRAY( type_rule )
+
+        for ( i=1; i<=TOKEN_ARRAY[ LEN ]; ++i ) {
+            option_arr[ name KSEP OPTION_VAL_OPARR KSEP i ] = TOKEN_ARRAY[i]
+        }
+        option_arr[ name KSEP OPTION_VAL_OPARR KSEP LEN ] = i - 1
+    }
+
 }
 
 function parse_param_dsl(line,
@@ -364,6 +428,8 @@ function parse_param_dsl(line,
                     tmp = tmp " " TOKEN_ARRAY[i]
                 }
                 option_arr[ option_name KSEP 1 ] = tmp
+                # TODO: handle the first option value
+                # Get header() and type
 
                 j = 1
                 while (true) {
@@ -373,6 +439,7 @@ function parse_param_dsl(line,
                     }
                     j = j + 1
                     option_arr[ option_name KSEP j ] = nextline
+                    # TODO: handle the second option value
                 }
                 option_arr[ option_name KSEP LEN ] = j
 
@@ -444,9 +511,9 @@ function handle_arguments(
             }
 
             arg_typecheck_then_generate_code(
+                option_name KSEP 1
                 option_varname, 
                 arg_val,
-                option_arr[ option_name KSEP 1 ]
             )
         } else {
             for ( j=1; j<=option_num; ++j ) {
@@ -457,9 +524,9 @@ function handle_arguments(
                 }
 
                 arg_typecheck_then_generate_code(
+                    option_name KSEP j
                     option_varname "_" j,
                     arg_val,
-                    option_arr[ option_name KSEP j ]
                 )
             }
         }
@@ -467,6 +534,8 @@ function handle_arguments(
     }
 
     if (i <= arg_arr_len) {
+
+        for ()
         # Check if all required options are ready.
 
         # handle rest argv
