@@ -332,6 +332,7 @@ function handle_option_name(option_name,
     }
 }
 
+# name is key_prefix like OPTION_NAME
 function handle_option_value(arg_typedef, name,
     def, def_name, def_type, tmp, type_rule, i){
 
@@ -440,8 +441,6 @@ function parse_param_dsl(line,
                     tmp = tmp " " TOKEN_ARRAY[i]
                 }
                 option_arr[ option_name KSEP 1 ] = tmp
-                # TODO: handle the first option value
-                # Get header() and type
 
                 j = 1
                 while (true) {
@@ -451,7 +450,6 @@ function parse_param_dsl(line,
                     }
                     j = j + 1
                     option_arr[ option_name KSEP j ] = nextline
-                    # TODO: handle the second option value
                 }
                 option_arr[ option_name KSEP LEN ] = j
 
@@ -508,6 +506,13 @@ function check_required_option_ready(
             continue
         }
 
+        if ( true == option_m ) {
+            append_code_assignment( 
+                option_varname "_n", 
+                1
+            )
+        }
+
         # required?
         if (option_num == 1) {
             val = arg_default_map[ option_name ]
@@ -515,24 +520,31 @@ function check_required_option_ready(
                 val = option_arr[ option_name KSEP OPTION_VAL_DEFAULT ]
             }
 
-            append_code_assignment( 
-                option_varname, 
+            if (val == OPTION_VAL_DEFAULT_REQUIRED_VALUE) {
+                panic_error("Required a value in option: " option_name " " j)
+            }
+
+            assert(option_name KSEP 1, option_varname, val)
+
+            append_code_assignment(
+                option_varname,
                 val 
             )
             continue
         }
 
         for ( j=1; j<=option_num; ++j ) {
+            val = option_arr[ option_name KSEP j KSEP OPTION_VAL_DEFAULT ]
+
+            if (val == OPTION_VAL_DEFAULT_REQUIRED_VALUE) {
+                panic_error("Required a value in option: " option_name " " j)
+            }
+
+            assert(option_name KSEP 1, option_varname "_" j, val)
+
             append_code_assignment( 
                 option_varname "_" j, 
-                option_arr[ option_name KSEP j KSEP OPTION_VAL_DEFAULT ] 
-            )
-        }
-
-        if ( true == option_m ) {
-            append_code_assignment( 
-                option_varname "_n", 
-                1
+                val
             )
         }
     }
@@ -607,13 +619,21 @@ function handle_arguments(
         i += 1
     }
 
-    if (i <= arg_arr_len) {
+    check_required_option_ready()
 
-        check_required_option_ready()
-        # Check if all required options are ready.
+    if (i <= arg_arr_len) {
 
         # handle rest argv
         # TODO: print code set -- arguments
+        append("set --")
+
+        rest_argv[ LEN ] = 0
+
+        for (j=i; j<=arg_arr_len; ++j) {
+            tmp = tmp " \"$" i "\""
+        }
+
+        # TODO: using subcommand
     } else {
         append_code("set --")
     }
@@ -629,10 +649,8 @@ NR==1 {
 
 
 NR==2 {
+    # TODO: setting default values
     parse_param_dsl($0)
-    # analyze option line
-
-    # analyze subcommand lines
 }
 
 NR==3 {
@@ -645,8 +663,9 @@ NR==3 {
 ###############################
 
 NR>=4 {
+    # Setting default values
     if (keyline == "") {
-        keyline = $0
+        keyline = arg_name_2_option_name[ $0 ]
     } else {
         arg_default_map[keyline] = $0
         keyline = ""
