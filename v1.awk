@@ -21,7 +21,7 @@ function append_code(code){
     CODE=CODE "\n" code
 }
 
-function append_code_setval(varname, value) {
+function append_code_assignment(varname, value) {
     append_code( "local " varname " 2>/dev/null" )
     append_code( varname "=" value )
 }
@@ -456,7 +456,6 @@ function parse_param_dsl(line,
 # Step 3 Utils: Handle code
 ###############################
 
-
 function check_required_option_ready(
     i, j, option, option_num, option_name, option_m, option_varname ) 
 {
@@ -466,8 +465,11 @@ function check_required_option_ready(
 
         if ( option_arr_value_set[ option_name ] == true ) {
             if (option_m == true) {
-                option_varname = option_varname "_" n
-                append_code_setval( option_varname, arg_count[ option_name ] )
+                option_varname = option_varname "_n"
+                append_code_assignment( 
+                    option_varname, 
+                    option_assignment_count[ option_name ] 
+                )
             }
             continue
         }
@@ -491,7 +493,7 @@ function check_required_option_ready(
                 val = option_arr[ option_name KSEP OPTION_VAL_DEFAULT ]
             }
 
-            append_code_setval( 
+            append_code_assignment( 
                 option_varname, 
                 val 
             )
@@ -499,9 +501,16 @@ function check_required_option_ready(
         }
 
         for ( j=1; j<=option_num; ++j ) {
-            append_code_setval( 
+            append_code_assignment( 
                 option_varname "_" j, 
                 option_arr[ option_name KSEP j KSEP OPTION_VAL_DEFAULT ] 
+            )
+        }
+
+        if ( true == option_m ) {
+            append_code_assignment( 
+                option_varname "_n", 
+                1
             )
         }
     }
@@ -533,8 +542,8 @@ function handle_arguments(
         option_varname  = option_arr[ option_name KSEP OPTION_VARNAME ]
         gsub(/^--?/, "", option_varname)
         if (option_m == true) {
-            counter = (arg_count[ option_name ] || 0) + 1
-            arg_count[ option_name ] = counter
+            counter = (option_assignment_count[ option_name ] || 0) + 1
+            option_assignment_count[ option_name ] = counter
             option_varname = option_varname "_" counter
         }
 
