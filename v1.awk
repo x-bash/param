@@ -17,6 +17,19 @@ function quote_string(str){
     return "\"" str "\""
 }
 
+function str_unquote(str){
+    gsub(/\\\"/, "\"", str)
+    return substr(str, 2, length(str)-2)
+}
+
+function str_unquote_if_quoted(str){
+    if (str ~ /^\".+\"$/) #"
+    {
+        return str_unquote(str)
+    }
+    return str
+}
+
 function append_code(code){
     CODE=CODE "\n" code
 }
@@ -123,6 +136,7 @@ function assert_arr_eq(option_val_name, arg_name, value, sep,
         sw = false
         for (idx=2; idx<=op_arr_len; ++idx) {
             val = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+            val = str_unquote_if_quoted( val )
             if ( value_arr[i] == val ) {
                 sw = true
                 break
@@ -146,6 +160,7 @@ function assert_arr_regex(option_val_name, arg_name, value, sep,
         sw = false
         for (idx=2; idx<=len; ++idx) {
             val = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+            val = str_unquote_if_quoted( val )
             if (match( value_arr[i], val )) {
                 sw = true
                 break
@@ -176,6 +191,7 @@ function assert(option_val_name, arg_name, arg_val,
         len = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP LEN ]
         for (idx=2; idx<=len; ++idx) {
             val = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+            val = str_unquote_if_quoted( val )
             if (arg_val == val) {
                 sw = true
                 break
@@ -191,6 +207,7 @@ function assert(option_val_name, arg_name, arg_val,
         len = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP LEN ]
         for (idx=2; idx<=len; ++idx) {
             val = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+            val = str_unquote_if_quoted( val )
             if (match(arg_val, "^"val"$")) {
                 sw = true
                 break
@@ -278,6 +295,9 @@ BEGIN {
     OPTION_VAL_NAME = "val_name"
     OPTION_VAL_TYPE = "val_type"
     OPTION_VAL_DEFAULT = "val_default"
+    
+    OPTION_VAL_DEFAULT_REQUIRED_VALUE = "\001"
+
     OPTION_VAL_OPARR = "val_oparr"
 }
 
@@ -335,8 +355,10 @@ function handle_option_value(arg_typedef, name,
 
     if (match(def, /^=/)) {
         def_default = sub(def, 2)
-        # TODO: Unquote the def_default
-        option_arr[ name KSEP OPTION_VAL_DEFAULT ] = def_default
+        option_arr[ name KSEP OPTION_VAL_DEFAULT ] = str_unquote_if_quoted( def_default )
+    } else {
+        # It means, it is required.
+        option_arr[ name KSEP OPTION_VAL_DEFAULT ] = OPTION_VAL_DEFAULT_REQUIRED_VALUE
     }
 
     if (TOKEN_ARRAY[ LEN ] >= 2) {
@@ -587,13 +609,11 @@ function handle_arguments(
 
     if (i <= arg_arr_len) {
 
-       
+        check_required_option_ready()
         # Check if all required options are ready.
 
         # handle rest argv
         # TODO: print code set -- arguments
-
-        # TODO: typecheck the argument value
     } else {
         append_code("set --")
     }
