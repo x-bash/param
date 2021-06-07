@@ -21,6 +21,11 @@ function append_code(code){
     CODE=CODE "\n" code
 }
 
+function append_code_setval(varname, value) {
+    append_code( "local " varname " 2>/dev/null" )
+    append_code( varname "=" value )
+}
+
 function exit_print(code){
     print "return " code " 2>/dev/null || exit " code
     exit code
@@ -212,24 +217,10 @@ function assert(option_val_name, arg_name, arg_val,
     return true
 }
 
-# function typecheck(option_val_name, arg_val,
-#     len, i, token) {
-
-#     tokenize_argument_into_TOKEN_ARRAY(arg_rule)
-#     for (i=1; i<=len; ++i) {
-#         assert(option_val_name, arg_name, arg_val, TOKEN_ARRAY)
-#     }
-# }
-
-function parse_type(){
-
-}
 
 function arg_typecheck_then_generate_code(option_val_name, arg_var_name, arg_val,
     def, tmp ){
 
-
-    # typecheck(option_val_name, arg_val)
     assert(option_val_name, arg_var_name, arg_val)
 
     append_code( "local " arg_var_name  " 2>/dev/null" )
@@ -275,7 +266,6 @@ BEGIN {
 BEGIN {
     option_arr[ LEN ]=0
     option_name_list[ LEN ] = 0
-    # arg_name_2_option_name
 
     OPTION_NUM = "num"
     OPTION_SHORT = "shoft"
@@ -467,6 +457,57 @@ function parse_param_dsl(line,
 ###############################
 
 
+function check_required_option_ready(
+    i, j, option, option_num, option_name, option_m, option_varname ) 
+{
+    for (i=1; i<option_name_list[ LEN ]; ++i) {
+        option_name     = option_name_list[ i ]
+        option_m        = option_arr[ option_name KSEP OPTION_M ]
+
+        if ( option_arr_value_set[ option_name ] == true ) {
+            if (option_m == true) {
+                option_varname = option_varname "_" n
+                append_code_setval( option_varname, arg_count[ option_name ] )
+            }
+            continue
+        }
+
+        option_num = option_arr[ option_name KSEP OPTION_NUM ]
+        option_varname  = option_arr[ option_name KSEP OPTION_VARNAME ]
+        
+        gsub(/^--?/, "", option_varname)
+        if (option_m == true) {
+            option_varname = option_varname "_" 1
+        }
+
+        if (option_num == 0) {
+            continue
+        }
+
+        # required?
+        if (option_num == 1) {
+            val = arg_default_map[ option_name ]
+            if (length(val) == 0) {
+                val = option_arr[ option_name KSEP OPTION_VAL_DEFAULT ]
+            }
+
+            append_code_setval( 
+                option_varname, 
+                val 
+            )
+            continue
+        }
+
+        for ( j=1; j<=option_num; ++j ) {
+            append_code_setval( 
+                option_varname "_" j, 
+                option_arr[ option_name KSEP j KSEP OPTION_VAL_DEFAULT ] 
+            )
+        }
+    }
+    
+}
+
 ###############################
 # handle_arguments
 ###############################
@@ -485,17 +526,19 @@ function handle_arguments(
         }
 
         option_name     = arg_name_2_option_name[arg_name]
+        option_arr_value_set[ option_name ] = true
 
         option_num      = option_arr[ option_name KSEP LEN ]
         option_m        = option_arr[ option_name KSEP OPTION_M ]
         option_varname  = option_arr[ option_name KSEP OPTION_VARNAME ]
         gsub(/^--?/, "", option_varname)
-
         if (option_m == true) {
-            counter = (arg_count[arg_name] || 0) + 1
-            arg_count[arg_name] = counter
+            counter = (arg_count[ option_name ] || 0) + 1
+            arg_count[ option_name ] = counter
             option_varname = option_varname "_" counter
         }
+
+        # TODO: add counter
 
         # Consider unhandled arguments are rest_argv
         if ( !( arg_name ~ /--?/ ) ) break
@@ -535,7 +578,7 @@ function handle_arguments(
 
     if (i <= arg_arr_len) {
 
-        for ()
+       
         # Check if all required options are ready.
 
         # handle rest argv
