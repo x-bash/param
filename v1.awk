@@ -569,6 +569,19 @@ function handle_arguments(
         }
 
         option_name     = arg_name_2_option_name[arg_name]
+
+        # TODO: arg_name
+        if ((option_name == "") && (arg_name ~ /^-[^-]/)) {
+            # try split
+            substr(arg_name, 2)
+            arg_len = split(arg_name, arg_arr, //)
+            for () {
+                # Find option name
+                # setting the option to true
+            }
+            continue
+        }
+
         option_arr_value_set[ option_name ] = true
 
         option_num      = option_arr[ option_name KSEP LEN ]
