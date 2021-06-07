@@ -53,6 +53,7 @@ A
 # Good.
 function parse_into_OPTION_DETAIL(option,
     tmp, arr) {
+        
     option = "--repo|-r       \"Provide repo name\"     <repo>:repo_type=\"\"   "
 
     gsub("\\\\", option, "\001")

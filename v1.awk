@@ -64,7 +64,8 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
             TOKEN_ARRAY[LEN] = len
             astr = substr(astr, RLENGTH+1)
 
-        } else if (match(/^[^ \t\v]+/), astr){
+        } else if (match(/^[^ \t\v\003]+/), astr){ #"
+
             len = TOKEN_ARRAY[LEN] + 1
             tmp = substr(astr, 1, RLENGTH)
             gsub("\004", tmp, " ")
@@ -75,6 +76,16 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
             TOKEN_ARRAY[LEN] = len
             astr = substr(astr, RLENGTH+1)
 
+            if (match(/\003[^\003]+\003/, astr)) {
+                tmp = substr(astr, 1, RLENGTH)
+                gsub("\004", tmp, " ")      # Unwrap
+                gsub("\003", tmp, "")       # Unwrap
+                gsub("\002", tmp, "\"")     
+                gsub("\001", tmp, "\\")     # Unwrap
+                TOKEN_ARRAY[len] = TOKEN_ARRAY[len] tmp
+
+                astr = substr(astr, RLENGTH+1)
+            }
         } else {
             panic_error("Fail to tokenzied following line:\n" original_astr)
         }
@@ -186,11 +197,21 @@ function typecheck(arg_val, arg_rule,
     }
 }
 
-function arg_typecheck_then_generate_code(arg_var_name, arg_val, arg_typedef){
+function parse_type(){
+
+}
+
+function arg_typecheck_then_generate_code(arg_var_name, arg_val, arg_typedef,
+    def, tmp ){
     
     # arg_typedef =>  meta  arg_type
-    match( arg_typedef, /^/ )
-
+    tokenize_argument_into_TOKEN_ARRAY( arg_typedef )
+    def = TOKEN_ARRAY[ 1 ]
+    tmp = ""
+    for ( i=2; i<TOKEN_ARRAY[ LEN ]; ++i ) {
+        tmp = TOKEN_ARRAY[ i ]
+    }
+    
 
 
     if (arg_type ~ /^=/) {
@@ -390,6 +411,11 @@ function handle_arguments(
     i = 1
     while (i <= arg_arr_len) {
         arg_name = arg_arr[i]
+
+        if ( ( arg_name == "--help") && ( arg_name == "-h") ) {
+            print_helpdoc()
+            exit_print(1)
+        }
 
         option_name     = arg_name_2_option_name[arg_name]
 
