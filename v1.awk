@@ -335,15 +335,15 @@ function handle_option_name(option_name,
 }
 
 # name is key_prefix like OPTION_NAME
-function handle_option_value(arg_typedef, name,
+function handle_option_argument_declaration(arg_declaration, name,
     def, def_name, def_type, tmp, type_rule, i){
 
-    # arg_typedef =>  meta  arg_type
-    tokenize_argument_into_TOKEN_ARRAY( arg_typedef )
+    # arg_declaration =>  meta  arg_type
+    tokenize_argument_into_TOKEN_ARRAY( arg_declaration )
     def = TOKEN_ARRAY[ 1 ]
 
     if (! match(def, /^<[-_A-Za-z0-9]+>/)) {
-        panic_error("Unexecpted option value name: \n" arg_typedef)
+        panic_error("Unexecpted option value name: \n" arg_declaration)
     }
 
     def_name = sub(def, 2, RLENGTH-1)
@@ -443,7 +443,7 @@ function parse_param_dsl(line,
                     tmp = tmp " " TOKEN_ARRAY[i]
                 }
                 option_arr[ option_name KSEP 1 ] = tmp
-                handle_option_value( tmp, option_name KSEP 1 )
+                handle_option_argument_declaration( tmp, option_name KSEP 1 )
 
                 j = 1
                 while (true) {
@@ -453,6 +453,7 @@ function parse_param_dsl(line,
                     }
                     j = j + 1
                     option_arr[ option_name KSEP j ] = nextline
+                    handle_option_argument_declaration( nextline, option_name KSEP j )
                 }
                 option_arr[ option_name KSEP LEN ] = j
 
@@ -518,7 +519,7 @@ function check_required_option_ready(
 
         # required?
         if (option_num == 1) {
-            val = arg_default_map[ option_name ]
+            val = arg_declarationault_map[ option_name ]
             if (length(val) == 0) {
                 val = option_arr[ option_name KSEP OPTION_VAL_DEFAULT ]
             }
@@ -683,7 +684,7 @@ NR>=4 {
     if (keyline == "") {
         keyline = arg_name_2_option_name[ $0 ]
     } else {
-        arg_default_map[keyline] = $0
+        arg_declarationault_map[keyline] = $0
         keyline = ""
     }
 }
