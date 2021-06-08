@@ -62,12 +62,11 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
 
     original_astr = astr
 
-    gsub("\\\\", astr, "\001")
-    gsub("\\\"", astr, "\002")
-    gsub("\"", astr, "\003")
-    gsub("\\ ", astr, "\004")
+    gsub("\\\\",    astr, "\001")
+    gsub("\\\"",    astr, "\002")
+    gsub("\"",      astr, "\003")
+    gsub("\\ ",     astr, "\004")
 
-    
     astr = str_trim_left(astr)
     TOKEN_ARRAY[LEN] = 0
     while (length(astr) > 0){
@@ -286,7 +285,7 @@ BEGIN {
     option_arr[ LEN ]=0
     option_id_list[ LEN ] = 0
 
-    OPTION_NUM = "num"
+    OPTION_ARGC = "num"
     OPTION_SHORT = "shoft"
     OPTION_TYPE = "type"
     OPTION_DESC = "desc"
@@ -484,7 +483,7 @@ function parse_param_dsl(line,
 ###############################
 
 function check_required_option_ready(
-    i, j, option, option_num, option_id, option_m, option_name ) 
+    i, j, option, option_argc, option_id, option_m, option_name ) 
 {
     for (i=1; i<option_id_list[ LEN ]; ++i) {
         option_id     = option_id_list[ i ]
@@ -500,9 +499,9 @@ function check_required_option_ready(
             continue
         }
 
-        option_num      = option_arr[ option_id KSEP OPTION_NUM ]
+        option_argc      = option_arr[ option_id KSEP OPTION_ARGC ]
 
-        if ( 0 == option_num ) {
+        if ( 0 == option_argc ) {
             continue
         }
 
@@ -519,7 +518,7 @@ function check_required_option_ready(
         }
 
         # required?
-        if (option_num == 1) {
+        if (option_argc == 1) {
             val = arg_declarationault_map[ option_id ]
             if (length(val) == 0) {
                 val = option_arr[ option_id KSEP OPTARG_DEFAULT ]
@@ -538,7 +537,7 @@ function check_required_option_ready(
             continue
         }
 
-        for ( j=1; j<=option_num; ++j ) {
+        for ( j=1; j<=option_argc; ++j ) {
             val = option_arr[ option_id KSEP j KSEP OPTARG_DEFAULT ]
 
             if (val == OPTARG_DEFAULT_REQUIRED_VALUE) {
@@ -560,7 +559,7 @@ function check_required_option_ready(
 # handle_arguments
 ###############################
 function handle_arguments( 
-    i, j, arg_name, arg_val, option_id, option_num, count) {
+    i, j, arg_name, arg_val, option_id, option_argc, count) {
 
     arg_arr_len = arg_arr[LEN]
 
@@ -589,10 +588,12 @@ function handle_arguments(
 
         option_arr_value_set[ option_id ] = true
 
-        option_num      = option_arr[ option_id KSEP LEN ]
+        option_argc      = option_arr[ option_id KSEP LEN ]
         option_m        = option_arr[ option_id KSEP OPTION_M ]
         option_name  = option_arr[ option_id KSEP OPTION_NAME ]
         gsub(/^--?/, "", option_name)
+
+        # If option_argc == 0, op
         if (option_m == true) {
             counter = (option_assignment_count[ option_id ] || 0) + 1
             option_assignment_count[ option_id ] = counter
@@ -604,10 +605,12 @@ function handle_arguments(
         # Consider unhandled arguments are rest_argv
         if ( !( arg_name ~ /--?/ ) ) break
         
-        if (option_num == 0) {
-            # OK, enable
+        if (option_argc == 0) {
+            append_code_assignment(
+                option_name
+            )
             # print code XXX=true
-        } else if (option_num == 1) {
+        } else if (option_argc == 1) {
             i = i + 1
             arg_val = arg_arr[i]
             if (i > arg_arr_len) {
@@ -620,7 +623,7 @@ function handle_arguments(
                 arg_val,
             )
         } else {
-            for ( j=1; j<=option_num; ++j ) {
+            for ( j=1; j<=option_argc; ++j ) {
                 i += 1
                 arg_val = arg_arr[i]
                 if (i > arg_arr_len) {
