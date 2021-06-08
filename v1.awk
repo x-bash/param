@@ -225,6 +225,8 @@ function assert(option_val_name, arg_name, arg_val,
     } else if (op ~ /^=~.$/) {
         sep = substr(op, 3, 1)
         assert_arr_regex(option_val_name, arg_name, arg_val, sep)
+    } else if (op == "") { 
+        # Do nothing.
     } else {
         print "Op[" op "] Not Match any candidates: \n" line > "/dev/stderr"
         exit_print(1)
@@ -441,6 +443,7 @@ function parse_param_dsl(line,
                     tmp = tmp " " TOKEN_ARRAY[i]
                 }
                 option_arr[ option_name KSEP 1 ] = tmp
+                handle_option_value( tmp, option_name KSEP 1 )
 
                 j = 1
                 while (true) {
