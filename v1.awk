@@ -588,7 +588,7 @@ function handle_arguments(
 
         option_arr_value_set[ option_id ] = true
 
-        option_argc      = option_arr[ option_id KSEP LEN ]
+        option_argc     = option_arr[ option_id KSEP LEN ]
         option_m        = option_arr[ option_id KSEP OPTION_M ]
         option_name  = option_arr[ option_id KSEP OPTION_NAME ]
         gsub(/^--?/, "", option_name)
