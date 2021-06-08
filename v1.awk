@@ -114,28 +114,28 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
 
 ### Type check
 
-function join_to_rule_line(option_val_name, 
+function join_to_rule_line(optarg_id, 
     len, idx, result){
 
     result = ""
-    len = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP LEN ]
+    len = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP LEN ]
     for (idx=1; idx<=len; ++idx) {
-        result = result " " option_arr[ option_val_name KSEP OPTARG_OPARR KSEP idx ]
+        result = result " " option_arr[ optarg_id KSEP OPTARG_OPARR KSEP idx ]
     }
 
     return result
 }
 
-function assert_arr_eq(option_val_name, arg_name, value, sep,
+function assert_arr_eq(optarg_id, arg_name, value, sep,
     i, idx, value_arr_len, value_arr, sw){
 
-    op_arr_len = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP LEN ]
+    op_arr_len = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP LEN ]
 
     value_arr_len = split(value, value_arr, sep)
     for (i=1; i<=value_arr_len; ++i) {
         sw = false
         for (idx=2; idx<=op_arr_len; ++idx) {
-            val = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP idx ]
+            val = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP idx ]
             val = str_unquote_if_quoted( val )
             if ( value_arr[i] == val ) {
                 sw = true
@@ -143,23 +143,23 @@ function assert_arr_eq(option_val_name, arg_name, value, sep,
             }
         }
         if (sw == false) {
-            error( "Arg: [" arg_name "] 's part of value is [" value_arr[i] "]\nFail to match any candidate:\n" join_to_rule_line( option_val_name ) )
+            error( "Arg: [" arg_name "] 's part of value is [" value_arr[i] "]\nFail to match any candidate:\n" join_to_rule_line( optarg_id ) )
             print_helpdoc()
             exit_print(1)
         }
     }
 }
 
-function assert_arr_regex(option_val_name, arg_name, value, sep,
+function assert_arr_regex(optarg_id, arg_name, value, sep,
     i, value_arr_len, value_arr, sw){
 
-    len = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP LEN ]
+    len = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP LEN ]
 
     value_arr_len = split(value, value_arr, sep)
     for (i=1; i<=value_arr_len; ++i) {
         sw = false
         for (idx=2; idx<=len; ++idx) {
-            val = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP idx ]
+            val = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP idx ]
             val = str_unquote_if_quoted( val )
             if (match( value_arr[i], val )) {
                 sw = true
@@ -167,7 +167,7 @@ function assert_arr_regex(option_val_name, arg_name, value, sep,
             }
         }
         if (sw == false) {
-            error( "Arg: [" arg_name "] 's part of value is [" value_arr[i] "]\nFail to match any regex pattern:\n" join_to_rule_line( option_val_name ) )
+            error( "Arg: [" arg_name "] 's part of value is [" value_arr[i] "]\nFail to match any regex pattern:\n" join_to_rule_line( optarg_id ) )
             print_helpdoc()
             exit_print(1)
         }
@@ -175,10 +175,10 @@ function assert_arr_regex(option_val_name, arg_name, value, sep,
 }
 
 # op_arg_idx # token_arr_len, token_arr, op_arg_idx,         
-function assert(option_val_name, arg_name, arg_val,
+function assert(optarg_id, arg_name, arg_val,
     op, sw, idx, len, val){
 
-    op = option_arr[option_val_name KSEP OPTARG_OPARR KSEP 1 ]
+    op = option_arr[optarg_id KSEP OPTARG_OPARR KSEP 1 ]
 
     if (op == "=int") {
         if (! match(arg_val, /[+-]?[0-9]+/) ) {    # float is: /[+-]?[0-9]+(.[0-9]+)?/
@@ -188,9 +188,9 @@ function assert(option_val_name, arg_name, arg_val,
         }
     } else if (op == "=") {
         sw = false
-        len = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP LEN ]
+        len = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP LEN ]
         for (idx=2; idx<=len; ++idx) {
-            val = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP idx ]
+            val = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP idx ]
             val = str_unquote_if_quoted( val )
             if (arg_val == val) {
                 sw = true
@@ -198,15 +198,15 @@ function assert(option_val_name, arg_name, arg_val,
             }
         }
         if (sw == false) {
-            error( "Arg: [" arg_name "] value is [" arg_val "]\nFail to match any candidates:\n" join_to_rule_line(option_val_name) )
+            error( "Arg: [" arg_name "] value is [" arg_val "]\nFail to match any candidates:\n" join_to_rule_line(optarg_id) )
             print_helpdoc()
             exit_print(1)
         }
     } else if (op == "=~") {
         sw = false
-        len = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP LEN ]
+        len = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP LEN ]
         for (idx=2; idx<=len; ++idx) {
-            val = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP idx ]
+            val = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP idx ]
             val = str_unquote_if_quoted( val )
             if (match(arg_val, "^"val"$")) {
                 sw = true
@@ -214,17 +214,17 @@ function assert(option_val_name, arg_name, arg_val,
             }
         }
         if (sw == false) {
-            error( "Arg: [" arg_name "] value is [" arg_val "]\nFail to match any regex pattern:\n" join_to_rule_line(option_val_name) )
+            error( "Arg: [" arg_name "] value is [" arg_val "]\nFail to match any regex pattern:\n" join_to_rule_line(optarg_id) )
             print_helpdoc()
             exit_print(1)
         }
 
     } else if (op ~ /^=.$/) {
         sep = substr(op, 2, 1)
-        assert_arr_eq(option_val_name, arg_name, arg_val, sep)
+        assert_arr_eq( optarg_id, arg_name, arg_val, sep )
     } else if (op ~ /^=~.$/) {
         sep = substr(op, 3, 1)
-        assert_arr_regex(option_val_name, arg_name, arg_val, sep)
+        assert_arr_regex( optarg_id, arg_name, arg_val, sep )
     } else if (op == "") { 
         # Do nothing.
     } else {
@@ -237,13 +237,13 @@ function assert(option_val_name, arg_name, arg_val,
 }
 
 
-function arg_typecheck_then_generate_code(option_val_name, arg_var_name, arg_val,
+function arg_typecheck_then_generate_code(optarg_id, arg_var_name, arg_val,
     def, tmp ){
 
-    assert(option_val_name, arg_var_name, arg_val)
+    assert(optarg_id, arg_var_name, arg_val)
 
     append_code( "local " arg_var_name  " 2>/dev/null" )
-    append_code( arg_var_name "=" quote_string(arg_val) )
+    append_code( arg_var_name "=" quote_string( arg_val ) )
 }
 
 ###############################
@@ -265,7 +265,7 @@ function type_arr_add(line,
     name = substr(line, 1, RLENGTH)
     rest = substr(line, RLENGTH+1)
 
-    type_arr[name] = str_trim(rest)
+    type_arr[name] = str_trim( rest )
 }
 
 ###############################
@@ -284,7 +284,7 @@ BEGIN {
 
 BEGIN {
     option_arr[ LEN ]=0
-    option_name_list[ LEN ] = 0
+    option_id_list[ LEN ] = 0
 
     OPTION_NUM = "num"
     OPTION_SHORT = "shoft"
@@ -292,9 +292,9 @@ BEGIN {
     OPTION_DESC = "desc"
 
     OPTION_M = "M"
-    OPTION_VARNAME = "varname"
+    OPTION_NAME = "varname"
 
-    OPTARG_NAME = "val_name"
+    OPTARG_ID = "val_id"
     OPTARG_TYPE = "val_type"
     OPTARG_DEFAULT = "val_default"
     
@@ -303,34 +303,34 @@ BEGIN {
     OPTARG_OPARR = "val_oparr"
 }
 
-function handle_option_name(option_name,
+function handle_option_id(option_id,
     arr, arr_len, arg_name, i, sw){
 
-    # Add option_name to option_name_list
-    i = option_name_list[ LEN ] + 1
-    option_name_list[i] = option_name
-    option_name_list[ LEN ] = i
+    # Add option_id to option_id_list
+    i = option_id_list[ LEN ] + 1
+    option_id_list[i] = option_id
+    option_id_list[ LEN ] = i
 
-    option_arr[ option_name KSEP OPTION_M ] = false
+    option_arr[ option_id KSEP OPTION_M ] = false
 
-    arr_len = split( option_name, arr, /\|/ )
+    arr_len = split( option_id, arr, /\|/ )
     for (i=1; i<arr_len; ++i) {
         arg_name = arr[i]
 
         if (arg_name == "m") {
-            option_arr[ option_name KSEP OPTION_M ] = true
+            option_arr[ option_id KSEP OPTION_M ] = true
             continue
         }
 
         if (arg_name !~ /^-/) {
-            panic_error("Unexpected option name: \n" option_name)
+            panic_error("Unexpected option name: \n" option_id)
         }
 
         if (i == 1) {
-            option_arr[ option_name KSEP OPTION_VARNAME ] = arg_name
+            option_arr[ option_id KSEP OPTION_NAME ] = arg_name
         }
 
-        arg_name_2_option_name[ arg_name ] = option_name
+        option_alias_2_option_id[ arg_name ] = option_id
     }
 }
 
@@ -348,7 +348,7 @@ function handle_option_argument_declaration(optarg_1_definition, optarg_name,
     }
 
     optarg_name = sub( optarg_definition_token1, 2, RLENGTH-1 )
-    option_arr[ optarg_name KSEP OPTARG_NAME ] = optarg_name
+    option_arr[ optarg_name KSEP OPTARG_ID ] = optarg_name
 
     optarg_definition_token1 = sub( optarg_definition_token1, RLENGTH+1 )
 
@@ -388,7 +388,8 @@ function handle_option_argument_declaration(optarg_1_definition, optarg_name,
 }
 
 function parse_param_dsl(line,
-    line_arr, i, j, state, tmp, len, nextline) {
+    line_arr, i, j, state, tmp, len, nextline,
+    option_id) {
 
     state = 0
     STATE_ADVISE        = 1
@@ -434,18 +435,18 @@ function parse_param_dsl(line,
                 option_arr[ len ] = line
 
                 tokenize_argument_into_TOKEN_ARRAY( line )
-                option_name = TOKEN_ARRAY[1]
-                handle_option_name( option_name )
+                option_id = TOKEN_ARRAY[1]
+                handle_option_id( option_id )
 
                 option_desc = TOKEN_ARRAY[2]
-                option_arr[ option_name KSEP OPTION_DESC ] = option_desc 
+                option_arr[ option_id KSEP OPTION_DESC ] = option_desc 
 
                 tmp = ""
                 for (i=3; i<=TOKEN_ARRAY[LEN]; ++i) {
                     tmp = tmp " " TOKEN_ARRAY[i]
                 }
-                option_arr[ option_name KSEP 1 ] = tmp
-                handle_option_argument_declaration( tmp, option_name KSEP 1 )
+                option_arr[ option_id KSEP 1 ] = tmp
+                handle_option_argument_declaration( tmp, option_id KSEP 1 )
 
                 j = 1
                 while (true) {
@@ -454,10 +455,10 @@ function parse_param_dsl(line,
                         break
                     }
                     j = j + 1
-                    option_arr[ option_name KSEP j ] = nextline
-                    handle_option_argument_declaration( nextline, option_name KSEP j )
+                    option_arr[ option_id KSEP j ] = nextline
+                    handle_option_argument_declaration( nextline, option_id KSEP j )
                 }
-                option_arr[ option_name KSEP LEN ] = j
+                option_arr[ option_id KSEP LEN ] = j
 
             } else if ( state == STATE_TYPE ) {
                 type_arr_add( line )
@@ -483,73 +484,71 @@ function parse_param_dsl(line,
 ###############################
 
 function check_required_option_ready(
-    i, j, option, option_num, option_name, option_m, option_varname ) 
+    i, j, option, option_num, option_id, option_m, option_name ) 
 {
-    for (i=1; i<option_name_list[ LEN ]; ++i) {
-        option_name     = option_name_list[ i ]
-        option_m        = option_arr[ option_name KSEP OPTION_M ]
+    for (i=1; i<option_id_list[ LEN ]; ++i) {
+        option_id     = option_id_list[ i ]
+        option_m        = option_arr[ option_id KSEP OPTION_M ]
 
-        if ( option_arr_value_set[ option_name ] == true ) {
+        if ( option_arr_value_set[ option_id ] == true ) {
             if (option_m == true) {
-                option_varname = option_varname "_n"
                 append_code_assignment( 
-                    option_varname, 
-                    option_assignment_count[ option_name ] 
+                    option_name "_n", 
+                    option_assignment_count[ option_id ] 
                 )
             }
             continue
         }
 
-        option_num = option_arr[ option_name KSEP OPTION_NUM ]
-        option_varname  = option_arr[ option_name KSEP OPTION_VARNAME ]
-        
-        gsub(/^--?/, "", option_varname)
-        if (option_m == true) {
-            option_varname = option_varname "_" 1
-        }
+        option_num      = option_arr[ option_id KSEP OPTION_NUM ]
 
-        if (option_num == 0) {
+        if ( 0 == option_num ) {
             continue
         }
 
+        option_name     = option_arr[ option_id KSEP OPTION_NAME ]
+        
+        gsub(/^--?/, "", option_name)
         if ( true == option_m ) {
             append_code_assignment( 
-                option_varname "_n", 
+                option_name "_n",
                 1
             )
+
+            option_name = option_name "_" 1
         }
 
         # required?
         if (option_num == 1) {
-            val = arg_declarationault_map[ option_name ]
+            val = arg_declarationault_map[ option_id ]
             if (length(val) == 0) {
-                val = option_arr[ option_name KSEP OPTARG_DEFAULT ]
+                val = option_arr[ option_id KSEP OPTARG_DEFAULT ]
             }
 
             if (val == OPTARG_DEFAULT_REQUIRED_VALUE) {
-                panic_error("Required a value in option: " option_name " " j)
+                panic_error("Required a value in option: " option_id " " j)
             }
 
-            assert(option_name KSEP 1, option_varname, val)
+            assert(option_id KSEP 1, option_name, val)
 
             append_code_assignment(
-                option_varname,
+                option_name,
                 val 
             )
             continue
         }
 
         for ( j=1; j<=option_num; ++j ) {
-            val = option_arr[ option_name KSEP j KSEP OPTARG_DEFAULT ]
+            val = option_arr[ option_id KSEP j KSEP OPTARG_DEFAULT ]
 
             if (val == OPTARG_DEFAULT_REQUIRED_VALUE) {
-                panic_error("Required a value in option: " option_name " " j)
+                panic_error("Required a value in option: " option_id " " j)
             }
 
-            assert(option_name KSEP 1, option_varname "_" j, val)
+            assert(option_id KSEP 1, option_name "_" j, val)
 
             append_code_assignment( 
-                option_varname "_" j, 
+                option_name "_" j, 
                 val
             )
         }
@@ -561,7 +560,7 @@ function check_required_option_ready(
 # handle_arguments
 ###############################
 function handle_arguments( 
-    i, j, arg_name, arg_val, option_name, option_num, count) {
+    i, j, arg_name, arg_val, option_id, option_num, count) {
 
     arg_arr_len = arg_arr[LEN]
 
@@ -574,10 +573,10 @@ function handle_arguments(
             exit_print(1)
         }
 
-        option_name     = arg_name_2_option_name[arg_name]
+        option_id     = option_alias_2_option_id[arg_name]
 
         # TODO: arg_name
-        if ((option_name == "") && (arg_name ~ /^-[^-]/)) {
+        if ((option_id == "") && (arg_name ~ /^-[^-]/)) {
             # try split
             substr(arg_name, 2)
             arg_len = split(arg_name, arg_arr, //)
@@ -588,16 +587,16 @@ function handle_arguments(
             continue
         }
 
-        option_arr_value_set[ option_name ] = true
+        option_arr_value_set[ option_id ] = true
 
-        option_num      = option_arr[ option_name KSEP LEN ]
-        option_m        = option_arr[ option_name KSEP OPTION_M ]
-        option_varname  = option_arr[ option_name KSEP OPTION_VARNAME ]
-        gsub(/^--?/, "", option_varname)
+        option_num      = option_arr[ option_id KSEP LEN ]
+        option_m        = option_arr[ option_id KSEP OPTION_M ]
+        option_name  = option_arr[ option_id KSEP OPTION_NAME ]
+        gsub(/^--?/, "", option_name)
         if (option_m == true) {
-            counter = (option_assignment_count[ option_name ] || 0) + 1
-            option_assignment_count[ option_name ] = counter
-            option_varname = option_varname "_" counter
+            counter = (option_assignment_count[ option_id ] || 0) + 1
+            option_assignment_count[ option_id ] = counter
+            option_name = option_name "_" counter
         }
 
         # TODO: add counter
@@ -616,8 +615,8 @@ function handle_arguments(
             }
 
             arg_typecheck_then_generate_code(
-                option_name KSEP 1
-                option_varname, 
+                option_id KSEP 1
+                option_name, 
                 arg_val,
             )
         } else {
@@ -629,8 +628,8 @@ function handle_arguments(
                 }
 
                 arg_typecheck_then_generate_code(
-                    option_name KSEP j
-                    option_varname "_" j,
+                    option_id KSEP j
+                    option_name "_" j,
                     arg_val,
                 )
             }
@@ -684,7 +683,7 @@ NR==3 {
 NR>=4 {
     # Setting default values
     if (keyline == "") {
-        keyline = arg_name_2_option_name[ $0 ]
+        keyline = option_alias_2_option_id[ $0 ]
     } else {
         arg_declarationault_map[keyline] = $0
         keyline = ""
