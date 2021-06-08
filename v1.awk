@@ -113,7 +113,7 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
 
 ### Type check
 
-function join_to_rule_line(optarg_id, 
+function join_optarg_oparr(optarg_id, 
     len, idx, result){
 
     result = ""
@@ -126,7 +126,7 @@ function join_to_rule_line(optarg_id,
 }
 
 function assert_arr_eq(optarg_id, arg_name, value, sep,
-    i, idx, value_arr_len, value_arr, sw){
+    op_arr_len, i, idx, value_arr_len, value_arr, candidate, sw){
 
     op_arr_len = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP LEN ]
 
@@ -134,15 +134,15 @@ function assert_arr_eq(optarg_id, arg_name, value, sep,
     for (i=1; i<=value_arr_len; ++i) {
         sw = false
         for (idx=2; idx<=op_arr_len; ++idx) {
-            val = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP idx ]
-            val = str_unquote_if_quoted( val )
-            if ( value_arr[i] == val ) {
+            candidate = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP idx ]
+            candidate = str_unquote_if_quoted( candidate )
+            if ( value_arr[i] == candidate ) {
                 sw = true
                 break
             }
         }
         if (sw == false) {
-            error( "Arg: [" arg_name "] 's part of value is [" value_arr[i] "]\nFail to match any candidate:\n" join_to_rule_line( optarg_id ) )
+            error( "Arg: [" arg_name "] 's part of value is [" value_arr[i] "]\nFail to match any candidate:\n" join_optarg_oparr( optarg_id ) )
             print_helpdoc()
             exit_print(1)
         }
@@ -166,7 +166,7 @@ function assert_arr_regex(optarg_id, arg_name, value, sep,
             }
         }
         if (sw == false) {
-            error( "Arg: [" arg_name "] 's part of value is [" value_arr[i] "]\nFail to match any regex pattern:\n" join_to_rule_line( optarg_id ) )
+            error( "Arg: [" arg_name "] 's part of value is [" value_arr[i] "]\nFail to match any regex pattern:\n" join_optarg_oparr( optarg_id ) )
             print_helpdoc()
             exit_print(1)
         }
@@ -197,7 +197,7 @@ function assert(optarg_id, arg_name, arg_val,
             }
         }
         if (sw == false) {
-            error( "Arg: [" arg_name "] value is [" arg_val "]\nFail to match any candidates:\n" join_to_rule_line(optarg_id) )
+            error( "Arg: [" arg_name "] value is [" arg_val "]\nFail to match any candidates:\n" join_optarg_oparr(optarg_id) )
             print_helpdoc()
             exit_print(1)
         }
@@ -213,7 +213,7 @@ function assert(optarg_id, arg_name, arg_val,
             }
         }
         if (sw == false) {
-            error( "Arg: [" arg_name "] value is [" arg_val "]\nFail to match any regex pattern:\n" join_to_rule_line(optarg_id) )
+            error( "Arg: [" arg_name "] value is [" arg_val "]\nFail to match any regex pattern:\n" join_optarg_oparr(optarg_id) )
             print_helpdoc()
             exit_print(1)
         }
@@ -334,7 +334,7 @@ function handle_option_id(option_id,
 }
 
 # name is key_prefix like OPTION_NAME
-function handle_option_argument_declaration(optarg_1_definition, optarg_name,
+function handle_optarg_declaration(optarg_1_definition, optarg_name,
     optarg_definition_token1, optarg_name, optarg_type, 
     default_value, tmp, type_rule, i
     ){
@@ -445,7 +445,7 @@ function parse_param_dsl(line,
                     tmp = tmp " " TOKEN_ARRAY[i]
                 }
                 option_arr[ option_id KSEP 1 ] = tmp
-                handle_option_argument_declaration( tmp, option_id KSEP 1 )
+                handle_optarg_declaration( tmp, option_id KSEP 1 )
 
                 j = 1
                 while (true) {
@@ -455,7 +455,7 @@ function parse_param_dsl(line,
                     }
                     j = j + 1
                     option_arr[ option_id KSEP j ] = nextline
-                    handle_option_argument_declaration( nextline, option_id KSEP j )
+                    handle_optarg_declaration( nextline, option_id KSEP j )
                 }
                 option_arr[ option_id KSEP LEN ] = j
 
