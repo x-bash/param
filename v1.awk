@@ -519,7 +519,7 @@ function check_required_option_ready(
 
         # required?
         if (option_argc == 1) {
-            val = arg_declarationault_map[ option_id ]
+            val = option_default_map[ option_id ]
             if (length(val) == 0) {
                 val = option_arr[ option_id KSEP OPTARG_DEFAULT ]
             }
@@ -688,7 +688,7 @@ NR>=4 {
     if (keyline == "") {
         keyline = option_alias_2_option_id[ $0 ]
     } else {
-        arg_declarationault_map[keyline] = $0
+        option_default_map[keyline] = $0
         keyline = ""
     }
 }
