@@ -335,32 +335,31 @@ function handle_option_name(option_name,
 }
 
 # name is key_prefix like OPTION_NAME
-function handle_option_argument_declaration(optarg_declaration, optarg_name,
-    optarg_declaration, optarg_typename, optarg_type, 
+function handle_option_argument_declaration(optarg_1_definition, optarg_name,
+    optarg_definition_token1, optarg_typename, optarg_type, 
     default_value, tmp, type_rule, i
     ){
 
-    # optarg_declaration =>  meta  arg_type
-    tokenize_argument_into_TOKEN_ARRAY( optarg_declaration )
-    optarg_declaration = TOKEN_ARRAY[ 1 ]
+    tokenize_argument_into_TOKEN_ARRAY( optarg_1_definition )
+    optarg_definition_token1 = TOKEN_ARRAY[ 1 ]
 
     if (! match(def, /^<[-_A-Za-z0-9]+>/)) {
-        panic_error("Unexecpted optarg declaration: \n" optarg_declaration)
+        panic_error("Unexecpted optarg declaration: \n" optarg_1_definition)
     }
 
-    optarg_typename = sub( optarg_declaration, 2, RLENGTH-1 )
+    optarg_typename = sub( optarg_definition_token1, 2, RLENGTH-1 )
     # TODO: rename OPTION_VAL_NAME
     option_arr[ optarg_name KSEP OPTION_VAL_NAME ] = optarg_typename
 
-    optarg_declaration = sub( optarg_declaration, RLENGTH+1 )
+    optarg_definition_token1 = sub( optarg_definition_token1, RLENGTH+1 )
 
-    if (match( optarg_declaration, /^:[-_A-Za-z0-9]+/) ) {
-        optarg_type = sub( optarg_declaration, 2, RLENGTH ) 
-        optarg_declaration = sub( optarg_declaration, RLENGTH+1 )
+    if (match( optarg_definition_token1, /^:[-_A-Za-z0-9]+/) ) {
+        optarg_type = sub( optarg_definition_token1, 2, RLENGTH ) 
+        optarg_definition_token1 = sub( optarg_definition_token1, RLENGTH+1 )
     }
 
-    if (match( optarg_declaration , /^=/) ) {
-        default_value = sub( optarg_declaration, 2 )
+    if (match( optarg_definition_token1 , /^=/) ) {
+        default_value = sub( optarg_definition_token1, 2 )
         option_arr[ optarg_name KSEP OPTION_VAL_DEFAULT ] = str_unquote_if_quoted( default_value )
     } else {
         # It means, it is required.
