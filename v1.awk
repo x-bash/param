@@ -294,11 +294,11 @@ BEGIN {
     OPTION_M = "M"
     OPTION_VARNAME = "varname"
 
-    OPTION_VAL_NAME = "val_name"
-    OPTION_VAL_TYPE = "val_type"
-    OPTION_VAL_DEFAULT = "val_default"
+    OPTARG_NAME = "val_name"
+    OPTARG_TYPE = "val_type"
+    OPTARG_DEFAULT = "val_default"
     
-    OPTION_VAL_DEFAULT_REQUIRED_VALUE = "\001"
+    OPTARG_DEFAULT_REQUIRED_VALUE = "\001"
 
     OPTION_VAL_OPARR = "val_oparr"
 }
@@ -336,7 +336,7 @@ function handle_option_name(option_name,
 
 # name is key_prefix like OPTION_NAME
 function handle_option_argument_declaration(optarg_1_definition, optarg_name,
-    optarg_definition_token1, optarg_typename, optarg_type, 
+    optarg_definition_token1, optarg_name, optarg_type, 
     default_value, tmp, type_rule, i
     ){
 
@@ -347,9 +347,8 @@ function handle_option_argument_declaration(optarg_1_definition, optarg_name,
         panic_error("Unexecpted optarg declaration: \n" optarg_1_definition)
     }
 
-    optarg_typename = sub( optarg_definition_token1, 2, RLENGTH-1 )
-    # TODO: rename OPTION_VAL_NAME
-    option_arr[ optarg_name KSEP OPTION_VAL_NAME ] = optarg_typename
+    optarg_name = sub( optarg_definition_token1, 2, RLENGTH-1 )
+    option_arr[ optarg_name KSEP OPTARG_NAME ] = optarg_name
 
     optarg_definition_token1 = sub( optarg_definition_token1, RLENGTH+1 )
 
@@ -360,10 +359,10 @@ function handle_option_argument_declaration(optarg_1_definition, optarg_name,
 
     if (match( optarg_definition_token1 , /^=/) ) {
         default_value = sub( optarg_definition_token1, 2 )
-        option_arr[ optarg_name KSEP OPTION_VAL_DEFAULT ] = str_unquote_if_quoted( default_value )
+        option_arr[ optarg_name KSEP OPTARG_DEFAULT ] = str_unquote_if_quoted( default_value )
     } else {
         # It means, it is required.
-        option_arr[ optarg_name KSEP OPTION_VAL_DEFAULT ] = OPTION_VAL_DEFAULT_REQUIRED_VALUE
+        option_arr[ optarg_name KSEP OPTARG_DEFAULT ] = OPTARG_DEFAULT_REQUIRED_VALUE
     }
 
     if (TOKEN_ARRAY[ LEN ] >= 2) {
@@ -374,7 +373,8 @@ function handle_option_argument_declaration(optarg_1_definition, optarg_name,
     } else {
         type_rule = type_arr[ optarg_type ]
         if (type_rule == "") {
-            panic_error("Unknown type: \n" optarg_type)
+            # panic_error("Unknown type: \n" optarg_type)
+            return
         }
 
         tokenize_argument_into_TOKEN_ARRAY( type_rule )
@@ -523,10 +523,10 @@ function check_required_option_ready(
         if (option_num == 1) {
             val = arg_declarationault_map[ option_name ]
             if (length(val) == 0) {
-                val = option_arr[ option_name KSEP OPTION_VAL_DEFAULT ]
+                val = option_arr[ option_name KSEP OPTARG_DEFAULT ]
             }
 
-            if (val == OPTION_VAL_DEFAULT_REQUIRED_VALUE) {
+            if (val == OPTARG_DEFAULT_REQUIRED_VALUE) {
                 panic_error("Required a value in option: " option_name " " j)
             }
 
@@ -540,9 +540,9 @@ function check_required_option_ready(
         }
 
         for ( j=1; j<=option_num; ++j ) {
-            val = option_arr[ option_name KSEP j KSEP OPTION_VAL_DEFAULT ]
+            val = option_arr[ option_name KSEP j KSEP OPTARG_DEFAULT ]
 
-            if (val == OPTION_VAL_DEFAULT_REQUIRED_VALUE) {
+            if (val == OPTARG_DEFAULT_REQUIRED_VALUE) {
                 panic_error("Required a value in option: " option_name " " j)
             }
 
