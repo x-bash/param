@@ -118,9 +118,9 @@ function join_to_rule_line(option_val_name,
     len, idx, result){
 
     result = ""
-    len = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP LEN ]
+    len = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP LEN ]
     for (idx=1; idx<=len; ++idx) {
-        result = result " " option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+        result = result " " option_arr[ option_val_name KSEP OPTARG_OPARR KSEP idx ]
     }
 
     return result
@@ -129,13 +129,13 @@ function join_to_rule_line(option_val_name,
 function assert_arr_eq(option_val_name, arg_name, value, sep,
     i, idx, value_arr_len, value_arr, sw){
 
-    op_arr_len = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP LEN ]
+    op_arr_len = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP LEN ]
 
     value_arr_len = split(value, value_arr, sep)
     for (i=1; i<=value_arr_len; ++i) {
         sw = false
         for (idx=2; idx<=op_arr_len; ++idx) {
-            val = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+            val = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP idx ]
             val = str_unquote_if_quoted( val )
             if ( value_arr[i] == val ) {
                 sw = true
@@ -153,13 +153,13 @@ function assert_arr_eq(option_val_name, arg_name, value, sep,
 function assert_arr_regex(option_val_name, arg_name, value, sep,
     i, value_arr_len, value_arr, sw){
 
-    len = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP LEN ]
+    len = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP LEN ]
 
     value_arr_len = split(value, value_arr, sep)
     for (i=1; i<=value_arr_len; ++i) {
         sw = false
         for (idx=2; idx<=len; ++idx) {
-            val = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+            val = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP idx ]
             val = str_unquote_if_quoted( val )
             if (match( value_arr[i], val )) {
                 sw = true
@@ -178,7 +178,7 @@ function assert_arr_regex(option_val_name, arg_name, value, sep,
 function assert(option_val_name, arg_name, arg_val,
     op, sw, idx, len, val){
 
-    op = option_arr[option_val_name KSEP OPTION_VAL_OPARR KSEP 1 ]
+    op = option_arr[option_val_name KSEP OPTARG_OPARR KSEP 1 ]
 
     if (op == "=int") {
         if (! match(arg_val, /[+-]?[0-9]+/) ) {    # float is: /[+-]?[0-9]+(.[0-9]+)?/
@@ -188,9 +188,9 @@ function assert(option_val_name, arg_name, arg_val,
         }
     } else if (op == "=") {
         sw = false
-        len = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP LEN ]
+        len = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP LEN ]
         for (idx=2; idx<=len; ++idx) {
-            val = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+            val = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP idx ]
             val = str_unquote_if_quoted( val )
             if (arg_val == val) {
                 sw = true
@@ -204,9 +204,9 @@ function assert(option_val_name, arg_name, arg_val,
         }
     } else if (op == "=~") {
         sw = false
-        len = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP LEN ]
+        len = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP LEN ]
         for (idx=2; idx<=len; ++idx) {
-            val = option_arr[ option_val_name KSEP OPTION_VAL_OPARR KSEP idx ]
+            val = option_arr[ option_val_name KSEP OPTARG_OPARR KSEP idx ]
             val = str_unquote_if_quoted( val )
             if (match(arg_val, "^"val"$")) {
                 sw = true
@@ -300,7 +300,7 @@ BEGIN {
     
     OPTARG_DEFAULT_REQUIRED_VALUE = "\001"
 
-    OPTION_VAL_OPARR = "val_oparr"
+    OPTARG_OPARR = "val_oparr"
 }
 
 function handle_option_name(option_name,
@@ -367,9 +367,9 @@ function handle_option_argument_declaration(optarg_1_definition, optarg_name,
 
     if (TOKEN_ARRAY[ LEN ] >= 2) {
         for ( i=2; i<=TOKEN_ARRAY[ LEN ]; ++i ) {
-            option_arr[ optarg_name KSEP OPTION_VAL_OPARR KSEP (i-1) ] = TOKEN_ARRAY[i]
+            option_arr[ optarg_name KSEP OPTARG_OPARR KSEP (i-1) ] = TOKEN_ARRAY[i]
         }
-        option_arr[ optarg_name KSEP OPTION_VAL_OPARR KSEP LEN ] = i - 2
+        option_arr[ optarg_name KSEP OPTARG_OPARR KSEP LEN ] = i - 2
     } else {
         type_rule = type_arr[ optarg_type ]
         if (type_rule == "") {
@@ -380,9 +380,9 @@ function handle_option_argument_declaration(optarg_1_definition, optarg_name,
         tokenize_argument_into_TOKEN_ARRAY( type_rule )
 
         for ( i=1; i<=TOKEN_ARRAY[ LEN ]; ++i ) {
-            option_arr[ optarg_name KSEP OPTION_VAL_OPARR KSEP i ] = TOKEN_ARRAY[i]
+            option_arr[ optarg_name KSEP OPTARG_OPARR KSEP i ] = TOKEN_ARRAY[i]
         }
-        option_arr[ optarg_name KSEP OPTION_VAL_OPARR KSEP LEN ] = i - 1
+        option_arr[ optarg_name KSEP OPTARG_OPARR KSEP LEN ] = i - 1
     }
 
 }
