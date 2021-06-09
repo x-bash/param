@@ -240,9 +240,7 @@ function arg_typecheck_then_generate_code(optarg_id, arg_var_name, arg_val,
     def, tmp ){
 
     assert(optarg_id, arg_var_name, arg_val)
-
-    append_code( "local " arg_var_name  " 2>/dev/null" )
-    append_code( arg_var_name "=" quote_string( arg_val ) )
+    append_code_assignment( arg_var_name, quote_string( arg_val ) )
 }
 
 ###############################
@@ -252,8 +250,7 @@ BEGIN {
     type_arr[LEN]=0
 }
 
-function type_arr_add(line,
-    name, rest){
+function type_arr_add(line,                 name, rest){
     line = str_trim(line)
 
     match("/^[_\-A-Za-z0-9]+/", "", line)
@@ -302,8 +299,7 @@ BEGIN {
     OPTARG_OPARR = "val_oparr"
 }
 
-function handle_option_id(option_id,
-    arr, arr_len, arg_name, i, sw){
+function handle_option_id(option_id,            arr, arr_len, arg_name, i, sw){
 
     # Add option_id to option_id_list
     i = option_id_list[ LEN ] + 1
@@ -368,7 +364,7 @@ function handle_optarg_declaration(optarg_1_definition, optarg_name,
         for ( i=2; i<=TOKEN_ARRAY[ LEN ]; ++i ) {
             option_arr[ optarg_name KSEP OPTARG_OPARR KSEP (i-1) ] = TOKEN_ARRAY[i]
         }
-        option_arr[ optarg_name KSEP OPTARG_OPARR KSEP LEN ] = i - 2
+        option_arr[ optarg_name KSEP OPTARG_OPARR KSEP LEN ] = TOKEN_ARRAY[ LEN ] - 1
     } else {
         type_rule = type_arr[ optarg_type ]
         if (type_rule == "") {
@@ -381,7 +377,7 @@ function handle_optarg_declaration(optarg_1_definition, optarg_name,
         for ( i=1; i<=TOKEN_ARRAY[ LEN ]; ++i ) {
             option_arr[ optarg_name KSEP OPTARG_OPARR KSEP i ] = TOKEN_ARRAY[i]
         }
-        option_arr[ optarg_name KSEP OPTARG_OPARR KSEP LEN ] = i - 1
+        option_arr[ optarg_name KSEP OPTARG_OPARR KSEP LEN ] = TOKEN_ARRAY[ LEN ]
     }
 
 }
@@ -494,7 +490,7 @@ function check_required_option_ready(
         option_id       = option_id_list[ i ]
         option_m        = option_arr[ option_id KSEP OPTION_M ]
 
-        if ( option_arr_value_set[ option_id ] == true ) {
+        if ( option_arr_assigned[ option_id ] == true ) {
             if (option_m == true) {
                 append_code_assignment(
                     option_name "_n", 
@@ -600,7 +596,7 @@ function handle_arguments(
             continue
         }
 
-        option_arr_value_set[ option_id ] = true
+        option_arr_assigned[ option_id ] = true
 
         option_argc     = option_arr[ option_id KSEP LEN ]
         option_m        = option_arr[ option_id KSEP OPTION_M ]

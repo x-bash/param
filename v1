@@ -6,11 +6,13 @@
 # In what scope?
 
 # shellcheck disable=SC2139
-param(){
-    local name="${1:-Please provide name}"
-    alias "${name}_param=_param_def"
-    alias "${name}_param_type=\"O=${name} param_type\""
-}
+# param(){
+#     local name="${1:-Please provide name}"
+#     alias "${name}_param=_param_def"
+#     alias "${name}_param_type=\"O=${name} param_type\""
+# }
+
+alias param='{ eval "$(_param_main "$@")" }'
 
 # Handle param marg
 param_marg(){
@@ -97,7 +99,7 @@ param_default() {
                     else
                         dict_json
                     fi ;;
-        dump_raw)       if [ -n "$object_name" ]; then
+        dump_raw)   if [ -n "$object_name" ]; then
                         dict_scope "${object_name}" | dict_dump
                     else
                         dict_dump
