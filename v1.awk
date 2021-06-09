@@ -491,7 +491,7 @@ function check_required_option_ready(
 
         if ( option_arr_value_set[ option_id ] == true ) {
             if (option_m == true) {
-                append_code_assignment( 
+                append_code_assignment(
                     option_name "_n", 
                     option_assignment_count[ option_id ] 
                 )
