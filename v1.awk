@@ -459,6 +459,11 @@ function parse_param_dsl(line,
                 }
                 option_arr[ option_id KSEP LEN ] = j
 
+                # Only 1 argument
+                if ( j == 1 ) {
+                    option_arr[ option_id KSEP 1 ]
+                }
+
             } else if ( state == STATE_TYPE ) {
                 type_arr_add( line )
 
@@ -486,7 +491,7 @@ function check_required_option_ready(
     i, j, option, option_argc, option_id, option_m, option_name ) 
 {
     for (i=1; i<option_id_list[ LEN ]; ++i) {
-        option_id     = option_id_list[ i ]
+        option_id       = option_id_list[ i ]
         option_m        = option_arr[ option_id KSEP OPTION_M ]
 
         if ( option_arr_value_set[ option_id ] == true ) {
@@ -532,11 +537,12 @@ function check_required_option_ready(
 
             append_code_assignment(
                 option_name,
-                val 
+                val
             )
             continue
         }
 
+        # if argc >= 2
         for ( j=1; j<=option_argc; ++j ) {
             val = option_arr[ option_id KSEP j KSEP OPTARG_DEFAULT ]
 
@@ -626,7 +632,7 @@ function handle_arguments(
 
             arg_typecheck_then_generate_code(
                 option_id KSEP 1
-                option_name, 
+                option_name,
                 arg_val,
             )
         } else {
