@@ -559,7 +559,7 @@ function check_required_option_ready(
 # handle_arguments
 ###############################
 function handle_arguments( 
-    i, j, arg_name, arg_name_short, arg_val, option_id, option_argc, count) {
+    i, j, arg_name, arg_name_short, arg_val, option_id, option_argc, count, sw) {
 
     arg_arr_len = arg_arr[LEN]
 
@@ -652,16 +652,32 @@ function handle_arguments(
     if (i <= arg_arr_len) {
 
         # handle rest argv
-        # TODO: print code set -- arguments
         append("set --")
 
         rest_argv[ LEN ] = 0
 
-        for (j=i; j<=arg_arr_len; ++j) {
-            tmp = tmp " \"$" i "\""
+        # if subcommand declaration exists
+        if (subcommand_arr[LEN] !== 0) {
+            sw = false
+            for (j=1; j<=subcommand_arr[LEN]; ++j) {
+                if (subcommand_arr[j] == arg_arr[i]) {
+                    sw = true
+                }
+            }
+            if (sw == false) {
+                panic_error("Subcommand expected, but not found: " arg_arr[i])
+            }
+            append_code_assignment(
+                "PARAM_SUBCMD",
+                arg_arr[i]
+            )
+            j += 1
         }
 
-        # TODO: using subcommand
+        for (j=i; j<=arg_arr_len; ++j) {
+            tmp = tmp " " quote_string(arg_arr[j])
+        }
+        append_code("set -- " tmp)
     } else {
         append_code("set --")
     }
