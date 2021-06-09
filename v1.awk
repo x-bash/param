@@ -509,7 +509,7 @@ function check_required_option_ready(
         
         gsub(/^--?/, "", option_name)
         if ( true == option_m ) {
-            append_code_assignment( 
+            append_code_assignment(
                 option_name "_n",
                 1
             )
