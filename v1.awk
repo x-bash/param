@@ -559,7 +559,7 @@ function check_required_option_ready(
 # handle_arguments
 ###############################
 function handle_arguments( 
-    i, j, arg_name, arg_val, option_id, option_argc, count) {
+    i, j, arg_name, arg_name_short, arg_val, option_id, option_argc, count) {
 
     arg_arr_len = arg_arr[LEN]
 
@@ -574,14 +574,22 @@ function handle_arguments(
 
         option_id     = option_alias_2_option_id[arg_name]
 
-        # TODO: arg_name
         if ((option_id == "") && (arg_name ~ /^-[^-]/)) {
-            # try split
-            substr(arg_name, 2)
+            arg_name = substr(arg_name, 2)
             arg_len = split(arg_name, arg_arr, //)
-            for () {
-                # Find option name
-                # setting the option to true
+            for (j=1; j<=arg_len; ++j) {
+                arg_name_short  = "-" arg_arr[ j ]
+                option_id       = option_alias_2_option_id[ arg_name_short ]
+                option_name     = option_arr[ option_id KSEP OPTION_NAME ]
+
+                if (option_name == "") {
+                    panic_error("option_name not found. [option_id]=" option_id " , [arg_name]=" arg_name_short " , [original arg_name]=" arg_name)
+                }
+
+                append_code_assignment(
+                    option_name,
+                    "true"
+                )
             }
             continue
         }
@@ -600,16 +608,15 @@ function handle_arguments(
             option_name = option_name "_" counter
         }
 
-        # TODO: add counter
-
         # Consider unhandled arguments are rest_argv
         if ( !( arg_name ~ /--?/ ) ) break
         
         if (option_argc == 0) {
-            append_code_assignment(
-                option_name
-            )
             # print code XXX=true
+            append_code_assignment(
+                option_name,
+                "true"
+            )
         } else if (option_argc == 1) {
             i = i + 1
             arg_val = arg_arr[i]
