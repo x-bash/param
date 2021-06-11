@@ -2,16 +2,19 @@ BEGIN {
     false = 0;  true = 1
     LEN="len"
     KSEP = "\034"
+
+    EXIT_CODE = -1
 }
 
 function exit_now(code){
+    EXIT_CODE = code
     exit code
 }
 
 function panic_error(msg){
     print msg > "/dev/stderr"
     print "return 1 2>/dev/null || exit 1 2>/dev/null"
-    exit 1
+    exit_now(1)
 }
 
 function debug(msg){
@@ -51,7 +54,7 @@ function append_code_assignment(varname, value) {
 
 function exit_print(exit_code){
     print "return " exit_code " 2>/dev/null || exit " exit_code
-    exit exit_code
+    exit_now( exit_code )
 }
 
 # output certain kinds of array
@@ -698,7 +701,7 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
         
         if (option_argc == 0) {
             # print code XXX=true
-            print "handle_arguments " option_id "\t" option_name 2>"/dev/stderr"
+            debug( "handle_arguments " option_id "\t" option_name )
             append_code_assignment( option_name, "true" )
         } else if (option_argc == 1) {
             i = i + 1
@@ -783,8 +786,7 @@ NR==2 {
     parse_param_dsl($0)
 }
 
-NR==3 {    
-
+NR==3 {
     # handle arguments
     arg_arr_len = split($0, arg_arr, ARG_SEP)
     arg_arr[ LEN ] = arg_arr_len
@@ -792,22 +794,23 @@ NR==3 {
     # print length(arg_arr) $0 2>"/dev/stderr"
 
     if ( arg_arr[1] == "_param_list_subcmd" ) {
-        debug( "error:\t" arg_arr[1] )
+        debug( "error:\t" arg_arr[1] "\t" subcommand_arr[ LEN ] )
         for (i=1; i <= subcommand_arr[ LEN ]; ++i) {
+            debug( subcommand_arr[ KSEP i ] )
             print "printf \"%s\" " subcommand_arr[ KSEP i ]
-            print "return 0"
         }
-        exit 1
+        print "return 0"
+        exit_now(1)
     }
 
     if ( arg_arr[1] == "_param_advise_json_items" ) {
+        # TODO: add more things about advise
         for (i=1; i<=option_id_list[ LEN ]; ++i) {
             option_id       = option_id_list[ i ]
-            # TODO: provide json items
-
+            print "printf \"\\\"%s\\\": \\\"%s\\\"\\n\" "  quote_string( option_id )  " " quote_string( "" )
         }
-
-        exit 1
+        print "return 0"
+        exit_now(1)
     }    
     
 }
@@ -827,7 +830,9 @@ NR>=4 {
 }
 
 END {
-    handle_arguments()
-    print_code()
-    # debug(CODE)
+    if (EXIT_CODE != 1) {
+        handle_arguments()
+        print_code()
+        # debug(CODE)
+    }
 }

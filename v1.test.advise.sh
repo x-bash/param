@@ -50,4 +50,4 @@ work_user(){
     echo "work_user"
 }
 
-work _param_list_subcmd
+work _param_advise_json_items
