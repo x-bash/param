@@ -804,11 +804,21 @@ NR==3 {
     }
 
     if ( arg_arr[1] == "_param_advise_json_items" ) {
-        # TODO: add more things about advise
+
+        print "printf \"{\\n\""
         for (i=1; i<=option_id_list[ LEN ]; ++i) {
             option_id       = option_id_list[ i ]
-            print "printf \"\\\"%s\\\": \\\"%s\\\"\\n\" "  quote_string( option_id )  " " quote_string( "" )
+            print "printf \"  \\\"%s\\\": \\\"%s\\\"\\n\" "  quote_string( option_id )  " " quote_string( "" )
         }
+
+        for (i=1; i <= subcommand_arr[ LEN ]; ++i) {
+            debug( subcommand_arr[ KSEP i ] )
+            key = quote_string( subcommand_arr[ KSEP i ] )
+            value = quote_string( "$( " APP_NAME "_" subcommand_arr[ KSEP i ] " _param_advise_json_items 2>/dev/null | echo '')"  )
+            print "printf \"  \\\"%s\\\": \\\"%s\\\"\\n\" "  key value
+        }
+
+        print "printf \"}\""
         print "return 0"
         exit_now(1)
     }    
