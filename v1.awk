@@ -286,10 +286,8 @@ function type_arr_add(line,                 name, rest){
 BEGIN {
     advise_arr[ LEN ]=0
     arg_arr[ LEN ]=0
-    subcommand_arr[ LEN ]=0
-
-    rest_argv_arr[ LEN ]=0
-    # argument_detail_arr
+    subcmd_arr[ LEN ]=0
+    # subcmd_map
 
     # RS="\001"
 }
@@ -497,21 +495,16 @@ function parse_param_dsl(line,
 
                 HAS_SUBCMD = true
 
-                tmp = subcommand_arr[ LEN ] + 1
-                subcommand_arr[ LEN ] = tmp
+                tmp = subcmd_arr[ LEN ] + 1
+                subcmd_arr[ LEN ] = tmp
 
                 if (! match(line, /^[A-Za-z0-9_-]+/)) {
                     panic_error( "Expect subcommand in the first token, but get:\n" line )
                 }
 
                 subcmd = substr( line, 1, RLENGTH )
-                subcommand_arr[ KSEP tmp ] = subcmd
-                subcommand_arr[ subcmd ] = str_trim( substr( line, RLENGTH+1 ) )
-
-            } else if (state == STATE_ARGUMENT) {
-                tmp = rest_argv_arr[ LEN ] + 1
-                rest_argv_arr[ LEN ] = tmp
-                rest_argv_arr[ tmp ] = line
+                subcmd_arr[ tmp ] = subcmd
+                subcmd_map[ subcmd ] = str_trim( substr( line, RLENGTH+1 ) )
 
             } else if (state == STATE_OPTION) {
 
@@ -733,9 +726,9 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
 
     if (i <= arg_arr_len) {
         # if subcommand declaration exists
-        # if (0 != subcommand_arr[LEN]) {
+        # if (0 != subcmd_arr[LEN]) {
         if ( HAS_SUBCMD == true ) {
-            if (subcommand_arr[ arg_arr[i] ] == "") {
+            if (subcmd_map[ arg_arr[i] ] == "") {
                 panic_error("Subcommand expected, but not found: " arg_arr[i])
             }
             append_code_assignment( "PARAM_SUBCMD", arg_arr[i] )
@@ -747,7 +740,7 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
         }
         append_code("set -- " tmp)
 
-        # if (0 == subcommand_arr[LEN]) {
+        # if (0 == subcmd_arr[LEN]) {
         if ( HAS_SUBCMD == false ) {
             # We will do it only if subcommand not defined.
             for (j=i; j<=arg_arr_len; ++j) {
@@ -794,9 +787,9 @@ NR==3 {
     # print length(arg_arr) $0 2>"/dev/stderr"
 
     if ( arg_arr[1] == "_param_list_subcmd" ) {
-        for (i=1; i <= subcommand_arr[ LEN ]; ++i) {
-            debug( subcommand_arr[ KSEP i ] )
-            print "printf \"%s\" " subcommand_arr[ KSEP i ]
+        for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
+            debug( subcmd_arr[ i ] )
+            print "printf \"%s\" " subcmd_arr[ i ]
         }
         print "return 0"
         exit_now(1)
@@ -810,10 +803,10 @@ NR==3 {
             print "printf \"  \\\"%s\\\": \\\"%s\\\"\\n\" "  quote_string( option_id )  " " quote_string( "" )
         }
 
-        for (i=1; i <= subcommand_arr[ LEN ]; ++i) {
-            debug( subcommand_arr[ KSEP i ] )
-            key = quote_string( subcommand_arr[ KSEP i ] )
-            value = quote_string( "$( " APP_NAME "_" subcommand_arr[ KSEP i ] " _param_advise_json_items 2>/dev/null | echo '')"  )
+        for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
+            debug( subcmd_arr[ i ] )
+            key = quote_string( subcmd_arr[ i ] )
+            value = quote_string( "$( " APP_NAME "_" subcmd_arr[ i ] " _param_advise_json_items 2>/dev/null | echo '')"  )
             print "printf \"  \\\"%s\\\": \\\"%s\\\"\\n\" "  key value
         }
 
