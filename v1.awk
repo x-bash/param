@@ -290,6 +290,8 @@ BEGIN {
     # subcmd_map
 
     # RS="\001"
+
+    rest_option_id_list[ LEN ] = 0
 }
 
 BEGIN {
@@ -412,6 +414,10 @@ function parse_param_dsl_for_positional_argument(line,
 
     option_id = TOKEN_ARRAY[1]
 
+    tmp = rest_option_id_list[ LEN ] + 1
+    rest_option_id_list[ LEN ] = tmp
+    rest_option_id_list[ tmp ] = option_id
+
     option_desc = TOKEN_ARRAY[2]
     option_arr[ option_id KSEP OPTION_DESC ] = option_desc
 
@@ -432,6 +438,10 @@ function parse_param_dsl_for_all_positional_argument(line,
     tokenize_argument_into_TOKEN_ARRAY( line )
 
     option_id = TOKEN_ARRAY[1]  # Should be #n
+
+    tmp = rest_option_id_list[ LEN ] + 1
+    rest_option_id_list[ LEN ] = tmp
+    rest_option_id_list[ tmp ] = option_id
 
     option_desc = TOKEN_ARRAY[2]
     option_arr[ option_id KSEP OPTION_DESC ] = option_desc
@@ -808,6 +818,11 @@ NR==3 {
             key = quote_string( subcmd_arr[ i ] )
             value = quote_string( "$( " APP_NAME "_" subcmd_arr[ i ] " _param_advise_json_items 2>/dev/null | echo '')"  )
             print "printf \"  \\\"%s\\\": \\\"%s\\\"\\n\" "  key value
+        }
+
+        for (i=1; i <= rest_option_id_list[ LEN ]; ++i) {
+            option_id       = rest_option_id_list[ i ]
+            print "printf \"  \\\"%s\\\": \\\"%s\\\"\\n\" "  quote_string( option_id )  " " quote_string( "" )
         }
 
         print "printf \"}\""
