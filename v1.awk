@@ -807,6 +807,8 @@ NR==3 {
 
     if ( arg_arr[1] == "_param_advise_json_items" ) {
 
+        indent = arg_arr[2] || 0
+
         print "printf \"{\\n\""
         for (i=1; i<=option_id_list[ LEN ]; ++i) {
             option_id       = option_id_list[ i ]
@@ -816,7 +818,7 @@ NR==3 {
         for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
             debug( subcmd_arr[ i ] )
             key = quote_string( subcmd_arr[ i ] )
-            value = quote_string( "$( " APP_NAME "_" subcmd_arr[ i ] " _param_advise_json_items 2>/dev/null | echo '')"  )
+            value = quote_string( "$( " APP_NAME "_" subcmd_arr[ i ] " _param_advise_json_items " (indent + 2) " 2>/dev/null | echo '')"  )
             print "printf \"  \\\"%s\\\": \\\"%s\\\"\\n\" "  key value
         }
 
