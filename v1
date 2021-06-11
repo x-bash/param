@@ -12,7 +12,11 @@
 #     alias "${name}_param_type=\"O=${name} param_type\""
 # }
 
-alias param='{ eval "$(_param_main "$@")" }'
+xrc dict
+
+# TODO: We may need to set IFS.
+alias param='local IFS=; { eval "$(_param_main "$@")"; }'
+# alias param=cat
 
 # Handle param marg
 param_marg(){
@@ -44,34 +48,43 @@ param_marg_seq(){
     seq "$(param_marg_len "$a")"
 }
 
-PARAM_AWK_PATH="$(xrc which param/v0.awk)"
+# PARAM_AWK_PATH="$(xrc which param/v1.awk)"
+PARAM_AWK_PATH="./v1.awk"
 PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT___
 PARAM_TYPE_VAR_PREFIX=___X_CMD_X_BASH_PARAM_TYPE___
 
 # DICT_KEYS_SEP conflict. But it is OK.
 PARAM_ARG_SEP="$(printf "\005")"          # ARG_SEP in awk script
+# PARAM_ARG_SEP="$(printf "\n")"          # ARG_SEP in awk script
 # PARAM_RS_SEP
 PARAM_RS_SEP="${DICT_SEP}"
 
 # param_type    gitee     repo
 # param_type    gitee     user    =~  [A-Za-z0-9_]+
 # param_type    gitee     access  =   private         public          inner-public
-param_types(){
+
+param_type_unset(){
+    local app_name="${1:?Provide app name}"; 
+    local varname="${PARAM_TYPE_VAR_PREFIX}${app_name}"
+    eval "$varname="
+}
+
+param_type(){
     local app_name="${1:?Provide app name}";        shift
     local result="$*"
     local varname="${PARAM_TYPE_VAR_PREFIX}${app_name}"
-    echo "$varname"
     eval "$varname=\"\${$varname}\${PARAM_ARG_SEP}\${result}\""
+    # eval echo "fuck: \"\$$varname\""
 }
 
-param_types_print(){
+param_type_print(){
     local app_name="${1:?Provide app name}"
     local varname="${PARAM_TYPE_VAR_PREFIX}${app_name}"
     eval echo "\"\$$varname\""
 }
 
-param_types_pprint(){
-    param_types_print "$@" | tr "$PARAM_ARG_SEP" "\n"
+param_type_pprint(){
+    param_type_print "$@" | tr "$PARAM_ARG_SEP" "\n"
 }
 
 # param_default put gitee/$O repo x-bash
@@ -148,7 +161,7 @@ _param_main() {
         scope="$(echo "$src" | _param_get_scope)"
 
         # line 1: global types
-        param_types_print "${scope%%/*}"
+        param_type_print "${scope%%/*}"
         printf "%s" "$PARAM_RS_SEP"
 
         # line 2: config lines
@@ -167,7 +180,7 @@ _param_main() {
     } | awk \
             -v ARG_SEP="$PARAM_ARG_SEP" \
             -v RS="$PARAM_RS_SEP" \
-            -f "$PARAM_AWK_PATH" -
+            -f "$PARAM_AWK_PATH"
 }
 
 
