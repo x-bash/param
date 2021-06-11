@@ -83,7 +83,7 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
             TOKEN_ARRAY[LEN] = len
             astr = substr(astr, RLENGTH+1)
 
-        } else if (match(astr, /^[^ \t\v\003]+/)){ #"
+        } else if ( match(astr, /^[^ \t\v\003]+/) ){ #"
 
             len = TOKEN_ARRAY[LEN] + 1
             tmp = substr(astr, 1, RLENGTH)
@@ -95,12 +95,12 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
             TOKEN_ARRAY[LEN] = len
             astr = substr(astr, RLENGTH+1)
 
-            if (match(astr, /\003[^\003]+\003/)) {
+            if ( match(astr, /^\003[^\003]+\003/) ) {
                 tmp = substr(astr, 1, RLENGTH)
-                gsub("\004", " ", tmp)      # Unwrap
-                gsub("\003", "", tmp)       # Unwrap
-                gsub("\002", "\"", tmp)     
-                gsub("\001", "\\", tmp)     # Unwrap
+                gsub("\004", " ",   tmp)      # Unwrap
+                gsub("\003", "",    tmp)       # Unwrap
+                gsub("\002", "\"",  tmp)
+                gsub("\001", "\\",  tmp)     # Unwrap
                 TOKEN_ARRAY[len] = TOKEN_ARRAY[len] tmp
 
                 astr = substr(astr, RLENGTH+1)
@@ -241,6 +241,8 @@ function assert(optarg_id, arg_name, arg_val,
 function arg_typecheck_then_generate_code(optarg_id, arg_var_name, arg_val,
     def, tmp ){
 
+    print "arg_typecheck_then_generate_code()\n " optarg_id "\t" arg_var_name 2>"/dev/stderr"
+
     assert(optarg_id, arg_var_name, arg_val)
     append_code_assignment( arg_var_name, quote_string( arg_val ) )
 }
@@ -328,6 +330,7 @@ function handle_option_id(option_id,            arr, arr_len, arg_name, i, sw){
         }
 
         option_alias_2_option_id[ arg_name ] = option_id
+        print "option_alias_2_option_id\t" arg_name "!\t!" option_id " |" 2>"/dev/stderr"
     }
 }
 
@@ -408,11 +411,11 @@ function parse_param_dsl(line,
             state = STATE_TYPE
         } else if (line ~ /^scope:/) {
             state = STATE_SCOPE
-        } else if (line ~ /^option\s:\s+/) {
+        } else if (line ~ /^option\s?:/) {
             state = STATE_OPTION
-        } else if (line ~ /^subcommand\s:\s+/) {
+        } else if (line ~ /^subcommand\s?:/) {
             state = STATE_SUBCOMMAND
-        } else if (line ~ /^argument\s:\s+/) {
+        } else if (line ~ /^argument\s?:/) {
             state = STATE_ARGUMENT
         } else {
 
@@ -561,6 +564,7 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
         }
 
         option_id     = option_alias_2_option_id[arg_name]
+        print "arg_name \t" arg_name >"/dev/stderr" 
 
         if ((option_id == "") && (arg_name ~ /^-[^-]/)) {
             arg_name = substr(arg_name, 2)
@@ -583,7 +587,7 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
 
         option_argc     = option_arr[ option_id KSEP LEN ]
         option_m        = option_arr[ option_id KSEP OPTION_M ]
-        option_name  = option_arr[ option_id KSEP OPTION_NAME ]
+        option_name     = option_arr[ option_id KSEP OPTION_NAME ]
         gsub(/^--?/, "", option_name)
 
         # If option_argc == 0, op
@@ -598,6 +602,7 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
         
         if (option_argc == 0) {
             # print code XXX=true
+            print "handle_arguments " option_id "\t" option_name 2>"/dev/stderr"
             append_code_assignment( option_name, "true" )
         } else if (option_argc == 1) {
             i = i + 1
