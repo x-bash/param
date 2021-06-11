@@ -813,6 +813,8 @@ NR==3 {
         for (i=1; i<=option_id_list[ LEN ]; ++i) {
             option_id       = option_id_list[ i ]
             print "printf \"  \\\"%s\\\": \\\"%s\\\"\\n\" "  quote_string( option_id )  " " quote_string( "" )
+            # TODO: "$( eval advise_map[ option_id ])"
+            # TODO: parse_type( "" )
         }
 
         for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
