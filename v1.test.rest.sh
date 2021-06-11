@@ -33,10 +33,6 @@ option:
 
 A
 
-# subcommand:
-#     repo            ""
-#     user            ""
-
     echo "param repo: $repo"
     echo "param repo2: $repo2_n  $repo2_1_1 $repo2_1_2"
     echo "param priviledge: $priviledge"

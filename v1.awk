@@ -234,7 +234,7 @@ function assert(optarg_id, arg_name, arg_val,
     } else if (op == "") { 
         # Do nothing.
     } else {
-        debug( "Op[" op "] Not Match any candidates: \n" line )
+        # debug( "Op[" op "] Not Match any candidates: \n" line )
         exit_print(1)
         return false
     }
@@ -741,7 +741,6 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
         # if (0 == subcommand_arr[LEN]) {
         if ( HAS_SUBCMD == false ) {
             # We will do it only if subcommand not defined.
-            debug( "error !!!!" i "\t" arg_arr_len )
             for (j=i; j<=arg_arr_len; ++j) {
                 tmp = option_arr[ "#" j ] # type
                 if (tmp != "") {
@@ -750,7 +749,6 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
                 }
 
                 tmp = option_arr[ "#n" ] # type
-                debug( "error !!!!" tmp )
                 if (tmp != "") {
                     
                     assert("#n", "$" (j-i+1), arg_arr[j])
