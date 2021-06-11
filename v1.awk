@@ -4,6 +4,10 @@ BEGIN {
     KSEP = "\034"
 }
 
+function exit_now(code){
+    exit code
+}
+
 function panic_error(msg){
     print msg > "/dev/stderr"
     print "return 1 2>/dev/null || exit 1 2>/dev/null"
@@ -443,7 +447,7 @@ function parse_param_dsl_for_all_positional_argument(line,
 }
 
 function parse_param_dsl(line,
-    line_arr, i, j, state, tmp, len, nextline,
+    line_arr, i, j, state, tmp, len, nextline, subcmd,
     option_id) {
 
     state = 0
@@ -492,13 +496,15 @@ function parse_param_dsl(line,
 
                 tmp = subcommand_arr[ LEN ] + 1
                 subcommand_arr[ LEN ] = tmp
-                subcommand_arr[ tmp ] = line
 
                 if (! match(line, /^[A-Za-z0-9_-]+/)) {
-                    panic_error("Expect subcommand in the first token, but get:\n" line)
+                    panic_error( "Expect subcommand in the first token, but get:\n" line )
                 }
 
-                subcommand_arr[substr(line, 1, RLENGTH)] = str_trim( substr(line, RLENGTH+1) )
+                subcmd = substr( line, 1, RLENGTH )
+                subcommand_arr[ KSEP tmp ] = subcmd
+                subcommand_arr[ subcmd ] = str_trim( substr( line, RLENGTH+1 ) )
+
             } else if (state == STATE_ARGUMENT) {
                 tmp = rest_argv_arr[ LEN ] + 1
                 rest_argv_arr[ LEN ] = tmp
@@ -777,11 +783,33 @@ NR==2 {
     parse_param_dsl($0)
 }
 
-NR==3 {
+NR==3 {    
+
     # handle arguments
     arg_arr_len = split($0, arg_arr, ARG_SEP)
     arg_arr[ LEN ] = arg_arr_len
+
     # print length(arg_arr) $0 2>"/dev/stderr"
+
+    if ( arg_arr[1] == "_param_list_subcmd" ) {
+        debug( "error:\t" arg_arr[1] )
+        for (i=1; i <= subcommand_arr[ LEN ]; ++i) {
+            print "printf \"%s\" " subcommand_arr[ KSEP i ]
+            print "return 0"
+        }
+        exit 1
+    }
+
+    if ( arg_arr[1] == "_param_advise_json_items" ) {
+        for (i=1; i<=option_id_list[ LEN ]; ++i) {
+            option_id       = option_id_list[ i ]
+            # TODO: provide json items
+
+        }
+
+        exit 1
+    }    
+    
 }
 
 ###############################
