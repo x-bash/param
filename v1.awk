@@ -794,7 +794,6 @@ NR==3 {
     # print length(arg_arr) $0 2>"/dev/stderr"
 
     if ( arg_arr[1] == "_param_list_subcmd" ) {
-        debug( "error:\t" arg_arr[1] "\t" subcommand_arr[ LEN ] )
         for (i=1; i <= subcommand_arr[ LEN ]; ++i) {
             debug( subcommand_arr[ KSEP i ] )
             print "printf \"%s\" " subcommand_arr[ KSEP i ]
