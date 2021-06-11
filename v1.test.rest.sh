@@ -17,7 +17,7 @@ scope:
     gitee   $O
 type:
     access  =   private         public
-    repo_t  =~   "abc"   "cde"   "def"
+    repo_t  =~   "cde"   "def"
 advise:
     repo list_repo
     1: list_repo
@@ -27,23 +27,30 @@ option:
     --repo2|-r2|m       "Provide two repo name"
         <repo1>:repo_type               =~   "abc"   "cde"   "def"
         <repo2>:repo_t
-subcommand:
-    repo            ""
-    user            ""
+    --priviledge|-p       "Provide privilidge"
+        <priviledge_type>:access=public
+    #n  "Provide repos" <repo_name>:repo_t
+
 A
 
-    echo "param repo: $repo"
-    echo "param repo2: $repo2_1  $repo2_2"
+# subcommand:
+#     repo            ""
+#     user            ""
 
-    work_${PARAM_SUBCMD} "$*";
+    echo "param repo: $repo"
+    echo "param repo2: $repo2_n  $repo2_1_1 $repo2_1_2"
+    echo "param priviledge: $priviledge"
+
+    # work_${PARAM_SUBCMD} "$*";
+    echo "$*"
 }
 
-# work_repo(){
-#     echo "work_repo()"
-# }
+work_repo(){
+    echo "work_repo()"
+}
 
-# work_user(){
-#     echo "work_user"
-# }
+work_user(){
+    echo "work_user"
+}
 
-work --repo abc
+work --repo abc -r2 abc cde cde
