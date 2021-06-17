@@ -1,21 +1,38 @@
 # shellcheck shell=sh disable=SC2039,SC2142,SC3043
 
 w() {
-    echo "-------"
     local arg1
     local arg2
     local arg3
+    local arg_sep
+    local dict_sep
     arg1=$(param_default get "gitee/$O" arg1)
     arg2=$(param_default get "gitee/$O" arg2)
     arg3=$(param_default get "gitee/$O" arg3)
 
-    # param_default dump
-    param_default dump "gitee/$O" && echo
-    param_default dump "gitee" && echo  # TODO: 这个跑不到
-
-    # param_default dump
-    param_default dump_raw "gitee/$O" && echo
-    param_default dump_raw "gitee" && echo  # TODO: 这个跑不到
+    assert_stdout "param_default dump gitee/$O" <<A
+{
+  "arg1": "1",
+  "arg2": "11",
+  "arg3": "111"
+}
+A
+    arg_sep="$(printf "\005")" 
+    assert_stdout "param_default dump gitee" <<A
+{
+  "c${arg_sep}arg1": "1",
+  "c${arg_sep}arg2": "11",
+  "c${arg_sep}arg3": "111"
+}
+A
+    dict_sep="$(printf "\003")"
+    assert_stdout "param_default dump_raw gitee/$O" <<A
+c${arg_sep}arg1${dict_sep}1${dict_sep}c${arg_sep}arg2${dict_sep}11${dict_sep}c${arg_sep}arg3${dict_sep}111${dict_sep}3
+A
+    # TODO: 有疑问
+    assert_stdout "param_default dump_raw gitee"  <<A
+c${arg_sep}arg1${dict_sep}1${dict_sep}c${arg_sep}arg2${dict_sep}11${dict_sep}c${arg_sep}arg3${dict_sep}111${dict_sep}3
+A
 
 param <<A
 scope:
@@ -40,10 +57,9 @@ subcommand:
     user            ""
 A
 
-    echo "-------"
-    echo "arg1: $arg1"
-    echo "arg2: $arg2"
-    echo "arg3: $arg3"
+    # echo "arg1: $arg1"
+    # echo "arg2: $arg2"
+    # echo "arg3: $arg3"
 }
 
 # param_default clear gitee___c

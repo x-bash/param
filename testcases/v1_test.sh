@@ -9,6 +9,7 @@ testcase_list="
 "
 
 . ./v1
+xrc assert
 
 for testcase in $testcase_list 
 do
@@ -20,8 +21,6 @@ done
 
 # TODO 需要解决的问题
 # 1. dict 的各个版本之前的差异还是有问题 ./v1 L16
-# 2. 合并一个更优雅的testcase
-# 3. advise 的生成，递归调用 param
-# 4. 更充分的 testcase
-# 5. help 文档生成
-# 6. advise 的内容生成
+# 2. 合并一个更优雅的testcase, 更充分的 testcase
+# 3. advise 的内容生成生成，递归调用 param
+# 4. help 文档生成
