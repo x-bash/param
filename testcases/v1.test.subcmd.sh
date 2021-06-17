@@ -1,7 +1,5 @@
 # shellcheck shell=sh disable=SC2039,SC2142,SC3043
 
-. ./v1
-
 param_type_unset    gitee
 
 # Using alias

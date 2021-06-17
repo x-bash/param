@@ -13,6 +13,7 @@
 # }
 
 xrc dict
+xrc dict/_v0/str # TODO: fix dist bug in bash5
 
 # TODO: We may need to set IFS.
 alias param='local IFS=; { eval "$(_param_main "$@")"; }'
