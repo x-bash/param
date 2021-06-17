@@ -1,7 +1,5 @@
 # shellcheck shell=sh disable=SC2039,SC2142,SC3043
 
-. ~/.x-cmd/boot
-
 . ./v1
 
 param_type_unset    gitee
@@ -29,8 +27,9 @@ option:
         <repo2>:repo_t
     --priviledge|-p       "Provide privilidge"
         <priviledge_type>:access=public
-    #n  "Provide repos" <repo_name>:repo_t
-
+subcommand:
+    repo            ""
+    user            ""
 A
 
     echo "param repo: $repo"
@@ -49,4 +48,4 @@ work_user(){
     echo "work_user"
 }
 
-work --repo abc -r2 abc cde cde
+work _param_list_subcmd

@@ -1,4 +1,5 @@
-################################################
+# shellcheck shell=sh disable=SC2039,SC2142,SC3043
+
 
 # param should follow app.
 

@@ -1,4 +1,4 @@
-
+# shellcheck shell=sh disable=SC2039,SC2142,SC3043
 # xrc param/v0
 . ./v0
 
@@ -51,7 +51,7 @@ param_default put   gitee___c repo xk1
 # w --repo hi
 
 ff(){
-    O=OBJECT_NAME w -a private --repo "中文" --user "7777" work a b 
+    O=OBJECT_NAME w -a private --user "7777" work a b 
 }
 
 ff

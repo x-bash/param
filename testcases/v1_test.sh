@@ -1,5 +1,19 @@
-# xrc param/v0
-. ./v1
+# shellcheck shell=sh disable=SC2039,SC2142,SC3043,SC1090
+
+testcase_list="
+    ./testcases/v1.test.advise.rest.sh
+    ./testcases/v1.test.advise.subcmd.sh
+    ./testcases/v1.test.list.sh
+    ./testcases/v1.test.subcmd.sh
+"
+
+for testcase in $testcase_list 
+do
+    printf "\n====== test %s =====\n" "$testcase"
+    . "${testcase}"
+    printf "\n=====================\n"
+done
+
 
 # TODO 需要解决的问题
 # 1. dict 的各个版本之前的差异还是有问题，
@@ -22,7 +36,30 @@ w() {
     # param_default dump
     param_default dump_raw "gitee/$O" && echo
     param_default dump_raw "gitee" && echo  # TODO: 这个跑不到
-    
+
+param <<A
+scope:
+    gitee   $O
+type:
+    access  =   private         public
+advise:
+    repo list_repo
+    1: list_repo
+option:
+    --repo|-r|m         "Provide repo name"
+        <repo>:repo_type                =~   "abc"   "cde"   "def"
+    --repo2|-r2|m       "Provide two repo name"
+        <repo1>
+        <repo2>:repo_type               =~   "abc"   "cde"   "def"
+    --repo|-r|m     "Provide repo name"
+        <repo>:repo_type                =~   "abc"   "cde"   "def"
+    --repo|-r|m     "Provide repo name"
+        <repo>:repo_type="el's repo"    =~   "abc"   "cde"   "def"
+subcommand:
+    repo            ""
+    user            ""
+A
+
     echo "-------"
     echo "arg1: $arg1"
     echo "arg2: $arg2"
