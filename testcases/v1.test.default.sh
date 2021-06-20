@@ -43,23 +43,23 @@ advise:
     repo list_repo
     1: list_repo
 option:
-    --repo|-r|m         "Provide repo name"
+    --arg1|-r|m         "Provide repo name"
         <repo>:repo_type                =~   "abc"   "cde"   "def"
-    --repo2|-r2|m       "Provide two repo name"
+    --arg2|-r2|m       "Provide two repo name"
         <repo1>
         <repo2>:repo_type               =~   "abc"   "cde"   "def"
-    --repo|-r|m     "Provide repo name"
+    --arg3|-r3|m     "Provide repo name"
         <repo>:repo_type                =~   "abc"   "cde"   "def"
-    --repo|-r|m     "Provide repo name"
-        <repo>:repo_type="el's repo"    =~   "abc"   "cde"   "def"
+    --arg4|-r4|m     "Provide repo name"
+        <repo>:repo_type    =~   "abc"   "cde"   "def"
 subcommand:
     repo            ""
     user            ""
 A
 
-    # echo "arg1: $arg1"
-    # echo "arg2: $arg2"
-    # echo "arg3: $arg3"
+    echo "arg1: $arg1"
+    echo "arg2: $arg2"
+    echo "arg3: $arg3"
 }
 
 # param_default clear gitee___c

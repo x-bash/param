@@ -30,7 +30,6 @@ option:
         <repo1>:repo_type      =~   "abc"   "cde"   "def"
         <repo2>:repo_type      =~   "abc"   "cde"   "def"
 
-
 subcommand:
     repo            ""
     user            ""
