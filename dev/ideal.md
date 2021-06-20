@@ -46,35 +46,58 @@ A
 
 ```
 
-
 ```bash
 
-# Ideal design
+advises:
+    --repo: list_repo
+    --repo2:     
+        - list_repo
+        - list_repo
+    #1: list_repo
 
-# First argument is gitee function
-# Second and third argument is options for default.
+types:
+    repo_type: =~ [A-Za-z0-9]
 
-param typedef repo-type "Provide name of repo" =~ [A-Za-z0-9]+
-param typedef user-type "Provide name of user" =~ [A-Za-z][A-Za-z0-9_]+
+defaults:
+    scope: $O
 
+options:
+    --repo|-r:
+        <repo-1>: 
+            type: ""
+            default: ""
+        desc: Provide two repos
 
+    --repo2|-r2:
+        <repo-1>: 
+            type: ""
+            default: ""
+        <repo-2>: 
+            type: ""
+            default: ""
+        desc: Provide two repos
 
-param_gen gitee gitee $O <<A
-OPTIONS:
-    --help  -h          "Provide repo name"
-    --debug -D          "Open DEBUG"
+    # 更倾向于下面两种
+    --repo|-r:   <repo>:repo_type=""  "Provide repo name"
 
-SUBCOMMANDS:
-    repo    "repo command"
-    user    "user command"
-"
-A
+    --repo|-r:
+        - <repo name 1>:repo_type=""   
+        - "Provide repo name 2"
 
-gitee_param(){
-    if [ $debug ]; then
-        :
-    fi
-}
+    --repo2|-r2:   <repo1>:repo_type=""  <repo2>:repo_type=""  "Provide repo name"
+
+    --repo2|-r2:
+        - <repo name 1>:repo_type=""        
+        - <repo name 2>:repo_type=""        
+        - "Provide repo name 2"
+
+subcommand:
+    repo:   ""
+    user:   ""
+
+arguments:
+    #1      <repo name>=""          "Repo Name"
+    #n      <repo name>=""          "Repo Name"
 
 param_gen gitee_repo_create gitee $O <<A
 OPTIONS:

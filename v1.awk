@@ -796,6 +796,13 @@ NR==3 {
 
     # print length(arg_arr) $0 2>"/dev/stderr"
 
+    # print "------------------------------------" >"/dev/stderr"
+    # for (key in option_arr) { 
+    #     print key ": " option_arr[key] > "/dev/stderr"
+    # }
+    # print "------------------------------------" >"/dev/stderr"
+
+
     if ( arg_arr[1] == "_param_list_subcmd" ) {
         for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
             debug( subcmd_arr[ i ] )
@@ -812,7 +819,20 @@ NR==3 {
         print "printf \"{\\n\""
         for (i=1; i<=option_id_list[ LEN ]; ++i) {
             option_id       = option_id_list[ i ]
-            print "printf \"  \\\"%s\\\": \\\"%s\\\"\\n\" "  quote_string( option_id )  " " quote_string( "" )
+            option_argc     = option_arr[ option_id KSEP LEN ] # 是否会变成环境变量？
+            oparr_string    = ""
+
+            for ( j=1; j<=option_argc; ++j ) {
+                op_arr_len = option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP LEN ]
+                for ( k=2; k<=op_arr_len; ++k ) {
+                    oparr_string = oparr_string option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP k ] ", "
+                }
+            }
+
+            # TODO: Need to determine if it is an option with argument
+            oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
+            print "printf \"  \\\"%s\\\": [ %s ]\\n\" "  quote_string( option_id )  " " quote_string( oparr_string )
+
             # TODO: "$( eval advise_map[ option_id ])"
             # TODO: parse_type( "" )
         }
@@ -826,7 +846,15 @@ NR==3 {
 
         for (i=1; i <= rest_option_id_list[ LEN ]; ++i) {
             option_id       = rest_option_id_list[ i ]
-            print "printf \"  \\\"%s\\\": \\\"%s\\\"\\n\" "  quote_string( option_id )  " " quote_string( "" )
+            oparr_string    = ""
+
+            op_arr_len = option_arr[ option_id KSEP OPTARG_OPARR KSEP LEN ]
+            for ( k=2; k<=op_arr_len; ++k ) {
+                oparr_string = oparr_string option_arr[ option_id KSEP OPTARG_OPARR KSEP k ] ", "
+            }
+        
+            oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
+            print "printf \"  \\\"%s\\\": [ %s ]\\n\" "  quote_string( option_id )  " " quote_string( oparr_string )
         }
 
         print "printf \"}\""
@@ -854,6 +882,7 @@ END {
     if (EXIT_CODE != 1) {
         handle_arguments()
         print_code()
+        print "local HELP_DOC=" quote_string(HELP_DOC) " 2>/dev/null"
         # debug(CODE)
     }
 }
