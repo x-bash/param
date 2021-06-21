@@ -39,6 +39,23 @@ A
 }
 
 work_repo(){
+    param <<A
+scope:
+    gitee   $O
+type:
+    access  =   private         public
+    repo_t  =~   "cde"   "def"
+advise:
+    repo list_repo
+    1: list_repo
+option:
+    --priviledge|-p       "Provide privilidge"
+        <priviledge_type>:access=public
+subcommand:
+    repo2            ""
+    user2            ""
+A
+
     echo "work_repo()"
 }
 
@@ -48,3 +65,4 @@ work_user(){
 
 work --repo abc -r2 abc cde repo
 work _param_help_doc
+work _param_advise_json_items
