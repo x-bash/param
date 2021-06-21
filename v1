@@ -13,7 +13,7 @@
 # }
 
 xrc dict
-xrc dict/_v0/str # TODO: fix dist bug in bash5
+xrc dict/_v0/str # TODO BUG: fix dist bug in bash5
 
 # TODO: We may need to set IFS.
 alias param='local IFS=; { eval "$(_param_main "$@")"; }'
@@ -182,7 +182,8 @@ _param_main() {
             -v ARG_SEP="$PARAM_ARG_SEP" \
             -v RS="$PARAM_RS_SEP" \
             -f "$PARAM_AWK_PATH" \
-            -v APP_NAME="work"
+            -v APP_NAME="work" # TODO BUG:  APP_NAME
+
 }
 
 

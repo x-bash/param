@@ -6,6 +6,7 @@ testcase_list="
     ./testcases/v1.test.advise.subcmd.sh
     ./testcases/v1.test.list.sh
     ./testcases/v1.test.subcmd.sh
+    ./testcases/v1.test.rest.sh
 "
 
 . ./v1

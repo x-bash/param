@@ -25,6 +25,8 @@ option:
         <repo2>:repo_t
     --priviledge|-p       "Provide privilidge"
         <priviledge_type>:access=public
+    --debug             "Open debug mode"
+        <repo>                          =FLAG
     #n  "Provide repos" <repo_name>:repo_t
 
 A
@@ -32,6 +34,7 @@ A
     echo "param repo: $repo"
     echo "param repo2: $repo2_n  $repo2_1_1 $repo2_1_2"
     echo "param priviledge: $priviledge"
+    echo "debug: $debug "
 
     # work_${PARAM_SUBCMD} "$*";
     echo "$*"

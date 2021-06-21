@@ -23,7 +23,7 @@ option:
     --repo2|-r2|m       "Provide two repo name"
         <repo1>:repo_type               =~   "abc"   "cde"   "def"
         <repo2>:repo_t
-    --priviledge|-p       "Provide privilidge"
+    --priviledge|-p     "Provide privilidge"
         <priviledge_type>:access=public
     #n  "Provide repos" <repo_name>:repo_t
 A
