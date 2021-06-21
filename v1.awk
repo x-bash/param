@@ -789,6 +789,63 @@ NR==2 {
     parse_param_dsl($0)
 }
 
+function print_helpdoc(              i, j, k, option_id, option_argc, oparr_string, ret, HELP_DOC ){
+    HELP_DOC = "Help Doc:\n"
+
+    HELP_DOC = HELP_DOC "Options:\n"    
+
+    for (i=1; i<=option_id_list[ LEN ]; ++i) {
+        option_id       = option_id_list[ i ]
+        option_argc     = option_arr[ option_id KSEP LEN ] # 是否会变成环境变量？
+        oparr_string    = ""
+
+        for ( j=1; j<=option_argc; ++j ) {
+            op_arr_len = option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP LEN ]
+            for ( k=2; k<=op_arr_len; ++k ) {
+                oparr_string = oparr_string option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP k ] ", "
+            }
+        }
+
+        # TODO: Need to determine if it is an option with argument
+        oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
+        # TODO: make it better
+        HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t\033[35m" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
+    }
+
+    for (i=1; i <= rest_option_id_list[ LEN ]; ++i) {
+        option_id       = rest_option_id_list[ i ]
+        oparr_string    = ""
+
+        op_arr_len = option_arr[ option_id KSEP OPTARG_OPARR KSEP LEN ]
+        for ( k=2; k<=op_arr_len; ++k ) {
+            oparr_string = oparr_string option_arr[ option_id KSEP OPTARG_OPARR KSEP k ] ", "
+        }
+    
+        oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
+        HELP_DOC = HELP_DOC "    " option_id " " oparr_string "\n"
+        # print "printf \"  \\\"%s\\\": [ %s ]\\n\" "  quote_string( option_id )  " " quote_string( oparr_string )
+    }
+
+    HELP_DOC = HELP_DOC "Subcommands:\n"
+
+    for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
+        debug( subcmd_arr[ i ] )
+        key = quote_string( subcmd_arr[ i ] )
+        value = quote_string( "$( " APP_NAME "_" subcmd_arr[ i ] " _param_advise_json_items " (indent + 2) " 2>/dev/null | echo \\\"\\\")"  )
+
+        HELP_DOC = HELP_DOC "    " key  "\n"
+
+        # print "printf \"  \\\"%s\\\": \\\"%s\\\"\\n\" "  key value
+    }
+    
+    # DO NOT DELETE
+    # print "local HELP_DOC=" quote_string(HELP_DOC) " 2>/dev/null"
+    # print "printf %s " " " "\$HELP_DOC"
+    # print "return 0"
+    print HELP_DOC > "/dev/stderr"
+    exit_now(1)
+}
+
 NR==3 {
     # handle arguments
     arg_arr_len = split($0, arg_arr, ARG_SEP)
@@ -864,67 +921,7 @@ NR==3 {
 
     # TODO: I don't know if it's appropriate to write here
     if ( arg_arr[1] == "_param_help_doc" ) {
-
-        indent = arg_arr[2] || 0
-
-        HELP_DOC = "Help Doc:\n"
-
-        HELP_DOC = HELP_DOC "Options:\n"    
-
-        for (i=1; i<=option_id_list[ LEN ]; ++i) {
-            option_id       = option_id_list[ i ]
-            option_argc     = option_arr[ option_id KSEP LEN ] # 是否会变成环境变量？
-            oparr_string    = ""
-
-            for ( j=1; j<=option_argc; ++j ) {
-                op_arr_len = option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP LEN ]
-                for ( k=2; k<=op_arr_len; ++k ) {
-                    oparr_string = oparr_string option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP k ] ", "
-                }
-            }
-
-            # TODO: Need to determine if it is an option with argument
-            oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
-            # TODO: make it better
-            ret = name "\t" "\033[35m" op "\t" "\033[32m" default "\t" "\033[91m" desc "\033[0m" 
-            HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t\033[35m" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
-
-            # print "printf \"  \\\"%s\\\": [ %s ]\\n\" "  quote_string( option_id )  " " quote_string( oparr_string )
-
-            # TODO: "$( eval advise_map[ option_id ])"
-            # TODO: parse_type( "" )
-        }
-
-        for (i=1; i <= rest_option_id_list[ LEN ]; ++i) {
-            option_id       = rest_option_id_list[ i ]
-            oparr_string    = ""
-
-            op_arr_len = option_arr[ option_id KSEP OPTARG_OPARR KSEP LEN ]
-            for ( k=2; k<=op_arr_len; ++k ) {
-                oparr_string = oparr_string option_arr[ option_id KSEP OPTARG_OPARR KSEP k ] ", "
-            }
-        
-            oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
-            HELP_DOC = HELP_DOC "    " option_id " " oparr_string "\n"
-            # print "printf \"  \\\"%s\\\": [ %s ]\\n\" "  quote_string( option_id )  " " quote_string( oparr_string )
-        }
-
-        HELP_DOC = HELP_DOC "Subcommands:\n"
-
-        for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
-            debug( subcmd_arr[ i ] )
-            key = quote_string( subcmd_arr[ i ] )
-            value = quote_string( "$( " APP_NAME "_" subcmd_arr[ i ] " _param_advise_json_items " (indent + 2) " 2>/dev/null | echo '')"  )
-
-            HELP_DOC = HELP_DOC "    " key  "\n"
-
-            # print "printf \"  \\\"%s\\\": \\\"%s\\\"\\n\" "  key value
-        }
-        
-        print "local HELP_DOC=" quote_string(HELP_DOC) " 2>/dev/null"
-        print "printf %s " " " "\$HELP_DOC"
-        print "return 0"
-        exit_now(1)
+        print_helpdoc()
     } 
     
 }
