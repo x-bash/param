@@ -53,7 +53,7 @@ option:
         <priviledge_type>:access=public
 subcommand:
     repo2            ""
-    user2            ""
+    user            ""
 A
 
     echo "work_repo()"
@@ -66,3 +66,7 @@ work_user(){
 work --repo abc -r2 abc cde repo
 work _param_help_doc
 work _param_advise_json_items
+work_user _param_advise_json_items
+
+
+

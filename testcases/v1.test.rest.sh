@@ -26,7 +26,6 @@ option:
     --priviledge|-p       "Provide privilidge"
         <priviledge_type>:access=public
     --debug             "Open debug mode"
-        <repo>                          =FLAG
     #n  "Provide repos" <repo_name>:repo_t
 
 A
@@ -48,4 +47,4 @@ work_user(){
     echo "work_user"
 }
 
-work --repo abc -r2 abc cde cde
+work --repo abc --debug -r2 abc cde cde 

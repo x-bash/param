@@ -870,19 +870,21 @@ NR==3 {
         print "printf \"{\\n\""
         for (i=1; i<=option_id_list[ LEN ]; ++i) {
             option_id       = option_id_list[ i ]
-            option_argc     = option_arr[ option_id KSEP LEN ] # 是否会变成环境变量？
-            oparr_string    = ""
+            option_argc     = option_arr[ option_id KSEP LEN ]
 
             for ( j=1; j<=option_argc; ++j ) {
+                oparr_string    = ""
+                m_arg           = ""
                 op_arr_len = option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP LEN ]
                 for ( k=2; k<=op_arr_len; ++k ) {
                     oparr_string = oparr_string "\"" option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP k ] "\"" ", "
                 }
-            }
 
-            # TODO: Need to determine if it is an option with argument
-            oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
-            print "printf \"  \\\"%s\\\": [ %s ], \\n\" "  quote_string( option_id )  " " quote_string( oparr_string )
+                # TODO: Need to determine if it is an option with argument
+                if (option_argc > 1) { m_arg = ":" j }
+                oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
+                print "printf \"  \\\"%s\\\": [ %s ], \\n\" "  quote_string( option_id m_arg )  " " quote_string( oparr_string )
+            }
 
             # TODO: "$( eval advise_map[ option_id ])"
             # TODO: parse_type( "" )
@@ -891,7 +893,7 @@ NR==3 {
         for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
             # debug( subcmd_arr[ i ] )
             key = quote_string( subcmd_arr[ i ] )
-            # print "$( " APP_NAME "_" subcmd_arr[ i ] " _param_advise_json_items " (indent + 2) " 2>/dev/null | echo '')" > "/dev/stderr"
+
             # TODO BUG: 
             value = quote_string( "$( " APP_NAME "_" subcmd_arr[ i ] " _param_advise_json_items " (indent + 2) " 2>/dev/null || echo '"hello"')"  )
             print "printf \"  \\\"%s\\\": %s \\n\" "  key " " value
