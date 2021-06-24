@@ -44,4 +44,13 @@ work_user(){
     echo "work_user"
 }
 
-work _param_advise_json_items
+# TODO: is different ??
+assert_stdout "work _param_advise_json_items" <<A
+{
+  "--repo:-r": [ "abc", "cde", "def" ],
+  "--repo2:-r2:m:1": [ "abc", "cde", "def" ],
+  "--repo2:-r2:m:2": [ "cde", "def" ],
+  "--priviledge:-p": [  ],
+  "#n": [ "cde", "def" ]
+}
+A

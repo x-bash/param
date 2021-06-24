@@ -35,7 +35,6 @@ c${arg_sep}arg1${dict_sep}1${dict_sep}c${arg_sep}arg2${dict_sep}11${dict_sep}c${
 A
 }
 
-# param_default clear gitee___c
 param_default put gitee/c arg1 1
 param_default put gitee/c arg2 11
 param_default put gitee/c arg3 111
