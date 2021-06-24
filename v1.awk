@@ -704,7 +704,7 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
         
         if (option_argc == 0) {
             # print code XXX=true
-            debug( "handle_arguments " option_id "\t" option_name )
+            # debug( "handle_arguments " option_id "\t" option_name )
             append_code_assignment( option_name, "true" )
         } else if (option_argc == 1) {
             i = i + 1
