@@ -807,7 +807,7 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
             oparr_string = substr(oparr_string, 1, length(oparr_string)-1) ">"
             if (oparr_string == ">") oparr_string = ""
             # TODO: make it better
-            HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t" op "\t\033[35m" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
+            HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t\033[35m" op "\t" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
         }
     }
 
@@ -823,7 +823,7 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
 
         oparr_string = substr(oparr_string, 1, length(oparr_string)-1) ">"
         if (oparr_string == ">") oparr_string = ""
-        HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t" op "\t\033[35m" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
+        HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t\033[35m" op "\t" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
     }
 
     if (subcmd_arr[ LEN ]) {
@@ -863,7 +863,7 @@ NR==3 {
             indent_str = indent_str "  "
         }
 
-        print "printf \"{\\n\""
+        ADVISE_JSON = "{\n"
         for (i=1; i<=option_id_list[ LEN ]; ++i) {
             option_id       = option_id_list[ i ]
             option_argc     = option_arr[ option_id KSEP LEN ]
@@ -881,7 +881,7 @@ NR==3 {
                 option_id_advise = option_id
 
                 gsub("\\|", ":", option_id_advise)
-                print "printf \"  %s\\\"%s\\\": [ %s ], \\n\" " quote_string( indent_str ) " " quote_string( option_id_advise m_arg )  " " quote_string( oparr_string )
+                ADVISE_JSON = ADVISE_JSON "  " indent_str "\"" option_id_advise m_arg "\": [" oparr_string "],\n"
             }
 
             # TODO: "$( eval advise_map[ option_id ])"
@@ -898,7 +898,7 @@ NR==3 {
             }
         
             oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
-            print "printf \"  %s\\\"%s\\\": [ %s ]\\n\" " quote_string( indent_str ) " "  quote_string( option_id )  " " quote_string( oparr_string )
+            ADVISE_JSON = ADVISE_JSON "  " indent_str "\"" option_id_advise m_arg "\": [" oparr_string "],\n"
         }
 
         for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
@@ -909,14 +909,15 @@ NR==3 {
             subcmd_invocation = subcmd_funcname " _param_advise_json_items " (indent + 2) " 2>/dev/null "
             subcmd_invocation = "s=$(" subcmd_invocation "); "
 
-            value = subcmd_invocation " if [ $? -eq 126 ]; then printf $s ; else printf 'null'; fi"
+            value = subcmd_invocation " if [ $? -eq 126 ]; then printf $s, ; else printf '\"\",'; fi"
             value = "$( " value  " )"
-            value = quote_string( value )
 
-            print "printf \"  %s\\\"%s\\\": %s \\n\" " quote_string( indent_str ) " "  key " " value
+            ADVISE_JSON = ADVISE_JSON indent_str "  " key ":" value "\n"
         }
 
-        print "printf \"%s}\" " quote_string( indent_str )
+        ADVISE_JSON = ADVISE_JSON indent_str "}"
+        print "local ADVISE_JSON=" quote_string(ADVISE_JSON) " 2>/dev/null"
+        print "printf %s " " " "\$ADVISE_JSON"
         print "return 126"
         exit_now(1)
     }    
