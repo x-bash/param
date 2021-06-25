@@ -788,6 +788,7 @@ NR==2 {
 }
 
 function print_helpdoc(              i, j, k, option_id, option_argc, oparr_string, ret, HELP_DOC, key ){
+
     if (option_id_list[ LEN ] > 1 || rest_option_id_list[ LEN ] > 1) {
         HELP_DOC = HELP_DOC "Options:\n"    
     }
@@ -796,6 +797,7 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
         option_id       = option_id_list[ i ]
         option_argc     = option_arr[ option_id KSEP LEN ]
 
+        HELP_DOC = HELP_DOC "  \033[36m" option_id "\t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n" 
         for ( j=1; j<=option_argc; ++j ) {
             oparr_string    = "<"
             op              = option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP 1 ]
@@ -807,7 +809,7 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
             oparr_string = substr(oparr_string, 1, length(oparr_string)-1) ">"
             if (oparr_string == ">") oparr_string = ""
             # TODO: make it better
-            HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t\033[35m" op "\t" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
+            if (op > 0) HELP_DOC = HELP_DOC "    \033[35m" op "  " oparr_string "\033[0m\n"
         }
     }
 
@@ -823,7 +825,7 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
 
         oparr_string = substr(oparr_string, 1, length(oparr_string)-1) ">"
         if (oparr_string == ">") oparr_string = ""
-        HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t\033[35m" op "\t" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
+        HELP_DOC = HELP_DOC "  \033[36m" option_id "\t\033[35m" op "\t" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
     }
 
     if (subcmd_arr[ LEN ]) {
@@ -832,7 +834,7 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
 
     for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
         key = subcmd_arr[ i ]
-        HELP_DOC = HELP_DOC "\t\033[36m" key "\t\033[91m" subcmd_map[ key ] "\033[0m\n" 
+        HELP_DOC = HELP_DOC "  \033[36m" key "\t\033[91m" subcmd_map[ key ] "\033[0m\n" 
     }
     
     print "local HELP_DOC=" quote_string(HELP_DOC) " 2>/dev/null"
