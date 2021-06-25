@@ -23,7 +23,9 @@ option:
     --repo2|-r2|m       "Provide two repo name"
         <repo1>:repo_type               =~   "abc"   "cde"   "def"
         <repo2>:repo_t
-    --priviledge|-p       "Provide privilidge"
+    --user|-u           "User name"
+        <user>:user
+    --priviledge|-p     "Provide privilidge"
         <priviledge_type>:access=public
     --debug             "Open debug mode"
     #n  "Provide repos" <repo_name>:repo_t
@@ -47,4 +49,5 @@ work_user(){
     echo "work_user"
 }
 
-work --repo abc --debug -r2 abc cde cde 
+work --repo abc --debug -u niracler -r2 abc cde cde 
+work _param_help_doc

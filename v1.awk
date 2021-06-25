@@ -578,7 +578,6 @@ function parse_param_dsl(line,
 
                 option_arr[ option_id KSEP LEN ] = j
             }
-
         }
     }
 }
@@ -789,44 +788,51 @@ NR==2 {
 }
 
 function print_helpdoc(              i, j, k, option_id, option_argc, oparr_string, ret, HELP_DOC, key ){
-    HELP_DOC = HELP_DOC "Options:\n"    
+    if (option_id_list[ LEN ] > 1 || rest_option_id_list[ LEN ] > 1) {
+        HELP_DOC = HELP_DOC "Options:\n"    
+    }
 
     for (i=1; i<=option_id_list[ LEN ]; ++i) {
         option_id       = option_id_list[ i ]
-        option_argc     = option_arr[ option_id KSEP LEN ] # 是否会变成环境变量？
-        oparr_string    = "<"
+        option_argc     = option_arr[ option_id KSEP LEN ]
 
         for ( j=1; j<=option_argc; ++j ) {
+            oparr_string    = "<"
+            op              = option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP 1 ]
             op_arr_len = option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP LEN ]
             for ( k=2; k<=op_arr_len; ++k ) {
                 oparr_string = oparr_string option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP k ] "|"
             }
-        }
 
-        oparr_string = substr(oparr_string, 1, length(oparr_string)-1) ">"
-        if (oparr_string == ">") oparr_string = ""
-        # TODO: make it better
-        HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t\033[35m" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
+            oparr_string = substr(oparr_string, 1, length(oparr_string)-1) ">"
+            if (oparr_string == ">") oparr_string = ""
+            # TODO: make it better
+            HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t" op "\t\033[35m" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
+        }
     }
 
     for (i=1; i <= rest_option_id_list[ LEN ]; ++i) {
         option_id       = rest_option_id_list[ i ]
-        oparr_string    = ""
+        op              = option_arr[ option_id KSEP OPTARG_OPARR KSEP 1 ]
+        oparr_string    = "<"
 
         op_arr_len = option_arr[ option_id KSEP OPTARG_OPARR KSEP LEN ]
         for ( k=2; k<=op_arr_len; ++k ) {
-            oparr_string = oparr_string option_arr[ option_id KSEP OPTARG_OPARR KSEP k ] ", "
+            oparr_string = oparr_string option_arr[ option_id KSEP OPTARG_OPARR KSEP k ] "|"
         }
-    
-        oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
-        HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t\033[35m" oparr_string "\033[0m\n"
+
+        oparr_string = substr(oparr_string, 1, length(oparr_string)-1) ">"
+        if (oparr_string == ">") oparr_string = ""
+        HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t" op "\t\033[35m" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
     }
 
-    HELP_DOC = HELP_DOC "Subcommands:\n"
+    if (subcmd_arr[ LEN ]) {
+        HELP_DOC = HELP_DOC "Subcommands:\n"
+    }
 
     for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
         key = subcmd_arr[ i ]
-        HELP_DOC = HELP_DOC "\t\033[36m" key "\t" subcmd_map[ key ]  "\033[0m\n" 
+        HELP_DOC = HELP_DOC "\t\033[36m" key "\t\033[91m" subcmd_map[ key ] "\033[0m\n" 
     }
     
     print "local HELP_DOC=" quote_string(HELP_DOC) " 2>/dev/null"
@@ -901,17 +907,17 @@ NR==3 {
 
             subcmd_funcname = APP_NAME "_" subcmd_arr[ i ]
             subcmd_invocation = subcmd_funcname " _param_advise_json_items " (indent + 2) " 2>/dev/null "
-            subcmd_invocation = "s=\"$(" subcmd_invocation ")\"; "
+            subcmd_invocation = "s=$(" subcmd_invocation "); "
 
-            value = subcmd_invocation " if [ $? -eq 126 ]; then printf \"$s\"; else printf '\"\"'; fi"
-            value = "\"$( " major_block  " )\""
+            value = subcmd_invocation " if [ $? -eq 126 ]; then printf $s ; else printf 'null'; fi"
+            value = "$( " value  " )"
             value = quote_string( value )
 
             print "printf \"  %s\\\"%s\\\": %s \\n\" " quote_string( indent_str ) " "  key " " value
         }
 
         print "printf \"%s}\" " quote_string( indent_str )
-        print "return 0"
+        print "return 126"
         exit_now(1)
     }    
 
