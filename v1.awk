@@ -863,7 +863,7 @@ NR==3 {
             indent_str = indent_str "  "
         }
 
-        ADVISE_JSON = "{\n"
+        ADVISE_JSON = "{ \n"
         for (i=1; i<=option_id_list[ LEN ]; ++i) {
             option_id       = option_id_list[ i ]
             option_argc     = option_arr[ option_id KSEP LEN ]
@@ -909,7 +909,7 @@ NR==3 {
             subcmd_invocation = subcmd_funcname " _param_advise_json_items " (indent + 2) " 2>/dev/null "
             subcmd_invocation = "s=$(" subcmd_invocation "); "
 
-            value = subcmd_invocation " if [ $? -eq 126 ]; then printf $s, ; else printf '\"\",'; fi"
+            value = subcmd_invocation " if [ $? -eq 126 ]; then printf $s, ; else printf 'null,'; fi"
             value = "$( " value  " )"
 
             ADVISE_JSON = ADVISE_JSON indent_str "  " key ":" value "\n"
