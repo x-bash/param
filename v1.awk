@@ -899,9 +899,15 @@ NR==3 {
             # debug( subcmd_arr[ i ] )
             key = quote_string( subcmd_arr[ i ] )
 
-            # TODO BUG: 
-            value = quote_string( "$( " APP_NAME "_" subcmd_arr[ i ] " _param_advise_json_items " (indent + 2) " 2>/dev/null || echo '""')"  )
-            print "printf \"  %s\\\"%s\\\": %s \\n\" " quote_string( indent_str ) " "   key " " value
+            subcmd_funcname = APP_NAME "_" subcmd_arr[ i ]
+            subcmd_invocation = subcmd_funcname " _param_advise_json_items " (indent + 2) " 2>/dev/null "
+            subcmd_invocation = "s=\"$(" subcmd_invocation ")\"; "
+
+            value = subcmd_invocation " if [ $? -eq 126 ]; then printf \"$s\"; else printf '\"\"'; fi"
+            value = "\"$( " major_block  " )\""
+            value = quote_string( value )
+
+            print "printf \"  %s\\\"%s\\\": %s \\n\" " quote_string( indent_str ) " "  key " " value
         }
 
         print "printf \"%s}\" " quote_string( indent_str )
