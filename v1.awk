@@ -760,7 +760,6 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
 
                 tmp = option_arr[ "#n" ] # type
                 if (tmp != "") {
-                    
                     assert("#n", "$" (j-i+1), arg_arr[j])
                 }
             }
@@ -843,6 +842,75 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
     exit_now(1)
 }
 
+# Rely on subcmd_arr. Must after 
+function generate_advise_json(      indent, indent_str,
+    i, j,
+    option_id, option_argc){
+    indent = arg_arr[2] || 0  # for recursive gen advise json
+    indent_str = ""
+    for ( i=1; i <= indent; ++i ){
+        indent_str = indent_str "  "
+    }
+
+    ADVISE_JSON = "{\n"
+    for (i=1; i<=option_id_list[ LEN ]; ++i) {
+        option_id       = option_id_list[ i ]
+        option_argc     = option_arr[ option_id KSEP LEN ]
+
+        for ( j=1; j<=option_argc; ++j ) {
+            oparr_string    = ""
+
+            oparr_keyprefix    = option_id KSEP j KSEP OPTARG_OPARR
+            op_arr_len = option_arr[ oparr_keyprefix KSEP LEN ]
+            for ( k=2; k<=op_arr_len; ++k ) {
+                oparr_string = oparr_string "\"" option_arr[ oparr_keyprefix KSEP k ] "\"" ", "
+            }
+
+            oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
+            option_id_advise = option_id
+
+            gsub("\\|", ":", option_id_advise)
+
+            if (option_argc > 1) {
+                option_id_advise = option_id_advise ":" j
+            }
+            ADVISE_JSON = ADVISE_JSON "  " indent_str "\"" option_id_advise "\": [" oparr_string "],\n"
+        }
+    }
+
+    for (i=1; i <= rest_option_id_list[ LEN ]; ++i) {
+        option_id       = rest_option_id_list[ i ]
+        oparr_string    = ""
+
+        op_arr_len = option_arr[ option_id KSEP OPTARG_OPARR KSEP LEN ]
+        for ( k=2; k<=op_arr_len; ++k ) {
+            oparr_string = oparr_string "\"" option_arr[ option_id KSEP OPTARG_OPARR KSEP k ] "\"" ", "
+        }
+    
+        oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
+        ADVISE_JSON = ADVISE_JSON "  " indent_str "\"" option_id_advise m_arg "\": [" oparr_string "],\n"
+    }
+
+    for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
+        # debug( APP_NAME )
+        key = quote_string( subcmd_arr[ i ] )
+
+        subcmd_funcname = APP_NAME "_" subcmd_arr[ i ]
+        subcmd_invocation = subcmd_funcname " _param_advise_json_items " (indent + 2) " 2>/dev/null "
+        subcmd_invocation = "s=$(" subcmd_invocation "); "
+
+        value = subcmd_invocation " if [ $? -eq 126 ]; then printf $s, ; else printf 'null,'; fi"
+        value = "$( " value  " )"
+
+        ADVISE_JSON = ADVISE_JSON indent_str "  " key ":" value "\n"
+    }
+
+    ADVISE_JSON = ADVISE_JSON indent_str "}"
+    # print "local ADVISE_JSON=" quote_string(ADVISE_JSON) " 2>/dev/null"
+    print "printf \"%s\" " quote_string(ADVISE_JSON)
+    print "return 126"
+}
+
 NR==3 {
     # handle arguments
     arg_arr_len = split($0, arg_arr, ARG_SEP)
@@ -858,69 +926,7 @@ NR==3 {
     }
 
     if ( arg_arr[1] == "_param_advise_json_items" ) {
-
-        indent = arg_arr[2] || 0  # for recursive gen advise json
-        indent_str = ""
-        for ( i=1; i <= indent; ++i ){
-            indent_str = indent_str "  "
-        }
-
-        ADVISE_JSON = "{\n"
-        for (i=1; i<=option_id_list[ LEN ]; ++i) {
-            option_id       = option_id_list[ i ]
-            option_argc     = option_arr[ option_id KSEP LEN ]
-
-            for ( j=1; j<=option_argc; ++j ) {
-                oparr_string    = ""
-                m_arg           = ""
-                op_arr_len = option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP LEN ]
-                for ( k=2; k<=op_arr_len; ++k ) {
-                    oparr_string = oparr_string "\"" option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP k ] "\"" ", "
-                }
-
-                if (option_argc > 1) { m_arg = ":" j }
-                oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
-                option_id_advise = option_id
-
-                gsub("\\|", ":", option_id_advise)
-                ADVISE_JSON = ADVISE_JSON "  " indent_str "\"" option_id_advise m_arg "\": [" oparr_string "],\n"
-            }
-
-            # TODO: "$( eval advise_map[ option_id ])"
-            # TODO: parse_type( "" )
-        }
-
-        for (i=1; i <= rest_option_id_list[ LEN ]; ++i) {
-            option_id       = rest_option_id_list[ i ]
-            oparr_string    = ""
-
-            op_arr_len = option_arr[ option_id KSEP OPTARG_OPARR KSEP LEN ]
-            for ( k=2; k<=op_arr_len; ++k ) {
-                oparr_string = oparr_string "\"" option_arr[ option_id KSEP OPTARG_OPARR KSEP k ] "\"" ", "
-            }
-        
-            oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
-            ADVISE_JSON = ADVISE_JSON "  " indent_str "\"" option_id_advise m_arg "\": [" oparr_string "],\n"
-        }
-
-        for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
-            # debug( APP_NAME )
-            key = quote_string( subcmd_arr[ i ] )
-
-            subcmd_funcname = APP_NAME "_" subcmd_arr[ i ]
-            subcmd_invocation = subcmd_funcname " _param_advise_json_items " (indent + 2) " 2>/dev/null "
-            subcmd_invocation = "s=$(" subcmd_invocation "); "
-
-            value = subcmd_invocation " if [ $? -eq 126 ]; then printf $s, ; else printf 'null,'; fi"
-            value = "$( " value  " )"
-
-            ADVISE_JSON = ADVISE_JSON indent_str "  " key ":" value "\n"
-        }
-
-        ADVISE_JSON = ADVISE_JSON indent_str "}"
-        print "local ADVISE_JSON=" quote_string(ADVISE_JSON) " 2>/dev/null"
-        print "printf %s " " " "\$ADVISE_JSON"
-        print "return 126"
+        generate_advise_json()
         exit_now(1)
     }    
 
