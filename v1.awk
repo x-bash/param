@@ -88,9 +88,9 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
             len = TOKEN_ARRAY[LEN] + 1
             tmp = substr(astr, 1, RLENGTH)
             gsub("\004", " ",   tmp)      # Unwrap
-            gsub("\003", "",    tmp)       # Unwrap
+            gsub("\003", "",    tmp)      # Unwrap
             gsub("\002", "\"",  tmp)     
-            gsub("\001", "\\",  tmp)     # Unwrap
+            gsub("\001", "\\",  tmp)      # Unwrap
             TOKEN_ARRAY[len] = tmp
             TOKEN_ARRAY[LEN] = len
             astr = substr(astr, RLENGTH+1)
@@ -112,7 +112,7 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
                 gsub("\004", " ",   tmp)      # Unwrap
                 gsub("\003", "",    tmp)      # Unwrap
                 gsub("\002", "\"",  tmp)
-                gsub("\001", "\\",  tmp)     # Unwrap
+                gsub("\001", "\\",  tmp)      # Unwrap
                 TOKEN_ARRAY[len] = TOKEN_ARRAY[len] tmp
 
                 astr = substr(astr, RLENGTH+1)
@@ -126,7 +126,6 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
 }
 
 ### Type check
-
 function join_optarg_oparr(optarg_id, 
     len, idx, result){
 
@@ -789,13 +788,12 @@ NR==2 {
     parse_param_dsl($0)
 }
 
-function print_helpdoc(              i, j, k, option_id, option_argc, oparr_string, ret, HELP_DOC ){
-    HELP_DOC = "Help Doc:\n"
+function print_helpdoc(              i, j, k, option_id, option_argc, oparr_string, ret, HELP_DOC, key ){
     HELP_DOC = HELP_DOC "Options:\n"    
 
     for (i=1; i<=option_id_list[ LEN ]; ++i) {
         option_id       = option_id_list[ i ]
-        option_argc     = option_arr[ option_id KSEP LEN ] # Does it become an environment variable? Yes
+        option_argc     = option_arr[ option_id KSEP LEN ] # 是否会变成环境变量？
         oparr_string    = "<"
 
         for ( j=1; j<=option_argc; ++j ) {
@@ -805,16 +803,10 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
             }
         }
 
-        # TODO: Need to determine if it is an option with argument
         oparr_string = substr(oparr_string, 1, length(oparr_string)-1) ">"
         if (oparr_string == ">") oparr_string = ""
         # TODO: make it better
         HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t\033[35m" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
-
-        # print "printf \"  \\\"%s\\\": [ %s ]\\n\" "  quote_string( option_id )  " " quote_string( oparr_string )
-
-        # TODO: "$( eval advise_map[ option_id ])"
-        # TODO: parse_type( "" )
     }
 
     for (i=1; i <= rest_option_id_list[ LEN ]; ++i) {
@@ -828,17 +820,13 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
     
         oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
         HELP_DOC = HELP_DOC "\t\033[36m" option_id "\t\033[35m" oparr_string "\033[0m\n"
-        # print "printf \"  \\\"%s\\\": [ %s ]\\n\" "  quote_string( option_id )  " " quote_string( oparr_string )
     }
 
     HELP_DOC = HELP_DOC "Subcommands:\n"
 
     for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
-        debug( subcmd_arr[ i ] )
-        key = quote_string( subcmd_arr[ i ] )
-        HELP_DOC = HELP_DOC "\t\033[36m" key  "\033[0m\n" 
-
-        # print "printf \"  \\\"%s\\\": \\\"%s\\\"\\n\" "  key value
+        key = subcmd_arr[ i ]
+        HELP_DOC = HELP_DOC "\t\033[36m" key "\t" subcmd_map[ key ]  "\033[0m\n" 
     }
     
     print "local HELP_DOC=" quote_string(HELP_DOC) " 2>/dev/null"
@@ -851,8 +839,6 @@ NR==3 {
     # handle arguments
     arg_arr_len = split($0, arg_arr, ARG_SEP)
     arg_arr[ LEN ] = arg_arr_len
-
-    # print length(arg_arr) $0 2>"/dev/stderr"
 
     if ( arg_arr[1] == "_param_list_subcmd" ) {
         for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
@@ -884,12 +870,9 @@ NR==3 {
                     oparr_string = oparr_string "\"" option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP k ] "\"" ", "
                 }
 
-                # TODO: Need to determine if it is an option with argument
                 if (option_argc > 1) { m_arg = ":" j }
                 oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
                 option_id_advise = option_id
-
-                
 
                 gsub("\\|", ":", option_id_advise)
                 print "printf \"  %s\\\"%s\\\": [ %s ], \\n\" " quote_string( indent_str ) " " quote_string( option_id_advise m_arg )  " " quote_string( oparr_string )
