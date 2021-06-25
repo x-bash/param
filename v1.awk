@@ -846,7 +846,8 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
 function generate_advise_json(      indent, indent_str,
     i, j,
     option_id, option_argc){
-    indent = arg_arr[2] || 2  # for recursive gen advise json
+    indent = arg_arr[2] # for recursive gen advise json
+    if (indent == "") indent = 0
     indent_str = ""
     for ( i=1; i <= indent; ++i ){
         indent_str = indent_str "  "
@@ -874,7 +875,7 @@ function generate_advise_json(      indent, indent_str,
             if (option_argc > 1) {
                 option_id_advise = option_id_advise ":" j
             }
-            ADVISE_JSON = ADVISE_JSON "\n" indent_str "\"" option_id_advise "\": [" oparr_string "],"
+            ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" option_id_advise "\": [ " oparr_string " ],"
         }
     }
 
@@ -888,27 +889,27 @@ function generate_advise_json(      indent, indent_str,
         }
     
         oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
-        ADVISE_JSON = ADVISE_JSON "\n" indent_str "\"" option_id_advise m_arg "\": [" oparr_string "],"
+        ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" option_id_advise m_arg "\": [ " oparr_string " ],"
     }
 
     for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
         # debug( APP_NAME )
         key = quote_string( subcmd_arr[ i ] )
 
-        subcmd_funcname = APP_NAME "_" subcmd_arr[ i ]
-        subcmd_invocation = subcmd_funcname " _param_advise_json_items " (indent + 2) " 2>/dev/null "
+        subcmd_funcname = "${X_CMD_ADVISE_FUNC_NAME}_" subcmd_arr[ i ]
+        subcmd_invocation = subcmd_funcname " _param_advise_json_items " (indent + 1) " 2>/dev/null "
         subcmd_invocation = "s=$(" subcmd_invocation "); "
 
         value = subcmd_invocation " if [ $? -eq 126 ]; then printf $s ; else printf 'null'; fi"
         value = "$( " value  " )"
 
-        ADVISE_JSON = ADVISE_JSON "\n" indent_str key ":" value ","
+        ADVISE_JSON = ADVISE_JSON "\n  " indent_str key ": " value ","
     }
 
     if (ADVISE_JSON != "{"){
         ADVISE_JSON = substr(ADVISE_JSON, 1, length(ADVISE_JSON)-1)
     }
-    ADVISE_JSON = ADVISE_JSON indent_str "\n}"
+    ADVISE_JSON = ADVISE_JSON "\n" indent_str "}"
 
     # print "local ADVISE_JSON=" quote_string(ADVISE_JSON) " 2>/dev/null"
     print "printf \"%s\" " quote_string(ADVISE_JSON)
