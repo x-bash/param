@@ -865,7 +865,7 @@ NR==3 {
             indent_str = indent_str "  "
         }
 
-        ADVISE_JSON = "{ \n"
+        ADVISE_JSON = "{\n"
         for (i=1; i<=option_id_list[ LEN ]; ++i) {
             option_id       = option_id_list[ i ]
             option_argc     = option_arr[ option_id KSEP LEN ]
@@ -904,7 +904,7 @@ NR==3 {
         }
 
         for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
-            # debug( subcmd_arr[ i ] )
+            # debug( APP_NAME )
             key = quote_string( subcmd_arr[ i ] )
 
             subcmd_funcname = APP_NAME "_" subcmd_arr[ i ]
