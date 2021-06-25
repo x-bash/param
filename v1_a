@@ -1,94 +1,69 @@
 # shellcheck shell=sh disable=SC2039,SC2142,SC3043
 
-# author:       Li Junhao           l@x-cmd.com    edwinjhlee.github.io
-# maintainer:   Li Junhao
+. ./v1
 
-# In what scope?
-
-# shellcheck disable=SC2139
-# param(){
-#     local name="${1:-Please provide name}"
-#     alias "${name}_param=_param_def"
-#     alias "${name}_param_type=\"O=${name} param_type\""
-# }
-
-# param should follow app.
-
-# step 1: param create new app
+param_type_unset    gitee
 
 # Using alias
-param_type    gitee     repo
+# param_type    gitee     repo
 param_type    gitee     user    =~  [A-Za-z0-9_]+
 param_type    gitee     access  =   private         public          inner-public
 
-param <<A
+work(){
+    param <<A
 scope:
     gitee   $O
 type:
     access  =   private         public
+    repo_t  =~   "cde"   "def"
 advise:
     repo list_repo
     1: list_repo
 option:
-    --repo|-r|m         "Provide repo name"
+    --repo|-r           "Provide repo name"
         <repo>:repo_type                =~   "abc"   "cde"   "def"
     --repo2|-r2|m       "Provide two repo name"
         <repo1>:repo_type               =~   "abc"   "cde"   "def"
-        <repo2>:repo_type               =~   "abc"   "cde"   "def"
-
-    --repo|-r|m     "Provide repo name"
-        <repo>:repo_type                =~   "abc"   "cde"   "def"
-
-    --repo|-r|m     "Provide repo name"
-        <repo>:repo_type="el's repo"    =~   "abc"   "cde"   "def"
-
-    #1  "Provide"
-    #2  "Provide type"
+        <repo2>:repo_t
+    --priviledge|-p       "Provide privilidge"
+        <priviledge_type>:access=public
 subcommand:
-    repo            ""
-    user            ""
+    repo            "repo subcommand"
+    user            "user subcommand"
 A
 
+    echo "param repo: $repo"
+    echo "param repo2: $repo2_n  $repo2_1_1 $repo2_1_2"
+    echo "param priviledge: $priviledge"
 
-# Good.
-function parse_into_OPTION_DETAIL(option,
-    tmp, arr) {
-        
-    option = "--repo|-r       \"Provide repo name\"     <repo>:repo_type=\"\"   "
-
-    gsub("\\\\", option, "\001")
-    gsub("\\\"", option, "\002")
-    gsub("\"", option, "\003")
-    
-    if (! match( /--[^ ]+[ ]+/), option ){
-        panic_error( "error in match" )
-    }
-    
-    option_name = substr( option, 1, RLENGTH )
-    option = substr( option, RLENGTH+1 )
-
-    arr[LEN] = 0
-    
-    while (true) {
-        if (match(/[^\"]+[ ]+/), option) #"
-        {
-            tmp = substr( option, 1, RLENGTH )
-            option = substr( option, RLENGTH+1 )
-            len = arr[ LEN ]
-            arr[ LEN ] = len + 1
-            arr[ len ] = tmp
-        } else if (match(/[^\"]+=/, option)) #"
-        {
-            tmp = substr( option, 1, RLENGTH )
-            option = substr( option, RLENGTH+1) 
-            if (match(/\"[^"]\"/, option))  #"
-            {
-                tmp = tmp substr(option, 1, RLENGTH)
-                option = substr(option, RLENGTH+1)
-            }
-        } else {
-            panic_error("Fail to parse option")
-        }        
-    }
-
+    work_${PARAM_SUBCMD} "$*"
 }
+
+work_repo(){
+    param <<A
+scope:
+    gitee   $O
+type:
+    access  =   private         public
+    repo_t  =~   "cde"   "def"
+advise:
+    repo list_repo
+    1: list_repo
+option:
+    --priviledge|-p       "Provide privilidge"
+        <priviledge_type>:access=public
+A
+
+    echo "work_repo()"
+}
+
+work_user(){
+    echo "work_user"
+}
+
+work --repo abc -r2 abc cde repo
+work _param_help_doc
+work _param_advise_json_items
+
+
+
