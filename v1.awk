@@ -841,8 +841,8 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
 
 # Rely on subcmd_arr. Must after 
 function generate_advise_json(      indent, indent_str,
-    i, j,
-    option_id, option_argc){
+    i, j, 
+    option_id, option_argc, advise_map){
     indent = arg_arr[2] # for recursive gen advise json
     if (indent == "") indent = 0
     indent_str = ""
@@ -851,9 +851,12 @@ function generate_advise_json(      indent, indent_str,
     }
 
     ADVISE_JSON = "{"
+
+    # 组装
     for (i=1; i<=advise_arr[ LEN ]; ++i) { 
         split(advise_arr[ i ] ,a)
-        ADVISE_JSON = ADVISE_JSON "\n  " a[1] ": \"#> " a[2] "\","
+        advise_map[ a[1] ] = a[2]
+        advise_is_use[ a[1] ] = false
     }
 
     for (i=1; i<=option_id_list[ LEN ]; ++i) {
@@ -878,12 +881,20 @@ function generate_advise_json(      indent, indent_str,
                 oparr_string = "[ " substr(oparr_string, 1, length(oparr_string)-2) " ],"
             } else if (op == "=~") {
                 oparr_string = "[  ],"
+                # 反查
+                optarg_name = option_arr[ option_id KSEP j KSEP OPTARG_NAME ]
+                optarg_name = substr(optarg_name, 1, length(optarg_name)-1)
+                # debug(optarg_name)
+                if ( advise_map[ optarg_name ] != "" ) {
+                    oparr_string = "\"#> " advise_map[ optarg_name ] "\","
+                    advise_is_use[ optarg_name ] = true
+                }
             }
 
+            option_id_advise = option_id
             if (option_argc > 1) {
                 option_id_advise = option_id_advise ":" j
             }
-            option_id_advise = option_id
             gsub("\\|", ":", option_id_advise)
             ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" option_id_advise "\": " oparr_string 
         }
@@ -902,8 +913,24 @@ function generate_advise_json(      indent, indent_str,
             oparr_string = "[ " substr(oparr_string, 1, length(oparr_string)-2) " ],"
         } else if (op == "=~") {
             oparr_string = "[  ],"
+            optarg_name = option_arr[ option_id KSEP OPTARG_NAME ]
+            optarg_name = substr(optarg_name, 1, length(optarg_name)-1)
+            # 反查
+            # debug(optarg_name)
+            if ( advise_map[ optarg_name ] != "" ) {
+                oparr_string = "\"#> " advise_map[ optarg_name ] "\","
+                advise_is_use[ optarg_name ] = true
+            }
         }
         ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" option_id "\": " oparr_string
+    }
+
+    ## 补充
+    for (key in advise_map) { 
+        if ( advise_is_use[ key ] != true && advise_map[ key ] != "") {
+            ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" key "\": \"#> " advise_map[key] "\","
+            # debug(key)
+        }
     }
 
     for (i=1; i <= subcmd_arr[ LEN ]; ++i) {

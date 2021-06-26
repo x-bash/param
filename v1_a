@@ -47,7 +47,7 @@ scope:
 type:
     repo_t  =  "cde"   "def"
 option:
-    --priviledge|-p       "Provide privilidge"
+    --priviledge2|-e       "Provide privilidge"
         <priviledge_type>:access
     #n  "Provide repos" <repo_name>:repo_t
 A
@@ -71,10 +71,11 @@ option:
 A
 }
 
-work --repo abc -r2 abc cde -p private repo -p private
+work --repo abc -r2 abc cde -p private repo --priviledge2 private
 work _param_help_doc
+work_repo _param_help_doc
 X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
 echo
-work_repo _param_help_doc
+
 
 
