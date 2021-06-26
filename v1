@@ -181,7 +181,7 @@ _param_main() {
     } | awk \
             -v ARG_SEP="$PARAM_ARG_SEP" \
             -v RS="$PARAM_RS_SEP" \
-            -f "$PARAM_AWK_PATH" \
+            -f "$PARAM_AWK_PATH"
 }
 
 

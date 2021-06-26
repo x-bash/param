@@ -68,7 +68,7 @@ work_user_create(){
 scope:  gitee   $O
 option:
     --username|-u       "username"
-        <priviledge_type>:access=public
+        <priviledge_type>:user
 A
 }
 
