@@ -896,7 +896,6 @@ function generate_advise_json(      indent, indent_str,
         key = quote_string( subcmd_arr[ i ] )
 
         subcmd_funcname = "${X_CMD_ADVISE_FUNC_NAME}_" subcmd_arr[ i ]
-        print subcmd_funcname >> "ddddd"
 
         subcmd_invocation = "X_CMD_ADVISE_FUNC_NAME=${X_CMD_ADVISE_FUNC_NAME}_" subcmd_arr[ i ] " "
         subcmd_invocation = subcmd_invocation subcmd_funcname " _param_advise_json_items " (indent + 1) " 2>/dev/null "
