@@ -121,13 +121,6 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
             panic_error("Fail to tokenzied following line:\n" original_astr "\n" astr)
         }
 
-        # print "#############" > "/dev/stderr"
-        # print original_astr > "/dev/stderr"
-        # print TOKEN_ARRAY[1] > "/dev/stderr"
-        # print TOKEN_ARRAY[2] > "/dev/stderr"
-        # print TOKEN_ARRAY[3] > "/dev/stderr"
-        # print "-------------" > "/dev/stderr"
-
         astr = str_trim_left(astr)
     }
 }
