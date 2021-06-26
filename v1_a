@@ -25,7 +25,7 @@ option:
         <repo1>:repo_type               =   "abc"   "cde"   "def"
         <repo2>:repo_t
     --priviledge|-p       "Provide privilidge"
-        <priviledge_type>:access
+        <priviledge_type>:access=private
     --debug             "Open debug mode"
 subcommand:
     repo            "repo subcommand"
@@ -39,7 +39,7 @@ A
 
     # TODO: There is a bug with passing parameters into subcommands
     echo "$*"
-    work_"${PARAM_SUBCMD}" "$@"
+    # work_"${PARAM_SUBCMD}" "$@"
 }
 
 work_repo(){
@@ -73,7 +73,7 @@ option:
 A
 }
 
-O=xxxx work --repo abc -r2 abc cde -p private repo --priviledge2 private
+O=xxxx work --repo abc -r2 abc cde repo --priviledge2 private
 O=xxxx work _param_help_doc
 O=xxxx work_repo _param_help_doc
 X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items

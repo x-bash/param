@@ -121,6 +121,13 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
             panic_error("Fail to tokenzied following line:\n" original_astr "\n" astr)
         }
 
+        # print "#############" > "/dev/stderr"
+        # print original_astr > "/dev/stderr"
+        # print TOKEN_ARRAY[1] > "/dev/stderr"
+        # print TOKEN_ARRAY[2] > "/dev/stderr"
+        # print TOKEN_ARRAY[3] > "/dev/stderr"
+        # print "-------------" > "/dev/stderr"
+
         astr = str_trim_left(astr)
     }
 }
@@ -371,7 +378,7 @@ function handle_optarg_declaration(optarg_definition, optarg_id,
     optarg_definition_token1 = substr( optarg_definition_token1, RLENGTH+1 )
 
     if (match( optarg_definition_token1, /^:[-_A-Za-z0-9]+/) ) {
-        optarg_type = substr( optarg_definition_token1, 2, RLENGTH ) 
+        optarg_type = substr( optarg_definition_token1, 2, RLENGTH-1 ) 
         optarg_definition_token1 = substr( optarg_definition_token1, RLENGTH+1 )
     }
 
