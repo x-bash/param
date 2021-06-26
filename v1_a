@@ -11,7 +11,7 @@ param_type    gitee     access  =   private         public          inner-public
 
 work(){
     param <<A
-scope:  gitee   $O
+scope:  gitee/$O
 type:
     access  =   private         public
     repo_t  =~  "cde"   "def"
@@ -39,7 +39,7 @@ A
 
     # TODO: There is a bug with passing parameters into subcommands
     echo "$*"
-    work_"${PARAM_SUBCMD}" "$*"
+    work_"${PARAM_SUBCMD}" "$@"
 }
 
 work_repo(){

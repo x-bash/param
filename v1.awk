@@ -737,7 +737,7 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
                 panic_error("Subcommand expected, but not found: " arg_arr[i])
             }
             append_code_assignment( "PARAM_SUBCMD", arg_arr[i] )
-            j += 1
+            i += 1
         }
 
         for (j=i; j<=arg_arr_len; ++j) {
