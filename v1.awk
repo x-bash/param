@@ -127,27 +127,31 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
 
 ### Type check
 function join_optarg_oparr(optarg_id, 
-    len, idx, result){
+    len, idx, result, oparr_keyprefix){
+
+    oparr_keyprefix = optarg_id KSEP OPTARG_OPARR
 
     result = ""
-    len = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP LEN ]
+    len = option_arr[ oparr_keyprefix KSEP LEN ]
     for (idx=1; idx<=len; ++idx) {
-        result = result " " option_arr[ optarg_id KSEP OPTARG_OPARR KSEP idx ]
+        result = result " " option_arr[ oparr_keyprefix KSEP idx ]
     }
 
     return result
 }
 
 function assert_arr_eq(optarg_id, arg_name, value, sep,
-    op_arr_len, i, idx, value_arr_len, value_arr, candidate, sw){
+    op_arr_len, i, idx, value_arr_len, value_arr, candidate, sw,
+    oparr_keyprefix){
 
-    op_arr_len = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP LEN ]
+    oparr_keyprefix = optarg_id KSEP OPTARG_OPARR
+    op_arr_len = option_arr[ oparr_keyprefix KSEP LEN ]
 
     value_arr_len = split(value, value_arr, sep)
     for (i=1; i<=value_arr_len; ++i) {
         sw = false
         for (idx=2; idx<=op_arr_len; ++idx) {
-            candidate = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP idx ]
+            candidate = option_arr[ oparr_keyprefix KSEP idx ]
             candidate = str_unquote_if_quoted( candidate )
             if ( value_arr[i] == candidate ) {
                 sw = true
@@ -163,15 +167,17 @@ function assert_arr_eq(optarg_id, arg_name, value, sep,
 }
 
 function assert_arr_regex(optarg_id, arg_name, value, sep,
-    i, value_arr_len, value_arr, sw){
+    i, value_arr_len, value_arr, sw, oparr_keyprefix){
+    
+    oparr_keyprefix = optarg_id KSEP OPTARG_OPARR
 
-    len = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP LEN ]
+    len = option_arr[ oparr_keyprefix KSEP LEN ]
 
     value_arr_len = split(value, value_arr, sep)
     for (i=1; i<=value_arr_len; ++i) {
         sw = false
         for (idx=2; idx<=len; ++idx) {
-            val = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP idx ]
+            val = option_arr[ oparr_keyprefix KSEP idx ]
             val = str_unquote_if_quoted( val )
             if (match( value_arr[i], val )) {
                 sw = true
@@ -188,9 +194,11 @@ function assert_arr_regex(optarg_id, arg_name, value, sep,
 
 # op_arg_idx # token_arr_len, token_arr, op_arg_idx,         
 function assert(optarg_id, arg_name, arg_val,
-    op, sw, idx, len, val){
+    op, sw, idx, len, val,
+    oparr_keyprefix){
 
-    op = option_arr[optarg_id KSEP OPTARG_OPARR KSEP 1 ]
+    oparr_keyprefix = optarg_id KSEP OPTARG_OPARR
+    op = option_arr[ oparr_keyprefix KSEP 1 ]
 
     if (op == "=int") {
         if (! match(arg_val, /[+-]?[0-9]+/) ) {    # float is: /[+-]?[0-9]+(.[0-9]+)?/
@@ -200,9 +208,9 @@ function assert(optarg_id, arg_name, arg_val,
         }
     } else if (op == "=") {
         sw = false
-        len = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP LEN ]
+        len = option_arr[ oparr_keyprefix KSEP LEN ]
         for (idx=2; idx<=len; ++idx) {
-            val = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP idx ]
+            val = option_arr[ oparr_keyprefix KSEP idx ]
             val = str_unquote_if_quoted( val )
             if (arg_val == val) {
                 sw = true
@@ -216,9 +224,9 @@ function assert(optarg_id, arg_name, arg_val,
         }
     } else if (op == "=~") {
         sw = false
-        len = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP LEN ]
+        len = option_arr[ oparr_keyprefix KSEP LEN ]
         for (idx=2; idx<=len; ++idx) {
-            val = option_arr[ optarg_id KSEP OPTARG_OPARR KSEP idx ]
+            val = option_arr[ oparr_keyprefix KSEP idx ]
             val = str_unquote_if_quoted( val )
             if (match(arg_val, "^"val"$")) {
                 sw = true
