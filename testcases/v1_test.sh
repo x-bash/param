@@ -1,12 +1,14 @@
 # shellcheck shell=sh disable=SC2039,SC2142,SC3043,SC1090
 
+    # ./testcases/v1.test.default.sh
+    # ./testcases/v1.test.advise.rest.sh
+    # ./testcases/v1.test.advise.subcmd.sh
+    # ./testcases/v1.test.list.sh
+    # ./testcases/v1.test.rest.sh
+
 testcase_list="
-    ./testcases/v1.test.default.sh
-    ./testcases/v1.test.advise.rest.sh
-    ./testcases/v1.test.advise.subcmd.sh
-    ./testcases/v1.test.list.sh
     ./testcases/v1.test.subcmd.sh
-    ./testcases/v1.test.rest.sh
+    
 "
 
 . ./v1
