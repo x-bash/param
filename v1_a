@@ -37,6 +37,8 @@ A
     echo "param priviledge: $priviledge"
     echo "debug: $debug "
 
+    # TODO: There is a bug with passing parameters into subcommands
+    echo "$*"
     work_"${PARAM_SUBCMD}" "$*"
 }
 

@@ -852,7 +852,7 @@ function generate_advise_json(      indent, indent_str,
 
     ADVISE_JSON = "{"
 
-    # 组装
+    # TODO: Solve the bug that there are spaces in the command
     for (i=1; i<=advise_arr[ LEN ]; ++i) { 
         split(advise_arr[ i ] ,a)
         advise_map[ a[1] ] = a[2]
