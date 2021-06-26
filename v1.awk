@@ -784,6 +784,25 @@ NR==2 {
     parse_param_dsl($0)
 }
 
+function print_helpdoc_getitem(oparr_keyprefix,
+    op, oparr_string, op_arr_len, 
+    k){
+
+    op = option_arr[ oparr_keyprefix KSEP 1 ]
+    if ( op == "" ) return ""
+
+    oparr_string    = "<"
+    op_arr_len = option_arr[ oparr_keyprefix KSEP LEN ]
+    for ( k=2; k<=op_arr_len; ++k ) {
+        oparr_string = oparr_string option_arr[ oparr_keyprefix KSEP k ] "|"
+    }
+
+    oparr_string = substr(oparr_string, 1, length(oparr_string)-1) ">"
+    if (oparr_string == ">") oparr_string = ""
+
+    return op "\t" oparr_string
+}
+
 function print_helpdoc(              i, j, k, option_id, option_argc, oparr_string, ret, HELP_DOC, key ){
 
     if (option_id_list[ LEN ] > 0 || rest_option_id_list[ LEN ] > 0) {
@@ -796,33 +815,18 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
 
         HELP_DOC = HELP_DOC "  \033[36m" option_id "\t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n" 
         for ( j=1; j<=option_argc; ++j ) {
-            oparr_string    = "<"
-            op              = option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP 1 ]
-            op_arr_len = option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP LEN ]
-            for ( k=2; k<=op_arr_len; ++k ) {
-                oparr_string = oparr_string option_arr[ option_id KSEP j KSEP OPTARG_OPARR KSEP k ] "|"
-            }
-
-            oparr_string = substr(oparr_string, 1, length(oparr_string)-1) ">"
-            if (oparr_string == ">") oparr_string = ""
-            # TODO: make it better
-            if (op > 0) HELP_DOC = HELP_DOC "    \033[35m" op "  " oparr_string "\033[0m\n"
+            oparr_keyprefix = option_id KSEP j KSEP OPTARG_OPARR
+            oparr_string = print_helpdoc_getitem(oparr_keyprefix)
+            if (oparr_string != "") HELP_DOC = HELP_DOC "    \033[35m" oparr_string "\033[0m\n"
         }
     }
 
     for (i=1; i <= rest_option_id_list[ LEN ]; ++i) {
         option_id       = rest_option_id_list[ i ]
-        op              = option_arr[ option_id KSEP OPTARG_OPARR KSEP 1 ]
-        oparr_string    = "<"
 
-        op_arr_len = option_arr[ option_id KSEP OPTARG_OPARR KSEP LEN ]
-        for ( k=2; k<=op_arr_len; ++k ) {
-            oparr_string = oparr_string option_arr[ option_id KSEP OPTARG_OPARR KSEP k ] "|"
-        }
-
-        oparr_string = substr(oparr_string, 1, length(oparr_string)-1) ">"
-        if (oparr_string == ">") oparr_string = ""
-        HELP_DOC = HELP_DOC "  \033[36m" option_id "\t\033[35m" op "\t" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
+        oparr_keyprefix = option_id KSEP OPTARG_OPARR
+        oparr_string = print_helpdoc_getitem(oparr_keyprefix)
+        HELP_DOC = HELP_DOC "  \033[36m" option_id "\t\033[35m" oparr_string " \t\033[91m" option_arr[option_id KSEP OPTION_DESC ] "\033[0m\n"
     }
 
     if (subcmd_arr[ LEN ]) {
