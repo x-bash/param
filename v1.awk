@@ -852,7 +852,8 @@ function generate_advise_json(      indent, indent_str,
 
     ADVISE_JSON = "{"
     for (i=1; i<=advise_arr[ LEN ]; ++i) { 
-        # ADVISE_JSON = ADVISE_JSON "\n  #" i ": \"#> " advise_arr[ i ] "\","
+        split(advise_arr[ i ] ,a)
+        ADVISE_JSON = ADVISE_JSON "\n  " a[1] ": \"#> " a[2] "\","
     }
 
     for (i=1; i<=option_id_list[ LEN ]; ++i) {

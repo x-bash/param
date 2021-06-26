@@ -16,8 +16,8 @@ type:
     access  =   private         public
     repo_t  =~  "cde"   "def"
 advise:
-    repo list_repo
-    1: list_repo
+    repo  list_repo
+    #1    list_repo
 option:
     --repo|-r           "Provide repo name"
         <repo>:repo_type                =~  "abc"   "cde"   "def"
