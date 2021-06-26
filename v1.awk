@@ -365,7 +365,7 @@ function handle_optarg_declaration(optarg_definition, optarg_id,
         panic_error("Unexecpted optarg declaration: \n" optarg_definition)
     }
 
-    optarg_name = substr( optarg_definition_token1, 2, RLENGTH-1 )
+    optarg_name = substr( optarg_definition_token1, 2, RLENGTH-2 )
         option_arr[ optarg_id KSEP OPTARG_NAME ] = optarg_name
 
     optarg_definition_token1 = substr( optarg_definition_token1, RLENGTH+1 )
@@ -729,40 +729,41 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
 
     check_required_option_ready()
 
-    if (i <= arg_arr_len) {
-        # if subcommand declaration exists
-        # if (0 != subcmd_arr[LEN]) {
-        if ( HAS_SUBCMD == true ) {
-            if (subcmd_map[ arg_arr[i] ] == "") {
-                panic_error("Subcommand expected, but not found: " arg_arr[i])
-            }
-            append_code_assignment( "PARAM_SUBCMD", arg_arr[i] )
-            i += 1
-        }
-
-        for (j=i; j<=arg_arr_len; ++j) {
-            tmp = tmp " " quote_string(arg_arr[j])
-        }
-        append_code("set -- " tmp)
-
-        # if (0 == subcmd_arr[LEN]) {
-        if ( HAS_SUBCMD == false ) {
-            # We will do it only if subcommand not defined.
-            for (j=i; j<=arg_arr_len; ++j) {
-                tmp = option_arr[ "#" j ] # type
-                if (tmp != "") {
-                    assert("#" i, "$" (j-i+1), arg_arr[j])
-                    continue
-                }
-
-                tmp = option_arr[ "#n" ] # type
-                if (tmp != "") {
-                    assert("#n", "$" (j-i+1), arg_arr[j])
-                }
-            }
-        }
-    } else {
+    if (i > arg_arr_len) {
         append_code("set --")
+        return
+    }
+
+    # if subcommand declaration exists
+    # if (0 != subcmd_arr[LEN]) {
+    if ( HAS_SUBCMD == true ) {
+        if (subcmd_map[ arg_arr[i] ] == "") {
+            panic_error("Subcommand expected, but not found: " arg_arr[i])
+        }
+        append_code_assignment( "PARAM_SUBCMD", arg_arr[i] )
+        i += 1
+    }
+
+    for (j=i; j<=arg_arr_len; ++j) {
+        tmp = tmp " " quote_string(arg_arr[j])
+    }
+    append_code("set -- " tmp)
+
+    # if (0 == subcmd_arr[LEN]) {
+    if ( HAS_SUBCMD == false ) {
+        # We will do it only if subcommand not defined.
+        for (j=i; j<=arg_arr_len; ++j) {
+            tmp = option_arr[ "#" j ] # type
+            if (tmp != "") {
+                assert("#" i, "$" (j-i+1), arg_arr[j])
+                continue
+            }
+
+            tmp = option_arr[ "#n" ] # type
+            if (tmp != "") {
+                assert("#n", "$" (j-i+1), arg_arr[j])
+            }
+        }
     }
 }
 
@@ -839,10 +840,36 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
     exit_now(1)
 }
 
+function generate_advise_json_value_candidates(oparr_keyprefix,
+    oparr_string, optarg_name, k, op ){
+
+    op = option_arr[ oparr_keyprefix KSEP 1 ]
+
+    oparr_string = ""
+    if (op == "=") {
+        op_arr_len = option_arr[ oparr_keyprefix KSEP LEN ]
+        for ( k=2; k<=op_arr_len; ++k ) {
+            oparr_string = oparr_string "\"" option_arr[ oparr_keyprefix KSEP k ] "\"" ", "
+        }
+        oparr_string = "[ " substr(oparr_string, 1, length(oparr_string)-2) " ],"
+    } else if (op == "=~") {
+        oparr_string = "[  ],"
+        optarg_name = option_arr[ option_id KSEP OPTARG_NAME ]
+
+        if ( advise_map[ optarg_name ] != "" ) {
+            oparr_string = "\"#> " advise_map[ optarg_name ] "\","
+            advise_map[ optarg_name ] = ""
+        }
+    }
+
+    return oparr_string
+}
+
 # Rely on subcmd_arr. Must after 
 function generate_advise_json(      indent, indent_str,
     i, j, 
-    option_id, option_argc, advise_map){
+    option_id, option_argc, advise_map,
+    option_id_advise ){
     indent = arg_arr[2] # for recursive gen advise json
     if (indent == "") indent = 0
     indent_str = ""
@@ -854,7 +881,7 @@ function generate_advise_json(      indent, indent_str,
 
     # TODO: Solve the bug that there are spaces in the command
     for (i=1; i<=advise_arr[ LEN ]; ++i) { 
-        split(advise_arr[ i ] ,a)
+        split(advise_arr[ i ], a)
         advise_map[ a[1] ] = a[2]
         advise_is_use[ a[1] ] = false
     }
@@ -868,28 +895,8 @@ function generate_advise_json(      indent, indent_str,
         }
 
         for ( j=1; j<=option_argc; ++j ) {
-            oparr_string       = ""
-            oparr_keyprefix    = option_id KSEP j KSEP OPTARG_OPARR
-            op = option_arr[ oparr_keyprefix KSEP 1 ]
-            # debug(op)
-
-            if (op == "=") {
-                op_arr_len = option_arr[ oparr_keyprefix KSEP LEN ]
-                for ( k=2; k<=op_arr_len; ++k ) {
-                    oparr_string = oparr_string "\"" option_arr[ oparr_keyprefix KSEP k ] "\"" ", "
-                }
-                oparr_string = "[ " substr(oparr_string, 1, length(oparr_string)-2) " ],"
-            } else if (op == "=~") {
-                oparr_string = "[  ],"
-                # 反查
-                optarg_name = option_arr[ option_id KSEP j KSEP OPTARG_NAME ]
-                optarg_name = substr(optarg_name, 1, length(optarg_name)-1)
-                # debug(optarg_name)
-                if ( advise_map[ optarg_name ] != "" ) {
-                    oparr_string = "\"#> " advise_map[ optarg_name ] "\","
-                    advise_is_use[ optarg_name ] = true
-                }
-            }
+            oparr_keyprefix = option_id KSEP j KSEP OPTARG_OPARR
+            oparr_string    = generate_advise_json_value_candidates(oparr_keyprefix)
 
             option_id_advise = option_id
             if (option_argc > 1) {
@@ -902,40 +909,19 @@ function generate_advise_json(      indent, indent_str,
 
     for (i=1; i <= rest_option_id_list[ LEN ]; ++i) {
         option_id       = rest_option_id_list[ i ]
-        oparr_string    = ""
         oparr_keyprefix = option_id KSEP OPTARG_OPARR
-
-        if (op == "=") {
-            op_arr_len = option_arr[ oparr_keyprefix KSEP LEN ]
-            for ( k=2; k<=op_arr_len; ++k ) {
-                oparr_string = oparr_string "\"" option_arr[ oparr_keyprefix KSEP k ] "\"" ", "
-            }
-            oparr_string = "[ " substr(oparr_string, 1, length(oparr_string)-2) " ],"
-        } else if (op == "=~") {
-            oparr_string = "[  ],"
-            optarg_name = option_arr[ option_id KSEP OPTARG_NAME ]
-            optarg_name = substr(optarg_name, 1, length(optarg_name)-1)
-            # 反查
-            # debug(optarg_name)
-            if ( advise_map[ optarg_name ] != "" ) {
-                oparr_string = "\"#> " advise_map[ optarg_name ] "\","
-                advise_is_use[ optarg_name ] = true
-            }
-        }
-        ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" option_id "\": " oparr_string
+        oparr_string    = generate_advise_json_value_candidates(oparr_keyprefix)
+        ADVISE_JSON     = ADVISE_JSON "\n" indent_str "  \"" option_id "\": " oparr_string
     }
 
-    ## 补充
     for (key in advise_map) { 
-        if ( advise_is_use[ key ] != true && advise_map[ key ] != "") {
+        if ( advise_map[ key ] != "") {
             ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" key "\": \"#> " advise_map[key] "\","
             # debug(key)
         }
     }
 
     for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
-        key = quote_string( subcmd_arr[ i ] )
-
         subcmd_funcname = "${X_CMD_ADVISE_FUNC_NAME}_" subcmd_arr[ i ]
 
         subcmd_invocation = "X_CMD_ADVISE_FUNC_NAME=${X_CMD_ADVISE_FUNC_NAME}_" subcmd_arr[ i ] " "
@@ -945,6 +931,7 @@ function generate_advise_json(      indent, indent_str,
         value = subcmd_invocation " if [ $? -eq 126 ]; then printf $s ; else printf 'null'; fi"
         value = "$( " value  " )"
 
+        key = quote_string( subcmd_arr[ i ] )
         ADVISE_JSON = ADVISE_JSON "\n  " indent_str key ": " value ","
     }
 
