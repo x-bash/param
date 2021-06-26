@@ -248,7 +248,6 @@ function assert(optarg_id, arg_name, arg_val,
     return true
 }
 
-
 function arg_typecheck_then_generate_code(optarg_id, arg_var_name, arg_val,
     def, tmp ){
 
@@ -641,7 +640,6 @@ function check_required_option_ready(       i, j, option, option_argc, option_id
             }
 
             assert(option_id KSEP 1, option_name "_" j, val)
-
             append_code_assignment( option_name "_" j, val )
         }
     }
@@ -677,7 +675,6 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
                 if (option_name == "") {
                     panic_error("option_name not found. [option_id]=" option_id " , [arg_name]=" arg_name_short " , [original arg_name]=" arg_name)
                 }
-
                 append_code_assignment( option_name, "true" )
             }
             continue
@@ -854,42 +851,58 @@ function generate_advise_json(      indent, indent_str,
     }
 
     ADVISE_JSON = "{"
+    for (i=1; i<=advise_arr[ LEN ]; ++i) { 
+        # ADVISE_JSON = ADVISE_JSON "\n  #" i ": \"#> " advise_arr[ i ] "\","
+    }
+
     for (i=1; i<=option_id_list[ LEN ]; ++i) {
         option_id       = option_id_list[ i ]
         option_argc     = option_arr[ option_id KSEP LEN ]
 
+        if (option_argc == 0) {
+            ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" option_id "\": null,"
+        }
+
         for ( j=1; j<=option_argc; ++j ) {
-            oparr_string    = ""
-
+            oparr_string       = ""
             oparr_keyprefix    = option_id KSEP j KSEP OPTARG_OPARR
-            op_arr_len = option_arr[ oparr_keyprefix KSEP LEN ]
-            for ( k=2; k<=op_arr_len; ++k ) {
-                oparr_string = oparr_string "\"" option_arr[ oparr_keyprefix KSEP k ] "\"" ", "
+            op = option_arr[ oparr_keyprefix KSEP 1 ]
+            # debug(op)
+
+            if (op == "=") {
+                op_arr_len = option_arr[ oparr_keyprefix KSEP LEN ]
+                for ( k=2; k<=op_arr_len; ++k ) {
+                    oparr_string = oparr_string "\"" option_arr[ oparr_keyprefix KSEP k ] "\"" ", "
+                }
+                oparr_string = "[ " substr(oparr_string, 1, length(oparr_string)-2) " ],"
+            } else if (op == "=~") {
+                oparr_string = "[  ],"
             }
-
-            oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
-            option_id_advise = option_id
-
-            gsub("\\|", ":", option_id_advise)
 
             if (option_argc > 1) {
                 option_id_advise = option_id_advise ":" j
             }
-            ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" option_id_advise "\": [ " oparr_string " ],"
+            option_id_advise = option_id
+            gsub("\\|", ":", option_id_advise)
+            ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" option_id_advise "\": " oparr_string 
         }
     }
 
     for (i=1; i <= rest_option_id_list[ LEN ]; ++i) {
         option_id       = rest_option_id_list[ i ]
         oparr_string    = ""
+        oparr_keyprefix = option_id KSEP OPTARG_OPARR
 
-        op_arr_len = option_arr[ option_id KSEP OPTARG_OPARR KSEP LEN ]
-        for ( k=2; k<=op_arr_len; ++k ) {
-            oparr_string = oparr_string "\"" option_arr[ option_id KSEP OPTARG_OPARR KSEP k ] "\"" ", "
+        if (op == "=") {
+            op_arr_len = option_arr[ oparr_keyprefix KSEP LEN ]
+            for ( k=2; k<=op_arr_len; ++k ) {
+                oparr_string = oparr_string "\"" option_arr[ oparr_keyprefix KSEP k ] "\"" ", "
+            }
+            oparr_string = "[ " substr(oparr_string, 1, length(oparr_string)-2) " ],"
+        } else if (op == "=~") {
+            oparr_string = "[  ],"
         }
-    
-        oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
-        ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" option_id "\": [ " oparr_string " ],"
+        ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" option_id "\": " oparr_string
     }
 
     for (i=1; i <= subcmd_arr[ LEN ]; ++i) {

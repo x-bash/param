@@ -20,12 +20,13 @@ advise:
     1: list_repo
 option:
     --repo|-r           "Provide repo name"
-        <repo>:repo_type                =~   "abc"   "cde"   "def"
+        <repo>:repo_type                =~  "abc"   "cde"   "def"
     --repo2|-r2|m       "Provide two repo name"
-        <repo1>:repo_type               =~   "abc"   "cde"   "def"
+        <repo1>:repo_type               =   "abc"   "cde"   "def"
         <repo2>:repo_t
     --priviledge|-p       "Provide privilidge"
-        <priviledge_type>:access=public
+        <priviledge_type>:access
+    --debug             "Open debug mode"
 subcommand:
     repo            "repo subcommand"
     user            "user subcommand"
@@ -34,6 +35,7 @@ A
     echo "param repo: $repo"
     echo "param repo2: $repo2_n  $repo2_1_1 $repo2_1_2"
     echo "param priviledge: $priviledge"
+    echo "debug: $debug "
 
     work_"${PARAM_SUBCMD}" "$*"
 }
@@ -43,15 +45,12 @@ work_repo(){
 scope:
     gitee   $O
 type:
-    access  =   private         public
-advise:
-    repo list_repo
+    repo_t  =  "cde"   "def"
 option:
     --priviledge|-p       "Provide privilidge"
-        <priviledge_type>:access=public
+        <priviledge_type>:access
     #n  "Provide repos" <repo_name>:repo_t
 A
-
     echo "work_repo()"
 }
 
@@ -72,7 +71,7 @@ option:
 A
 }
 
-work --repo abc -r2 abc cde repo
+work --repo abc -r2 abc cde -p private repo -p private
 work _param_help_doc
 X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
 echo
