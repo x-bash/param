@@ -9,8 +9,7 @@ param_type    gitee     access  =   private         public          inner-public
 
 work(){
     param <<A
-scope:
-    gitee   $O
+scope:  gitee/$O
 type:
     access  =   private         public
     repo_t  =~   "cde"   "def"

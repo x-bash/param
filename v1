@@ -98,13 +98,15 @@ _param_type_print(){
 ############################
 # Section 4: param default management
 
-# param_default put gitee/$O repo x-bash
-# param_default put gitee/$O user edwinjhlee
-# param_default put gitee/$O access public
+# param_default put <scope> <key> <value>
+# eg. param_default put gitee/$O repo x-bash
+# eg. param_default put gitee/$O user edwinjhlee
+# eg. param_default put gitee/$O access public
 ############################
 param_default() {
     local op="$1"
     local app_name=${2:?Provide Object}
+    shift 2
 
     local object_name=${app_name#*/}
     if [ "$object_name" = "$app_name" ]; then
@@ -113,8 +115,6 @@ param_default() {
     app_name=${app_name%%/*}
 
     local O="${PARAM_DEFAULT_VAR_PREFIX}${app_name}"
-
-    shift 2
 
     case "$op" in # yml seemed to be a better
         load)       dict_load_json "${1:?Provide path in function param_default}" ;;
@@ -184,15 +184,13 @@ _param_main() {
 }
 
 _param_get_scope(){
-    awk '{
-        if ($1 == "scope:") {
-            if ($2 == "") {
-                getline
-                print $1
-                exit 1
-            } else {
-                print $2
-            }
+    awk '"scope:"==$1{
+        if ($2 != "") {
+            print $2
+        } else {
+            getline
+            print $1
         }
+        exit 0
     }'
 }
