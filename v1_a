@@ -11,7 +11,7 @@ param_type    gitee     access  =   private         public          inner-public
 
 work(){
     param <<A
-scope:  gitee   $O
+scope:  gitee/$O
 type:
     access  =   private         public
     repo_t  =~  "cde"   "def"
@@ -37,9 +37,7 @@ A
     echo "param priviledge: $priviledge"
     echo "debug: $debug "
 
-    # TODO: There is a bug with passing parameters into subcommands
-    echo "$*"
-    work_"${PARAM_SUBCMD}" "$*"
+    shift && work_"${PARAM_SUBCMD}" "$@"
 }
 
 work_repo(){
@@ -73,9 +71,9 @@ option:
 A
 }
 
-work --repo abc -r2 abc cde -p private repo --priviledge2 private
-work _param_help_doc
-work_repo _param_help_doc
+O=xxxx work --repo abc -r2 abc cde -p private repo --priviledge2 private
+O=xxxx work _param_help_doc
+O=xxxx work_repo _param_help_doc
 X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
 echo
 
