@@ -11,11 +11,10 @@ param_type    gitee     access  =   private         public          inner-public
 
 work(){
     param <<A
-name:   work
 scope:  gitee   $O
 type:
     access  =   private         public
-    repo_t  =~   "cde"   "def"
+    repo_t  =~  "cde"   "def"
 advise:
     repo list_repo
     1: list_repo
@@ -36,7 +35,7 @@ A
     echo "param repo2: $repo2_n  $repo2_1_1 $repo2_1_2"
     echo "param priviledge: $priviledge"
 
-    work_${PARAM_SUBCMD} "$*"
+    work_"${PARAM_SUBCMD}" "$*"
 }
 
 work_repo(){
@@ -45,25 +44,38 @@ scope:
     gitee   $O
 type:
     access  =   private         public
-    repo_t  =~   "cde"   "def"
 advise:
     repo list_repo
-    1: list_repo
 option:
     --priviledge|-p       "Provide privilidge"
         <priviledge_type>:access=public
+    #n  "Provide repos" <repo_name>:repo_t
 A
 
     echo "work_repo()"
 }
 
 work_user(){
-    echo "work_user"
+    param <<A
+scope:  gitee   $O
+subcommand:
+    create          "create user"
+A
+}
+
+work_user_create(){
+    param <<A
+scope:  gitee   $O
+option:
+    --username|-u       "username"
+        <priviledge_type>:access=public
+A
 }
 
 work --repo abc -r2 abc cde repo
 work _param_help_doc
 X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
-
+echo
+work_repo _param_help_doc
 
 

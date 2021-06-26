@@ -13,7 +13,7 @@ scope:
     gitee   $O
 type:
     access  =   private         public
-    repo_t  =~   "cde"   "def"
+    repo_t  =   "cde"   "def"
 advise:
     repo list_repo
     1: list_repo
@@ -21,7 +21,7 @@ option:
     --repo|-r           "Provide repo name"
         <repo>:repo_type                =~   "abc"   "cde"   "def"
     --repo2|-r2|m       "Provide two repo name"
-        <repo1>:repo_type               =~   "abc"   "cde"   "def"
+        <repo1>:repo_type               =   "abc"   "cde"   "def"
         <repo2>:repo_t
     --priviledge|-p     "Provide privilidge"
         <priviledge_type>:access=public

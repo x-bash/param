@@ -182,8 +182,6 @@ _param_main() {
             -v ARG_SEP="$PARAM_ARG_SEP" \
             -v RS="$PARAM_RS_SEP" \
             -f "$PARAM_AWK_PATH" \
-            -v APP_NAME="$0" # TODO BUG:  APP_NAME
-
 }
 
 

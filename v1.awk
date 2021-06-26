@@ -788,7 +788,7 @@ NR==2 {
 
 function print_helpdoc(              i, j, k, option_id, option_argc, oparr_string, ret, HELP_DOC, key ){
 
-    if (option_id_list[ LEN ] > 1 || rest_option_id_list[ LEN ] > 1) {
+    if (option_id_list[ LEN ] > 0 || rest_option_id_list[ LEN ] > 0) {
         HELP_DOC = HELP_DOC "Options:\n"    
     }
 
@@ -889,15 +889,17 @@ function generate_advise_json(      indent, indent_str,
         }
     
         oparr_string = substr(oparr_string, 1, length(oparr_string)-2)
-        ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" option_id_advise m_arg "\": [ " oparr_string " ],"
+        ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" option_id "\": [ " oparr_string " ],"
     }
 
     for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
-        # debug( APP_NAME )
         key = quote_string( subcmd_arr[ i ] )
 
         subcmd_funcname = "${X_CMD_ADVISE_FUNC_NAME}_" subcmd_arr[ i ]
-        subcmd_invocation = subcmd_funcname " _param_advise_json_items " (indent + 1) " 2>/dev/null "
+        print subcmd_funcname >> "ddddd"
+
+        subcmd_invocation = "X_CMD_ADVISE_FUNC_NAME=${X_CMD_ADVISE_FUNC_NAME}_" subcmd_arr[ i ] " "
+        subcmd_invocation = subcmd_invocation subcmd_funcname " _param_advise_json_items " (indent + 1) " 2>/dev/null "
         subcmd_invocation = "s=$(" subcmd_invocation "); "
 
         value = subcmd_invocation " if [ $? -eq 126 ]; then printf $s ; else printf 'null'; fi"
