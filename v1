@@ -30,7 +30,7 @@ PARAM_RS_SEP="${DICT_SEP}"
 ############################
 # Section 2: param_marg -- Helper for param user: Handle param marg
 
-# Example
+# Example:
 # for idx in $(param_marg scope); do
 #     param_marg scope "$idx" 1
 # done
@@ -67,6 +67,7 @@ param_marg_seq(){
 ############################
 # Section 3: param type definition
 
+# Example:
 # param_type    gitee     repo
 # param_type    gitee     user    =~  [A-Za-z0-9_]+
 # param_type    gitee     access  =   private         public          inner-public
