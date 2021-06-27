@@ -152,7 +152,97 @@ A
 ############################
 # Section 5: param main
 ############################
-alias param='local IFS=; { eval "$(_param_main "$@")"; }'
+alias param='local IFS=; { eval "$(_param_main2 "$@")"; }'
+
+
+_param_main2() {
+
+    {
+        local scope
+        read -r scope
+        scope=${scope#*scope:  }
+        cat
+
+        # line 1: global types
+        _param_type_print "${scope%%/*}"
+
+        # line 2: config lines
+        printf "$PARAM_RS_SEP"
+        cat
+        
+        # line 3: running argument lines
+        local IFS
+        IFS="$PARAM_ARG_SEP"          # ARG_SEP in awk script
+        printf "$PARAM_RS_SEP%s$PARAM_RS_SEP" "$*"
+
+        # line 4: default dict
+        param_default dump_raw "$scope"
+        # printf "%s" "$PARAM_RS_SEP"
+    } | awk \
+            -v ARG_SEP="$PARAM_ARG_SEP" \
+            -v RS="$PARAM_RS_SEP" \
+            -f "$PARAM_AWK_PATH"
+}
+
+_param_get_scope2(){
+    awk '
+    {
+        if ("scope:" == $1) {
+            if ($2 != "") {
+                print $2
+            } else {
+                getline
+                print $1
+            }
+        } else {
+            print $0
+        }
+    }'
+}
+
+
+_param_main1() {
+    _param_get_scope1 | {
+        local scope
+        read -r scope
+
+        # line 1: global types
+        _param_type_print "${scope%%/*}"
+
+        # line 2: config lines
+        printf "$PARAM_RS_SEP"
+        cat
+        
+        # line 3: running argument lines
+        local IFS
+        IFS="$PARAM_ARG_SEP"          # ARG_SEP in awk script
+        printf "$PARAM_RS_SEP%s$PARAM_RS_SEP" "$*"
+
+        # line 4: default dict
+        param_default dump_raw "$scope"
+        # printf "%s" "$PARAM_RS_SEP"
+    } | awk \
+            -v ARG_SEP="$PARAM_ARG_SEP" \
+            -v RS="$PARAM_RS_SEP" \
+            -f "$PARAM_AWK_PATH"
+}
+
+_param_get_scope1(){
+    awk '
+    {
+        if ("scope:" == $1) {
+            if ($2 != "") {
+                print $2
+            } else {
+                getline
+                print $1
+            }
+        } else {
+            print $0
+        }
+    }'
+}
+
 
 _param_main() {
     {
@@ -161,6 +251,7 @@ _param_main() {
         local scope
         scope="$(echo "$src" | _param_get_scope)"
 
+        # echo "$src" >/dev/stderr
         # line 1: global types
         _param_type_print "${scope%%/*}"
 

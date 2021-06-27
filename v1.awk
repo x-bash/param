@@ -482,6 +482,8 @@ function parse_param_dsl(line,
 
         line = str_trim( line )
 
+        if (line == "") continue
+
         if (line ~ /^advise:/) {
             state = STATE_ADVISE
         } else if (line ~ /^type:/) {
