@@ -23,7 +23,7 @@ A
 work_repo(){
     param <<A
 scope:
-    gitee   $O
+    gitee/$O
 type:
     access  =   private         public
     repo_t  =~  "cde"   "def"
@@ -57,15 +57,15 @@ A
 
 work_user_create(){
     param <<A
-scope:  gitee   $O
+scope:  gitee/$O
 option:
     --username|-u       "username"
         <priviledge_type>:user
 A
 }
 
-time O=xxxx work repo --repo abc -r2 abc cde
-# time O=xxxx work _param_help_doc
+# time O=xxxx work repo --repo abc -r2 abc cde
+time O=xxxx work _param_help_doc
 # time O=xxxx work_repo _param_help_doc
 # time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
 echo
