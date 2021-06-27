@@ -154,9 +154,7 @@ A
 ############################
 alias param='local IFS=; { eval "$(_param_main2 "$@")"; }'
 
-
 _param_main2() {
-
     {
         local scope
         read -r scope
@@ -183,23 +181,6 @@ _param_main2() {
             -v RS="$PARAM_RS_SEP" \
             -f "$PARAM_AWK_PATH"
 }
-
-_param_get_scope2(){
-    awk '
-    {
-        if ("scope:" == $1) {
-            if ($2 != "") {
-                print $2
-            } else {
-                getline
-                print $1
-            }
-        } else {
-            print $0
-        }
-    }'
-}
-
 
 _param_main1() {
     _param_get_scope1 | {
