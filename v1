@@ -157,9 +157,19 @@ alias param='local IFS=; { eval "$(_param_main2 "$@")"; }'
 _param_main2() {
     {
         local scope
-        read -r scope
-        scope=${scope#*scope:  }
-        cat
+        local header
+
+        local IFS
+        read -r header scope
+
+        if [ $header != "scope:" ]; then
+            scope=
+            printf "%s\n" $header
+        else
+            if [ -z "$scope" ]; then
+                read -r scope
+            fi
+        fi
 
         # line 1: global types
         _param_type_print "${scope%%/*}"
@@ -169,7 +179,6 @@ _param_main2() {
         cat
         
         # line 3: running argument lines
-        local IFS
         IFS="$PARAM_ARG_SEP"          # ARG_SEP in awk script
         printf "$PARAM_RS_SEP%s$PARAM_RS_SEP" "$*"
 
