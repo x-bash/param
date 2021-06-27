@@ -74,7 +74,7 @@ time work_user create -u a
 # time O=xxxx work_repo --repo abc -r2 abc cde
 # time O=xxxx work_repo _param_help_doc
 # time O=xxxx work_repo _param_help_doc
-# time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
+time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
 echo
 
 
