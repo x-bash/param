@@ -790,7 +790,6 @@ NR==1 {
 
 
 NR==2 {
-    # TODO: setting default values
     parse_param_dsl($0)
 }
 

@@ -49,23 +49,30 @@ A
 
 work_user(){
     param <<A
-scope:  gitee   $O
 subcommand:
-    create          "create user"
+    create           "create user"
+    create1          "create user"
+    create2          "create user"
+    create3          "create user"
+    create4          "create user"
 A
+
+    # work_user_${PARAM_SUBCMD} "$@"
 }
 
 work_user_create(){
     param <<A
-scope:  gitee/$O
 option:
     --username|-u       "username"
         <priviledge_type>:user
 A
+    echo "$username"
 }
 
-time O=xxxx work_repo --repo abc -r2 abc cde
-time O=xxxx work_repo _param_help_doc
+time work_user create -u a
+
+# time O=xxxx work_repo --repo abc -r2 abc cde
+# time O=xxxx work_repo _param_help_doc
 # time O=xxxx work_repo _param_help_doc
 # time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
 echo

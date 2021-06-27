@@ -164,26 +164,28 @@ _param_main2() {
 
         if [ $header != "scope:" ]; then
             scope=
-            printf "%s\n" $header
+            # line 1: global types null
+            printf "$PARAM_RS_SEP%s\n" "$header"
         else
             if [ -z "$scope" ]; then
                 read -r scope
             fi
+
+            # line 1: global types
+            _param_type_print "${scope%%/*}"
+
+            # line 2: config lines
+            printf "$PARAM_RS_SEP"
         fi
 
-        # line 1: global types
-        _param_type_print "${scope%%/*}"
-
-        # line 2: config lines
-        printf "$PARAM_RS_SEP"
-        cat
+        cat 
         
         # line 3: running argument lines
         IFS="$PARAM_ARG_SEP"          # ARG_SEP in awk script
         printf "$PARAM_RS_SEP%s$PARAM_RS_SEP" "$*"
 
         # line 4: default dict
-        param_default dump_raw "$scope"
+        [ -n "$scope" ] && param_default dump_raw "$scope"
         # printf "%s" "$PARAM_RS_SEP"
     } | awk \
             -v ARG_SEP="$PARAM_ARG_SEP" \
@@ -197,7 +199,7 @@ _param_main1() {
         read -r scope
 
         # line 1: global types
-        _param_type_print "${scope%%/*}"
+        [ -n "$scope" ] && _param_type_print "${scope%%/*}"
 
         # line 2: config lines
         printf "$PARAM_RS_SEP"
@@ -209,7 +211,7 @@ _param_main1() {
         printf "$PARAM_RS_SEP%s$PARAM_RS_SEP" "$*"
 
         # line 4: default dict
-        param_default dump_raw "$scope"
+        [ -n "$scope" ] && param_default dump_raw "$scope"
         # printf "%s" "$PARAM_RS_SEP"
     } | awk \
             -v ARG_SEP="$PARAM_ARG_SEP" \
@@ -243,7 +245,7 @@ _param_main() {
 
         # echo "$src" >/dev/stderr
         # line 1: global types
-        _param_type_print "${scope%%/*}"
+        [ -n "$scope" ] && _param_type_print "${scope%%/*}"
 
         # line 2: config lines
         printf "$PARAM_RS_SEP%s$PARAM_RS_SEP" "$src"
@@ -254,7 +256,7 @@ _param_main() {
         printf "%s$PARAM_RS_SEP" "$*"
 
         # line 4: default dict
-        param_default dump_raw "$scope"
+        [ -n "$scope" ] && param_default dump_raw "$scope"
         # printf "%s" "$PARAM_RS_SEP"
     } | awk \
             -v ARG_SEP="$PARAM_ARG_SEP" \
