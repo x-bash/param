@@ -870,7 +870,7 @@ function generate_advise_json_value_candidates(oparr_keyprefix,
         optarg_name = option_arr[ option_id KSEP OPTARG_NAME ]
 
         if ( advise_map[ optarg_name ] != "" ) {
-            oparr_string = "\"#> " advise_map[ optarg_name ] "\","
+            oparr_string = "\"" advise_map[ optarg_name ] "\","
             advise_map[ optarg_name ] = ""
         }
     }
@@ -913,9 +913,8 @@ function generate_advise_json(      indent, indent_str,
 
             option_id_advise = option_id
             if (option_argc > 1) {
-                option_id_advise = option_id_advise ":" j
+                option_id_advise = option_id_advise "|" j
             }
-            gsub("\\|", ":", option_id_advise)
             ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" option_id_advise "\": " oparr_string 
         }
     }
@@ -929,7 +928,7 @@ function generate_advise_json(      indent, indent_str,
 
     for (key in advise_map) { 
         if ( advise_map[ key ] != "") {
-            ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" key "\": \"#> " advise_map[key] "\","
+            ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" key "\": \"" advise_map[key] "\","
             # debug(key)
         }
     }
