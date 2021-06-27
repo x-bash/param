@@ -17,11 +17,6 @@ subcommand:
     user            "user subcommand"
 A
 
-    echo "param repo: $repo"
-    echo "param repo2: $repo2_n  $repo2_1_1 $repo2_1_2"
-    echo "param priviledge: $priviledge"
-    echo "debug: $debug "
-
     work_"${PARAM_SUBCMD}" "$@"
 }
 
@@ -45,6 +40,10 @@ option:
         <priviledge_type>:access=private
     --debug             "Open debug mode"
 A
+    echo "param repo: $repo"
+    echo "param repo2: $repo2_n  $repo2_1_1 $repo2_1_2"
+    echo "param priviledge: $priviledge"
+    echo "debug: $debug "
     echo "work_repo()"
 }
 
@@ -65,10 +64,10 @@ option:
 A
 }
 
-time O=xxxx work --repo abc -r2 abc cde repo --priviledge2 private
-time O=xxxx work _param_help_doc
-time O=xxxx work_repo _param_help_doc
-time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
+time O=xxxx work repo --repo abc -r2 abc cde
+# time O=xxxx work _param_help_doc
+# time O=xxxx work_repo _param_help_doc
+# time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
 echo
 
 
