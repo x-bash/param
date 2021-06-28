@@ -1,6 +1,6 @@
 # shellcheck shell=sh disable=SC2039,SC2142,SC3043
 
-. ./v1
+xrc param/v1
 
 param_type_unset    gitee
 
@@ -57,7 +57,7 @@ subcommand:
     create4          "create user"
 A
 
-    # work_user_${PARAM_SUBCMD} "$@"
+    work_user_${PARAM_SUBCMD} "$@"
 }
 
 work_user_create(){
