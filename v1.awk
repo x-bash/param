@@ -866,13 +866,14 @@ function generate_advise_json_value_candidates(oparr_keyprefix,
         }
         oparr_string = "[ " substr(oparr_string, 1, length(oparr_string)-2) " ],"
     } else if (op == "=~") {
-        oparr_string = "[  ],"
         optarg_name = option_arr[ option_id KSEP OPTARG_NAME ]
-
+        oparr_string = "[  ],"
         if ( advise_map[ optarg_name ] != "" ) {
             oparr_string = "\"" advise_map[ optarg_name ] "\","
             advise_map[ optarg_name ] = ""
         }
+    } else {
+        oparr_string = "[  ],"
     }
 
     return oparr_string
@@ -889,6 +890,8 @@ function generate_advise_json(      indent, indent_str,
     for ( i=1; i <= indent; ++i ){
         indent_str = indent_str "  "
     }
+
+    debug( "hi: here works" )
 
     ADVISE_JSON = "{"
 

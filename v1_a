@@ -1,6 +1,8 @@
 # shellcheck shell=sh disable=SC2039,SC2142,SC3043
 
-xrc param/v1
+# xrc param/v1
+
+xrc ./v1
 
 param_type_unset    gitee
 
@@ -75,6 +77,7 @@ time work_user create -u a
 # time O=xxxx work_repo _param_help_doc
 # time O=xxxx work_repo _param_help_doc
 time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
+# time X_CMD_ADVISE_FUNC_NAME=work_user_create work_user_create _param_advise_json_items
 echo
 
 

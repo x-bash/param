@@ -16,8 +16,8 @@ xrc dict/_v0/str # TODO BUG: fix dist bug in bash5
 ############################
 # Section 1: Global definitions
 ############################
-PARAM_AWK_PATH="$(xrc which param/v1.awk)"
-# PARAM_AWK_PATH="./v1.awk"
+# PARAM_AWK_PATH="$(xrc which param/v1.awk)"
+PARAM_AWK_PATH="./v1.awk"
 PARAM_DEFAULT_VAR_PREFIX=___X_CMD_X_BASH_PARAM_DEFAULT___
 PARAM_TYPE_VAR_PREFIX=___X_CMD_X_BASH_PARAM_TYPE___
 
