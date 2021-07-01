@@ -699,7 +699,11 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
 
         # If option_argc == 0, op
         if (option_m == true) {
-            counter = (option_assignment_count[ option_id ] || 0) + 1
+            if (option_assignment_count[ option_id ] != "") {
+                counter = option_assignment_count[ option_id ] + 1
+            } else {
+                counter = 1
+            }
             option_assignment_count[ option_id ] = counter
             option_name = option_name "_" counter
         }
@@ -955,7 +959,6 @@ function generate_advise_json(      indent, indent_str,
     }
     ADVISE_JSON = ADVISE_JSON "\n" indent_str "}"
 
-    # print "local ADVISE_JSON=" quote_string(ADVISE_JSON) " 2>/dev/null"
     print "printf \"%s\" " quote_string(ADVISE_JSON)
     print "return 126"
 }
