@@ -119,11 +119,11 @@ time work user create -u "$mul_line_arg"
 # time O=xxxx work_repo --repo abc -r2 abc cde
 # time O=xxxx work_repo _param_help_doc
 # time O=xxxx work_repo _param_help_doc
-# time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
-# time X_CMD_ADVISE_FUNC_NAME=work_user_create work_user_create _param_advise_json_items
+# time X_CMD_ADVISE_FUNC_NAME=work work _x_cmd_advise_json
+# time X_CMD_ADVISE_FUNC_NAME=work_user_create work_user_create _x_cmd_advise_json
 
 # TODO: BUG, If the advsie command contains more than one line and more than one, get only the first
-time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
+time X_CMD_ADVISE_FUNC_NAME=work work _x_cmd_advise_json
 
 # TODO: BUG, There is a problem with multiple, as in the following example, m can only get the first and fifth
 # time O=a dingtalk_bot_send_feed_card_msg  \

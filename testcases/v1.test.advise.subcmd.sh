@@ -74,7 +74,7 @@ A
 
 work --repo abc -r2 abc cde repo
 work _param_help_doc
-X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
+X_CMD_ADVISE_FUNC_NAME=work work _x_cmd_advise_json
 echo
 work_repo _param_help_doc
 
