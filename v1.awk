@@ -891,8 +891,6 @@ function generate_advise_json(      indent, indent_str,
         indent_str = indent_str "  "
     }
 
-    debug( "hi: here works" )
-
     ADVISE_JSON = "{"
 
     # TODO: Solve the bug that there are spaces in the command
