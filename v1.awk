@@ -944,7 +944,7 @@ function generate_advise_json(      indent, indent_str,
         subcmd_funcname = "${X_CMD_ADVISE_FUNC_NAME}_" subcmd_arr[ i ]
 
         subcmd_invocation = "X_CMD_ADVISE_FUNC_NAME=${X_CMD_ADVISE_FUNC_NAME}_" subcmd_arr[ i ] " "
-        subcmd_invocation = subcmd_invocation subcmd_funcname " _param_advise_json_items " (indent + 1) " 2>/dev/null "
+        subcmd_invocation = subcmd_invocation subcmd_funcname " _x_cmd_advise_json " (indent + 1) " 2>/dev/null "
         subcmd_invocation = "s=$(" subcmd_invocation "); "
 
         value = subcmd_invocation " if [ $? -eq 126 ]; then printf $s ; else printf 'null'; fi"
@@ -977,7 +977,7 @@ NR==3 {
         exit_now(1)
     }
 
-    if ( arg_arr[1] == "_param_advise_json_items" ) {
+    if ( arg_arr[1] == "_x_cmd_advise_json" ) {
         generate_advise_json()
         exit_now(1)
     }    
