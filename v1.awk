@@ -883,7 +883,7 @@ function generate_advise_json_value_candidates(oparr_keyprefix,
 function generate_advise_json(      indent, indent_str,
     i, j, 
     option_id, option_argc, advise_map,
-    option_id_advise ){
+    option_id_advise, tmp ){
     indent = arg_arr[2] # for recursive gen advise json
     if (indent == "") indent = 0
     indent_str = ""
@@ -893,11 +893,13 @@ function generate_advise_json(      indent, indent_str,
 
     ADVISE_JSON = "{"
 
-    # TODO: Solve the bug that there are spaces in the command
     for (i=1; i<=advise_arr[ LEN ]; ++i) { 
-        split(advise_arr[ i ], a)
-        advise_map[ a[1] ] = a[2]
-        advise_is_use[ a[1] ] = false
+        split(advise_arr[ i ], tmp)
+
+        for (j=2; j<=length(tmp); ++j) {
+            advise_map[ tmp[1] ] = advise_map[ tmp[1] ] " " tmp[j]
+        }
+        advise_map[ tmp[1] ] = str_trim( advise_map[ tmp[1] ] )
     }
 
     for (i=1; i<=option_id_list[ LEN ]; ++i) {
