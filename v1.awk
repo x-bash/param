@@ -979,11 +979,17 @@ NR==3 {
         exit_now(1)
     }    
 
-    # TODO: I don't know if it's appropriate to write here
-    if ( arg_arr[1] == "_param_help_doc" ) {
-        print_helpdoc()
-    } 
-    
+    if ( "_param_help_doc" == arg_arr[1] )                              print_helpdoc()
+    if ( "help" == arg_arr[1] ) {
+        has_help_subcmd = false
+        for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
+            if ( "help" == subcmd_arr[i] )  has_help_subcmd = true
+        }
+        if (has_help_subcmd == false)                                   print_helpdoc()
+    }
+    if ( ( "--help" == arg_arr[1] ) || ( "-h" == arg_arr[1] ) ) {
+        if ("" == option_alias_2_option_id[ arg_arr[1] ])               print_helpdoc()
+    }
 }
 
 ###############################
