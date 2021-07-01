@@ -106,26 +106,24 @@ echo "body:${body}"
 }
 
 # TODO: BUG, multiple line arg is not support
-# mul_line_arg="aaa
-# bbb
-# ccc
-# "
-# time work user create -u "$mul_line_arg"
+mul_line_arg="aaa
+bbb
+ccc
+"
+time work user create -u "$mul_line_arg"
 
 # TODO: BUG, --title "Provide title" <title> can't be defined on the same line.
 # TODO: Unexecpted optarg declaration: <body | name>
-work test_one_line --title "dddd" --body "body"
+# work test_one_line --title "dddd" --body "body"
 
 # time O=xxxx work_repo --repo abc -r2 abc cde
 # time O=xxxx work_repo _param_help_doc
 # time O=xxxx work_repo _param_help_doc
-time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
+# time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
 # time X_CMD_ADVISE_FUNC_NAME=work_user_create work_user_create _param_advise_json_items
-echo
 
 # TODO: BUG, If the advsie command contains more than one line and more than one, get only the first
-# TODO: BUG, If the <name> is defined but not the type, the advise json that generates the subcommand will not get the type
-# time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
+time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
 
 # TODO: BUG, There is a problem with multiple, as in the following example, m can only get the first and fifth
 # time O=a dingtalk_bot_send_feed_card_msg  \
@@ -134,7 +132,5 @@ echo
 #     --card "test feed_card_msg3" "https://www.dingtalk.com/s?__biz=MzA4NjMwMTA2Ng==&mid=2650316842&idx=1&sn=60da3ea2b29f1dcc43a7c8e4a7c97a16&scene=2&srcid=09189AnRJEdIiWVaKltFzNTw&from=timeline&isappinstalled=0&key=&ascene=2&uin=&devicetype=android-23&version=26031933&nettype=WIFI" "https://gw.alicdn.com/tfs/TB1ayl9mpYqK1RjSZLeXXbXppXa-170-62.png" \
 #     --card "test feed_card_msg4" "https://www.dingtalk.com/s?__biz=MzA4NjMwMTA2Ng==&mid=2650316842&idx=1&sn=60da3ea2b29f1dcc43a7c8e4a7c97a16&scene=2&srcid=09189AnRJEdIiWVaKltFzNTw&from=timeline&isappinstalled=0&key=&ascene=2&uin=&devicetype=android-23&version=26031933&nettype=WIFI" "https://gw.alicdn.com/tfs/TB1ayl9mpYqK1RjSZLeXXbXppXa-170-62.png" \
 #     --card "test feed_card_msg5" "https://www.dingtalk.com/s?__biz=MzA4NjMwMTA2Ng==&mid=2650316842&idx=1&sn=60da3ea2b29f1dcc43a7c8e4a7c97a16&scene=2&srcid=09189AnRJEdIiWVaKltFzNTw&from=timeline&isappinstalled=0&key=&ascene=2&uin=&devicetype=android-23&version=26031933&nettype=WIFI" "https://gw.alicdn.com/tfs/TB1ayl9mpYqK1RjSZLeXXbXppXa-170-62.png"
-
-echo
 
 # TODO: BUG, param_marg card have bug

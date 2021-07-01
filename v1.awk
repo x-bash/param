@@ -699,7 +699,11 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
 
         # If option_argc == 0, op
         if (option_m == true) {
-            counter = (option_assignment_count[ option_id ] || 0) + 1
+            if (option_assignment_count[ option_id ] != "") {
+                counter = option_assignment_count[ option_id ] + 1
+            } else {
+                counter = 1
+            }
             option_assignment_count[ option_id ] = counter
             option_name = option_name "_" counter
         }
@@ -883,7 +887,7 @@ function generate_advise_json_value_candidates(oparr_keyprefix,
 function generate_advise_json(      indent, indent_str,
     i, j, 
     option_id, option_argc, advise_map,
-    option_id_advise ){
+    option_id_advise, tmp ){
     indent = arg_arr[2] # for recursive gen advise json
     if (indent == "") indent = 0
     indent_str = ""
@@ -891,15 +895,15 @@ function generate_advise_json(      indent, indent_str,
         indent_str = indent_str "  "
     }
 
-    # debug( "hi: here works" )
-
     ADVISE_JSON = "{"
 
-    # TODO: Solve the bug that there are spaces in the command
     for (i=1; i<=advise_arr[ LEN ]; ++i) { 
-        split(advise_arr[ i ], a)
-        advise_map[ a[1] ] = a[2]
-        advise_is_use[ a[1] ] = false
+        split(advise_arr[ i ], tmp)
+
+        for (j=2; j<=length(tmp); ++j) {
+            advise_map[ tmp[1] ] = advise_map[ tmp[1] ] " " tmp[j]
+        }
+        advise_map[ tmp[1] ] = str_trim( advise_map[ tmp[1] ] )
     }
 
     for (i=1; i<=option_id_list[ LEN ]; ++i) {
@@ -955,7 +959,6 @@ function generate_advise_json(      indent, indent_str,
     }
     ADVISE_JSON = ADVISE_JSON "\n" indent_str "}"
 
-    # print "local ADVISE_JSON=" quote_string(ADVISE_JSON) " 2>/dev/null"
     print "printf \"%s\" " quote_string(ADVISE_JSON)
     print "return 126"
 }
