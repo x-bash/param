@@ -369,7 +369,7 @@ function handle_optarg_declaration(optarg_definition, optarg_id,
     # debug( "handle_optarg_definition:\t" optarg_definition )
     # debug( "handle_optarg_declaration:\t" optarg_definition_token1 )
 
-    if (! match( optarg_definition_token1, /^<[-_A-Za-z0-9]+>/) ) {
+    if (! match( optarg_definition_token1, /^<[-_A-Za-z0-9]*>/) ) {
         panic_error("Unexecpted optarg declaration: \n" optarg_definition)
     }
 
@@ -565,6 +565,7 @@ function parse_param_dsl(line,
 
                 j = 0
                 if ( TOKEN_ARRAY[ LEN ] >= 3) {
+
                     tmp = ""
                     for (k=3; k<=TOKEN_ARRAY[LEN]; ++k) {
                         tmp = tmp " " TOKEN_ARRAY[k]

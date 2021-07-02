@@ -37,7 +37,7 @@ advise:
     #1    list_repo
 option:
     --repo|-r           "Provide repo name"
-        <repo>:repo_type                =~  "abc"   "cde"   "def"
+        <>:repo_type                =~  "abc"   "cde"   "def"
     --repo2|-r2|m       "Provide two repo name"
         <repo1>:repo_type               =   "abc"   "cde"   "def"
         <repo2>:repo_t
@@ -72,8 +72,7 @@ work_user_create(){
 scope:
     gitee/$O
 option:
-    --username|-u       "username"
-        <priviledge_type>:user
+    --username|-u  "username" <>:user
 A
     echo "$username"
 }
@@ -102,8 +101,8 @@ work_test_one_line() {
 scope:  gitee/$O
 option:
     --title        "Provide title"    <title>
+    --message|-m   "Provide message"  <>
     --body         "Provide body"     <body-name>
-    --message|-m   "Provide message"  <message>
 A
 
 echo "title:${title}"
@@ -112,13 +111,12 @@ echo "message:${message}"
 }
 
 # TODO: BUG, multiple line arg is not support
-# mul_line_arg="aaa
-# bbb
-# ccc
-# "
-# time work user create -u "$mul_line_arg"
+mul_line_arg="aaa
+bbb
+ccc
+"
+time work user create -u "$mul_line_arg"
 
-# TODO: Unexecpted optarg declaration: <body | name>
 work_test_one_line --title "dddd" --body "body" -m ssssss
 
 # time O=xxxx work_repo --repo abc -r2 abc cde
