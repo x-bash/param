@@ -369,7 +369,7 @@ function handle_optarg_declaration(optarg_definition, optarg_id,
     # debug( "handle_optarg_definition:\t" optarg_definition )
     # debug( "handle_optarg_declaration:\t" optarg_definition_token1 )
 
-    if (! match( optarg_definition_token1, /^<[-_A-Za-z0-9]+>/) ) {
+    if (! match( optarg_definition_token1, /^<[-_A-Za-z0-9]*>/) ) {
         panic_error("Unexecpted optarg declaration: \n" optarg_definition)
     }
 
@@ -526,6 +526,8 @@ function parse_param_dsl(line,
 
             } else if (state == STATE_OPTION) {
 
+                # debug( line )
+
                 if ( match(line, /^\#n[\s]*/ ) )
                 {
                     if (HAS_SUBCMD == true) {
@@ -563,9 +565,10 @@ function parse_param_dsl(line,
 
                 j = 0
                 if ( TOKEN_ARRAY[ LEN ] >= 3) {
+
                     tmp = ""
-                    for (i=3; i<=TOKEN_ARRAY[LEN]; ++i) {
-                        tmp = tmp " " TOKEN_ARRAY[i]
+                    for (k=3; k<=TOKEN_ARRAY[LEN]; ++k) {
+                        tmp = tmp " " TOKEN_ARRAY[k]
                     }
 
                     j = j + 1
@@ -575,6 +578,7 @@ function parse_param_dsl(line,
 
                 while (true) {
                     i += 1
+                    # debug("line_arr[ " i " ]" line_arr[ i ])
                     nextline = str_trim( line_arr[ i ] )
                     if ( nextline !~ /^</ ) {
                         i --
@@ -601,6 +605,8 @@ function check_required_option_ready(       i, j, option, option_argc, option_id
     for (i=1; i<=option_id_list[ LEN ]; ++i) {
         option_id       = option_id_list[ i ]
         option_m        = option_arr[ option_id KSEP OPTION_M ]
+        option_name     = option_arr[ option_id KSEP OPTION_NAME ]
+        gsub(/^--?/, "", option_name)
 
         if ( option_arr_assigned[ option_id ] == true ) {
             if (option_m == true) {
@@ -615,9 +621,6 @@ function check_required_option_ready(       i, j, option, option_argc, option_id
             continue
         }
 
-        option_name     = option_arr[ option_id KSEP OPTION_NAME ]
-        
-        gsub(/^--?/, "", option_name)
         if ( true == option_m ) {
             append_code_assignment( option_name "_n", 1 )
             option_name = option_name "_" 1
