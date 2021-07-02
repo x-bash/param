@@ -12,6 +12,18 @@ A
 cat <<A
 default scope: $O
 advise:
+    --repo|-r|m     list_repo
+option:
+    <--repo|-r|m>   "Provide repo name"     :repo_type      =~   "abc"   "cde"   "def"
+    [--repo|-r|m]   "Provide repo name"     :repo_type=""   =~   "abc"   "cde"   "def"
+argument:
+    1     <repo name>:repo_type=""    "Repo Name"
+    n     <repo name>:repo_type=""    "Repo Name"
+A
+
+cat <<A
+default scope: $O
+advise:
     repo list_repo
     1: list_repo
 option:

@@ -661,6 +661,8 @@ function check_required_option_ready(       i, j, option, option_argc, option_id
 ###############################
 function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, option_id, option_argc, count, sw) {
 
+    append_code( "local PARAM_SUBCMD" )     # Avoid the external environment influence.
+
     arg_arr_len = arg_arr[LEN]
 
     i = 1
@@ -816,7 +818,7 @@ function print_helpdoc_getitem(oparr_keyprefix,
     return op "\t" oparr_string
 }
 
-function print_helpdoc(              i, j, k, option_id, option_argc, oparr_string, ret, HELP_DOC, key ){
+function print_helpdoc(exit_code,              i, j, k, option_id, option_argc, oparr_string, ret, HELP_DOC, key ){
 
     if (option_id_list[ LEN ] > 0 || rest_option_id_list[ LEN ] > 0) {
         HELP_DOC = HELP_DOC "Options:\n"    
@@ -853,7 +855,8 @@ function print_helpdoc(              i, j, k, option_id, option_argc, oparr_stri
     
     print "local HELP_DOC=" quote_string(HELP_DOC) " 2>/dev/null"
     print "printf %s " " " "\$HELP_DOC"
-    print "return 0"
+    if (exit_code == "")    exit_code = 0
+    print "return " exit_code
     exit_now(1)
 }
 
@@ -982,16 +985,16 @@ NR==3 {
         exit_now(1)
     }    
 
-    if ( "_param_help_doc" == arg_arr[1] )                              print_helpdoc()
+    if ( "_param_help_doc" == arg_arr[1] )                              print_helpdoc(1)
     if ( "help" == arg_arr[1] ) {
         has_help_subcmd = false
         for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
             if ( "help" == subcmd_arr[i] )  has_help_subcmd = true
         }
-        if (has_help_subcmd == false)                                   print_helpdoc()
+        if (has_help_subcmd == false)                                   print_helpdoc(1)
     }
     if ( ( "--help" == arg_arr[1] ) || ( "-h" == arg_arr[1] ) ) {
-        if ("" == option_alias_2_option_id[ arg_arr[1] ])               print_helpdoc()
+        if ("" == option_alias_2_option_id[ arg_arr[1] ])               print_helpdoc(1)
     }
 }
 
