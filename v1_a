@@ -88,17 +88,21 @@ option:
             <picture-url>:url_type
 A
 
-		echo $card_1_1 # test feed_card_msg1
-		echo $card_2_1 # test feed_card_msg5
-		echo $card_3_1 #
+    IFS="
+"
+    for i in $(param_marg card); do
+        echo "title: $(param_marg_get card $i 1)"
+        echo "message-url: $(param_marg_get card $i 2)"
+        echo "picture-url: $(param_marg_get card $i 3)"
+    done
 }
 
 work_test_one_line() {
     param <<A
 scope:  gitee/$O
 option:
-    --title   "Provide title"    <title>
-    --body   "Provide title"     <body | name>
+    --title  "Provide title"    <title>
+    --body   "Provide title"    <body | name>
 A
 
 echo "title:${title}"
@@ -123,14 +127,11 @@ time work user create -u "$mul_line_arg"
 # time X_CMD_ADVISE_FUNC_NAME=work_user_create work_user_create _param_advise_json_items
 
 # TODO: BUG, If the advsie command contains more than one line and more than one, get only the first
-time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
+# time X_CMD_ADVISE_FUNC_NAME=work work _param_advise_json_items
 
-# TODO: BUG, There is a problem with multiple, as in the following example, m can only get the first and fifth
-# time O=a dingtalk_bot_send_feed_card_msg  \
+# time O=a work send  \
 #     --card "test feed_card_msg1" "https://www.dingtalk.com/s?__biz=MzA4NjMwMTA2Ng==&mid=2650316842&idx=1&sn=60da3ea2b29f1dcc43a7c8e4a7c97a16&scene=2&srcid=09189AnRJEdIiWVaKltFzNTw&from=timeline&isappinstalled=0&key=&ascene=2&uin=&devicetype=android-23&version=26031933&nettype=WIFI" "https://gw.alicdn.com/tfs/TB1ayl9mpYqK1RjSZLeXXbXppXa-170-62.png" \
 #     --card "test feed_card_msg2" "https://www.dingtalk.com/s?__biz=MzA4NjMwMTA2Ng==&mid=2650316842&idx=1&sn=60da3ea2b29f1dcc43a7c8e4a7c97a16&scene=2&srcid=09189AnRJEdIiWVaKltFzNTw&from=timeline&isappinstalled=0&key=&ascene=2&uin=&devicetype=android-23&version=26031933&nettype=WIFI" "https://gw.alicdn.com/tfs/TB1ayl9mpYqK1RjSZLeXXbXppXa-170-62.png" \
 #     --card "test feed_card_msg3" "https://www.dingtalk.com/s?__biz=MzA4NjMwMTA2Ng==&mid=2650316842&idx=1&sn=60da3ea2b29f1dcc43a7c8e4a7c97a16&scene=2&srcid=09189AnRJEdIiWVaKltFzNTw&from=timeline&isappinstalled=0&key=&ascene=2&uin=&devicetype=android-23&version=26031933&nettype=WIFI" "https://gw.alicdn.com/tfs/TB1ayl9mpYqK1RjSZLeXXbXppXa-170-62.png" \
 #     --card "test feed_card_msg4" "https://www.dingtalk.com/s?__biz=MzA4NjMwMTA2Ng==&mid=2650316842&idx=1&sn=60da3ea2b29f1dcc43a7c8e4a7c97a16&scene=2&srcid=09189AnRJEdIiWVaKltFzNTw&from=timeline&isappinstalled=0&key=&ascene=2&uin=&devicetype=android-23&version=26031933&nettype=WIFI" "https://gw.alicdn.com/tfs/TB1ayl9mpYqK1RjSZLeXXbXppXa-170-62.png" \
 #     --card "test feed_card_msg5" "https://www.dingtalk.com/s?__biz=MzA4NjMwMTA2Ng==&mid=2650316842&idx=1&sn=60da3ea2b29f1dcc43a7c8e4a7c97a16&scene=2&srcid=09189AnRJEdIiWVaKltFzNTw&from=timeline&isappinstalled=0&key=&ascene=2&uin=&devicetype=android-23&version=26031933&nettype=WIFI" "https://gw.alicdn.com/tfs/TB1ayl9mpYqK1RjSZLeXXbXppXa-170-62.png"
-
-# TODO: BUG, param_marg card have bug

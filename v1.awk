@@ -601,12 +601,11 @@ function check_required_option_ready(       i, j, option, option_argc, option_id
     for (i=1; i<=option_id_list[ LEN ]; ++i) {
         option_id       = option_id_list[ i ]
         option_m        = option_arr[ option_id KSEP OPTION_M ]
+        option_name     = option_arr[ option_id KSEP OPTION_NAME ]
+        gsub(/^--?/, "", option_name)
 
         if ( option_arr_assigned[ option_id ] == true ) {
             if (option_m == true) {
-                option_name     = option_arr[ option_id KSEP OPTION_NAME ]
-                gsub(/^--?/, "", option_name)
-                # debug( option_name "_n: " option_assignment_count[ option_id ])
                 append_code_assignment( option_name "_n",    option_assignment_count[ option_id ] )
             }
             continue
@@ -618,8 +617,6 @@ function check_required_option_ready(       i, j, option, option_argc, option_id
             continue
         }
 
-        option_name     = option_arr[ option_id KSEP OPTION_NAME ]
-        gsub(/^--?/, "", option_name)
         if ( true == option_m ) {
             append_code_assignment( option_name "_n", 1 )
             option_name = option_name "_" 1
