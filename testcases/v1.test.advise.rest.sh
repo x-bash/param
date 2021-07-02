@@ -51,7 +51,7 @@ work_user(){
 }
 
 # TODO: is different ??
-assert_stdout "work _param_advise_json_items" <<A
+assert_stdout "work _x_cmd_advise_json" <<A
 {
   "--repo:-r": [ "abc", "cde", "def" ],
   "--repo2:-r2:m:1": [ "abc", "cde", "def" ],

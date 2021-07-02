@@ -943,7 +943,7 @@ function generate_advise_json(      indent, indent_str,
         subcmd_funcname = "${X_CMD_ADVISE_FUNC_NAME}_" subcmd_arr[ i ]
 
         subcmd_invocation = "X_CMD_ADVISE_FUNC_NAME=${X_CMD_ADVISE_FUNC_NAME}_" subcmd_arr[ i ] " "
-        subcmd_invocation = subcmd_invocation subcmd_funcname " _param_advise_json_items " (indent + 1) " 2>/dev/null "
+        subcmd_invocation = subcmd_invocation subcmd_funcname " _x_cmd_advise_json " (indent + 1) " 2>/dev/null "
         subcmd_invocation = "s=$(" subcmd_invocation "); "
 
         value = subcmd_invocation " if [ $? -eq 126 ]; then printf $s ; else printf 'null'; fi"
@@ -976,16 +976,22 @@ NR==3 {
         exit_now(1)
     }
 
-    if ( arg_arr[1] == "_param_advise_json_items" ) {
+    if ( arg_arr[1] == "_x_cmd_advise_json" ) {
         generate_advise_json()
         exit_now(1)
     }    
 
-    # TODO: I don't know if it's appropriate to write here
-    if ( arg_arr[1] == "_param_help_doc" ) {
-        print_helpdoc()
-    } 
-    
+    if ( "_param_help_doc" == arg_arr[1] )                              print_helpdoc()
+    if ( "help" == arg_arr[1] ) {
+        has_help_subcmd = false
+        for (i=1; i <= subcmd_arr[ LEN ]; ++i) {
+            if ( "help" == subcmd_arr[i] )  has_help_subcmd = true
+        }
+        if (has_help_subcmd == false)                                   print_helpdoc()
+    }
+    if ( ( "--help" == arg_arr[1] ) || ( "-h" == arg_arr[1] ) ) {
+        if ("" == option_alias_2_option_id[ arg_arr[1] ])               print_helpdoc()
+    }
 }
 
 ###############################
