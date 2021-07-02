@@ -526,6 +526,8 @@ function parse_param_dsl(line,
 
             } else if (state == STATE_OPTION) {
 
+                # debug( line )
+
                 if ( match(line, /^\#n[\s]*/ ) )
                 {
                     if (HAS_SUBCMD == true) {
@@ -564,8 +566,8 @@ function parse_param_dsl(line,
                 j = 0
                 if ( TOKEN_ARRAY[ LEN ] >= 3) {
                     tmp = ""
-                    for (i=3; i<=TOKEN_ARRAY[LEN]; ++i) {
-                        tmp = tmp " " TOKEN_ARRAY[i]
+                    for (k=3; k<=TOKEN_ARRAY[LEN]; ++k) {
+                        tmp = tmp " " TOKEN_ARRAY[k]
                     }
 
                     j = j + 1
@@ -575,6 +577,7 @@ function parse_param_dsl(line,
 
                 while (true) {
                     i += 1
+                    # debug("line_arr[ " i " ]" line_arr[ i ])
                     nextline = str_trim( line_arr[ i ] )
                     if ( nextline !~ /^</ ) {
                         i --
