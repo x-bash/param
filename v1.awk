@@ -78,12 +78,13 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
     gsub(/\\\\/,    "\001", astr)
     gsub(/\\\"/,    "\002", astr) # "
     gsub("\"",      "\003", astr) # "
-    gsub(/\\\ /,     "\004", astr)
+    gsub(/\\\ /,    "\004", astr)
 
     astr = str_trim(astr)
 
     TOKEN_ARRAY[LEN] = 0
     while (length(astr) > 0){
+        
         if (match(astr, /^\003[^\003]+\003/)) {
             len = TOKEN_ARRAY[LEN] + 1
             tmp = substr(astr, 1, RLENGTH)
@@ -118,7 +119,7 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
                 astr = substr(astr, RLENGTH+1)
             }
         } else {
-            panic_error("Fail to tokenzied following line:\n" original_astr "\n" astr)
+            panic_error("Fail to tokenzied following line:\noriginal_astr:" original_astr "\nastr:" astr)
         }
 
         astr = str_trim_left(astr)
@@ -968,8 +969,14 @@ function generate_advise_json(      indent, indent_str,
 
 NR==3 {
     # handle arguments
-    arg_arr_len = split($0, arg_arr, ARG_SEP)
+    arguments = $0
+    gsub("\n", "\004", arguments)
+    arg_arr_len = split(arguments, arg_arr, ARG_SEP)
     arg_arr[ LEN ] = arg_arr_len
+
+    for (key in arg_arr) { 
+        gsub("\004", "\n", arg_arr[key])
+    }
 
     if ( arg_arr[1] == "_param_list_subcmd" ) {
         for (i=1; i <= subcmd_arr[ LEN ]; ++i) {

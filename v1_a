@@ -7,9 +7,10 @@ param_type_unset    gitee
 
 # Using alias
 # param_type    gitee     repo
-param_type    gitee     user       =~  [A-Za-z0-9_]+
-param_type    gitee     access     =   private         public          inner-public
-param_type    gitee     url_type   =~  https?://.+
+param_type    gitee     user         =~  [A-Za-z0-9_\\n]+
+param_type    gitee     access       =   private         public          inner-public
+param_type    gitee     url_type     =~  https?://.+
+param_type    gitee     atlist_type  =~  [-0-9,]+ 
 
 work(){
     param <<A
@@ -103,21 +104,21 @@ option:
     --title        "Provide title"    <title>
     --message|-m   "Provide message"  <>
     --body         "Provide body"     <body-name>
+    --at           "at somebody"      <at>:atlist_type=''
 A
 
-echo "title:${title}"
-echo "body:${body}"
-echo "message:${message}"
+    echo "title:${title}"
+    echo "body:${body}"
+    echo "message:${message}"
 }
 
-# TODO: BUG, multiple line arg is not support
 mul_line_arg="aaa
 bbb
 ccc
 "
-time work user create -u "$mul_line_arg"
+time work_user_create -u "$mul_line_arg"
 
-work_test_one_line --title "dddd" --body "body" -m ssssss
+# work_test_one_line --title "dddd" --body "body" -m ssssss
 
 # time O=xxxx work_repo --repo abc -r2 abc cde
 # time O=xxxx work_repo _param_help_doc
@@ -125,7 +126,7 @@ work_test_one_line --title "dddd" --body "body" -m ssssss
 # time X_CMD_ADVISE_FUNC_NAME=work work _x_cmd_advise_json
 # time X_CMD_ADVISE_FUNC_NAME=work_user_create work_user_create _x_cmd_advise_json
 
-# TODO: BUG, If the advsie command contains more than one line and more than one, get only the first
+# TODO: BUG, If the advsie command contains more than one line, get only the first
 # time X_CMD_ADVISE_FUNC_NAME=work work _x_cmd_advise_json
 
 # time O=a work send  \
