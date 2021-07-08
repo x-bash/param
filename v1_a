@@ -21,6 +21,8 @@ subcommand:
     user            "user subcommand"
     send            "send message"
     test_one_line   "test one line"
+options:
+    #n              "Provide number"
 A
 
     work_"${PARAM_SUBCMD}" "$@"
@@ -37,14 +39,14 @@ advise:
     repo  list_repo all
     #1    list_repo
 option:
-    --repo|-r           "Provide repo name"
-        <>:repo_type                =~  "abc"   "cde"   "def"
-    --repo2|-r2|m       "Provide two repo name"
-        <repo1>:repo_type               =   "abc"   "cde"   "def"
-        <repo2>:repo_t
-    --priviledge|-p       "Provide privilidge"
+    --repo|-r               "Provide repo name"
+        <>:repo_type                    =~  "abc"   "cde"   "def"
+    --repo2|-r2|m           "Provide two repo name"
+        <>:repo_type=""               =   "abc"   "cde"   "def"
+        <>:repo_t=
+    --priviledge|-p         "Provide privilidge"
         <priviledge_type>:access=private
-    --debug             "Open debug mode"
+    --debug                 "Open debug mode"
 A
     echo "param repo: $repo"
     echo "param repo2: $repo2_n  $repo2_1_1 $repo2_1_2"
@@ -112,11 +114,11 @@ A
     echo "message:${message}"
 }
 
-mul_line_arg="aaa
-bbb
-ccc
-"
-time work_user_create -u "$mul_line_arg"
+# mul_line_arg="aaa
+# bbb
+# ccc
+# "
+# time work_user_create -u "$mul_line_arg"
 
 # work_test_one_line --title "dddd" --body "body" -m ssssss
 
@@ -127,7 +129,7 @@ time work_user_create -u "$mul_line_arg"
 # time X_CMD_ADVISE_FUNC_NAME=work_user_create work_user_create _x_cmd_advise_json
 
 # TODO: BUG, If the advsie command contains more than one line, get only the first
-# time X_CMD_ADVISE_FUNC_NAME=work work _x_cmd_advise_json
+time X_CMD_ADVISE_FUNC_NAME=work work _x_cmd_advise_json
 
 # time O=a work send  \
 #     --card "test feed_card_msg1" "https://www.dingtalk.com/s?__biz=MzA4NjMwMTA2Ng==&mid=2650316842&idx=1&sn=60da3ea2b29f1dcc43a7c8e4a7c97a16&scene=2&srcid=09189AnRJEdIiWVaKltFzNTw&from=timeline&isappinstalled=0&key=&ascene=2&uin=&devicetype=android-23&version=26031933&nettype=WIFI" "https://gw.alicdn.com/tfs/TB1ayl9mpYqK1RjSZLeXXbXppXa-170-62.png" \

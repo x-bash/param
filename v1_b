@@ -1,0 +1,22 @@
+xrc ./v1
+
+work(){
+    param <<A
+subcommand:
+    repo            "repo subcommand"
+    user            "user subcommand"
+    send            "send message"
+    test_one_line   "test one line"
+options:
+    #n              "Provide number"
+A
+
+    echo "--------------------"
+    [ -z $PARAM_SUBCMD ] && echo "Has subcmd"
+    echo "$@"
+    echo "--------------------"
+}
+
+work repo a b c d e
+work a b c d e
+

@@ -108,7 +108,7 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
             TOKEN_ARRAY[LEN] = len
             astr = substr(astr, RLENGTH+1)
 
-            if ( match(astr, /^\003[^\003]+\003/) ) {
+            if ( match(astr, /^\003[^\003]*\003/) ) {
                 tmp = substr(astr, 1, RLENGTH)
                 gsub("\004", " ",   tmp)      # Unwrap
                 gsub("\003", "",    tmp)      # Unwrap
@@ -119,7 +119,7 @@ function tokenize_argument_into_TOKEN_ARRAY(astr,
                 astr = substr(astr, RLENGTH+1)
             }
         } else {
-            panic_error("Fail to tokenzied following line:\noriginal_astr:" original_astr "\nastr:" astr)
+            panic_error("Fail to tokenzied following line:\noriginal_astr:" original_astr "\nastr:|" astr "\ntmp: |" tmp)
         }
 
         astr = str_trim_left(astr)
@@ -321,7 +321,7 @@ BEGIN {
 
     OPTARG_OPARR = "val_oparr"
 
-    HAS_SUBCMD = -1
+    HAS_SUBCMD = false
 }
 
 function handle_option_id(option_id,            arr, arr_len, arg_name, i, sw){
@@ -508,10 +508,6 @@ function parse_param_dsl(line,
                 type_arr_add( line )
 
             } else if ( state == STATE_SUBCOMMAND ) {
-                if (HAS_SUBCMD == false) {
-                    panic_error("Subcommand and poisitional argument should not defined at the same time")
-                }
-
                 HAS_SUBCMD = true
 
                 tmp = subcmd_arr[ LEN ] + 1
@@ -531,10 +527,6 @@ function parse_param_dsl(line,
 
                 if ( match(line, /^\#n[\s]*/ ) )
                 {
-                    if (HAS_SUBCMD == true) {
-                        panic_error("Subcommand and poisitional argument should not defined at the same time")
-                    }
-                    HAS_SUBCMD = false
                     parse_param_dsl_for_all_positional_argument( line )
                     continue
                 }
@@ -758,10 +750,12 @@ function handle_arguments(          i, j, arg_name, arg_name_short, arg_val, opt
     # if (0 != subcmd_arr[LEN]) {
     if ( HAS_SUBCMD == true ) {
         if (subcmd_map[ arg_arr[i] ] == "") {
-            panic_error("Subcommand expected, but not found: " arg_arr[i])
+            # panic_error("Subcommand expected, but not found: " arg_arr[i])
+            HAS_SUBCMD = false  # No subcommand found
+        } else {
+            append_code_assignment( "PARAM_SUBCMD", arg_arr[i] )
+            i += 1
         }
-        append_code_assignment( "PARAM_SUBCMD", arg_arr[i] )
-        i += 1
     }
 
     for (j=i; j<=arg_arr_len; ++j) {
@@ -926,6 +920,15 @@ function generate_advise_json(      indent, indent_str,
             oparr_string    = generate_advise_json_value_candidates(oparr_keyprefix)
 
             option_id_advise = option_id
+
+            if ( option_arr[ option_id KSEP j KSEP OPTARG_DEFAULT ] == OPTARG_DEFAULT_REQUIRED_VALUE ) {
+                if (option_id_advise ~ /\|m$/) {
+                    option_id_advise = option_id_advise "r"
+                } else {
+                    option_id_advise = option_id_advise "|r"
+                }
+            }
+
             if (option_argc > 1) {
                 option_id_advise = option_id_advise "|" j
             }
@@ -933,6 +936,7 @@ function generate_advise_json(      indent, indent_str,
         }
     }
 
+    # Rules for rest options
     for (i=1; i <= rest_option_id_list[ LEN ]; ++i) {
         option_id       = rest_option_id_list[ i ]
         oparr_keyprefix = option_id KSEP OPTARG_OPARR
@@ -940,6 +944,7 @@ function generate_advise_json(      indent, indent_str,
         ADVISE_JSON     = ADVISE_JSON "\n" indent_str "  \"" option_id "\": " oparr_string
     }
 
+    # Rules in DSL's advise section
     for (key in advise_map) { 
         if ( advise_map[ key ] != "") {
             ADVISE_JSON = ADVISE_JSON "\n" indent_str "  \"" key "\": \"" advise_map[key] "\","
