@@ -491,11 +491,11 @@ function parse_param_dsl(line,
             state = STATE_TYPE
         } else if (line ~ /^scope:/) {
             state = STATE_SCOPE
-        } else if (line ~ /^option\s?:/) {
+        } else if (line ~ /^options?:/) {
             state = STATE_OPTION
-        } else if (line ~ /^subcommand\s?:/) {
+        } else if ( (line ~ /^subcommands?:/) || (line ~ /^subcmds?:/) ){
             state = STATE_SUBCOMMAND
-        } else if (line ~ /^argument\s?:/) {
+        } else if (line ~ /^arguments?:/) {
             state = STATE_ARGUMENT
         } else {
 
